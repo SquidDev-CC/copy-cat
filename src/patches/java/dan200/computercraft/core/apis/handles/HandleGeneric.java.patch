@@ -1,0 +1,20 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\HandleGeneric.java
++++ src\main\java\dan200\computercraft\core\apis\handles\HandleGeneric.java
+@@ -6,6 +6,8 @@
+ 
+ package dan200.computercraft.core.apis.handles;
+ 
++import cc.squiddev.cct.stub.Channel;
++import cc.squiddev.cct.stub.SeekableByteChannel;
+ import dan200.computercraft.api.lua.ILuaObject;
+ import dan200.computercraft.api.lua.LuaException;
+ import dan200.computercraft.shared.util.IoUtil;
+@@ -13,8 +15,6 @@
+ import javax.annotation.Nonnull;
+ import java.io.Closeable;
+ import java.io.IOException;
+-import java.nio.channels.Channel;
+-import java.nio.channels.SeekableByteChannel;
+ 
+ import static dan200.computercraft.core.apis.ArgumentHelper.optLong;
+ import static dan200.computercraft.core.apis.ArgumentHelper.optString;

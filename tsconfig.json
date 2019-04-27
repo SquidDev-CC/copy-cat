@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "moduleResolution": "node",
+    "target": "es6",
+    "lib": ["es2015", "dom" ],
+    "jsx": "react",
+    "jsxFactory": "h",
+    "newLine": "LF",
+    "outDir": "build/typescript",
+    "baseUrl": ".",
+
+    "forceConsistentCasingInFileNames":true,
+    "strict": true,
+    "noUnusedParameters": true,
+
+    "preserveWatchOutput": true
+  },
+  "include": [ "src/web/ts/**/*.ts", "src/web/ts/**/*.tsx" ]
+}

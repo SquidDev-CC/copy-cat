@@ -1,0 +1,29 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\OSAPI.java
++++ src\main\java\dan200\computercraft\core\apis\OSAPI.java
+@@ -283,7 +283,7 @@
+             {
+                 // time
+                 String param = optString( args, 0, "ingame" );
+-                switch( param.toLowerCase( Locale.ROOT ) )
++                switch( param.toLowerCase( ) )
+                 {
+                     case "utc":
+                     {
+@@ -311,7 +311,7 @@
+             {
+                 // day
+                 String param = optString( args, 0, "ingame" );
+-                switch( param.toLowerCase( Locale.ROOT ) )
++                switch( param.toLowerCase( ) )
+                 {
+                     case "utc":
+                     {
+@@ -359,7 +359,7 @@
+             {
+                 // epoch
+                 String param = optString( args, 0, "ingame" );
+-                switch( param.toLowerCase( Locale.ROOT ) )
++                switch( param.toLowerCase( ) )
+                 {
+                     case "utc":
+                     {

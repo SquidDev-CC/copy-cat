@@ -1,0 +1,91 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
++++ src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
+@@ -6,24 +6,16 @@
+ 
+ package dan200.computercraft.api.filesystem;
+ 
+-import dan200.computercraft.api.ComputerCraftAPI;
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import dan200.computercraft.api.peripheral.IComputerAccess;
+-import net.minecraft.world.World;
+ 
+ import javax.annotation.Nonnull;
+ import java.io.IOException;
+-import java.io.OutputStream;
+-import java.nio.channels.Channels;
+-import java.nio.channels.WritableByteChannel;
+ 
+ /**
+  * Represents a part of a virtual filesystem that can be mounted onto a computer using {@link IComputerAccess#mount(String, IMount)}
+  * or {@link IComputerAccess#mountWritable(String, IWritableMount)}, that can also be written to.
+  *
+- * Ready made implementations of this interface can be created using
+- * {@link ComputerCraftAPI#createSaveDirMount(World, String, long)}, or you're free to implement it yourselves!
+- *
+- * @see ComputerCraftAPI#createSaveDirMount(World, String, long)
+  * @see IComputerAccess#mount(String, IMount)
+  * @see IComputerAccess#mountWritable(String, IWritableMount)
+  * @see IMount
+@@ -47,58 +39,26 @@
+     void delete( @Nonnull String path ) throws IOException;
+ 
+     /**
+-     * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
++     * Opens a file with a given path, and returns a {@link WritableByteChannel} for writing to it.
+      *
+      * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
+-     * @return A stream for writing to
+-     * @throws IOException If the file could not be opened for writing.
+-     * @deprecated Use {@link #openChannelForWrite(String)} instead.
+-     */
+-    @Nonnull
+-    @Deprecated
+-    OutputStream openForWrite( @Nonnull String path ) throws IOException;
+-
+-    /**
+-     * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
+-     *
+-     * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
+      * @return A stream for writing to. If the channel implements {@link java.nio.channels.SeekableByteChannel}, one
+      * will be able to seek to arbitrary positions when using binary mode.
+      * @throws IOException If the file could not be opened for writing.
+      */
+     @Nonnull
+-    @SuppressWarnings( "deprecation" )
+-    default WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException
+-    {
+-        return Channels.newChannel( openForWrite( path ) );
+-    }
++    WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException;
+ 
+     /**
+-     * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
++     * Opens a file with a given path, and returns a {@link WritableByteChannel} for appending to it.
+      *
+      * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
+-     * @return A stream for writing to.
+-     * @throws IOException If the file could not be opened for writing.
+-     * @deprecated Use {@link #openChannelForAppend(String)} instead.
+-     */
+-    @Nonnull
+-    @Deprecated
+-    OutputStream openForAppend( @Nonnull String path ) throws IOException;
+-
+-    /**
+-     * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
+-     *
+-     * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
+      * @return A stream for writing to. If the channel implements {@link java.nio.channels.SeekableByteChannel}, one
+      * will be able to seek to arbitrary positions when using binary mode.
+      * @throws IOException If the file could not be opened for writing.
+      */
+     @Nonnull
+-    @SuppressWarnings( "deprecation" )
+-    default WritableByteChannel openChannelForAppend( @Nonnull String path ) throws IOException
+-    {
+-        return Channels.newChannel( openForAppend( path ) );
+-    }
++    WritableByteChannel openChannelForAppend(@Nonnull String path ) throws IOException;
+ 
+     /**
+      * Get the amount of free space on the mount, in bytes. You should decrease this value as the user writes to the

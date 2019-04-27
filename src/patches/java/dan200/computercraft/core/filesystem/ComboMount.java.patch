@@ -1,0 +1,47 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\ComboMount.java
++++ src\main\java\dan200\computercraft\core\filesystem\ComboMount.java
+@@ -6,12 +6,12 @@
+ 
+ package dan200.computercraft.core.filesystem;
+ 
++import cc.squiddev.cct.stub.ReadableByteChannel;
+ import dan200.computercraft.api.filesystem.IMount;
+ 
+ import javax.annotation.Nonnull;
+ import java.io.IOException;
+ import java.io.InputStream;
+-import java.nio.channels.ReadableByteChannel;
+ import java.util.ArrayList;
+ import java.util.HashSet;
+ import java.util.List;
+@@ -115,29 +115,13 @@
+ 
+     @Nonnull
+     @Override
+-    @Deprecated
+-    public InputStream openForRead( @Nonnull String path ) throws IOException
++    public ReadableByteChannel openChannelForRead(@Nonnull String path ) throws IOException
+     {
+         for( int i = m_parts.length - 1; i >= 0; --i )
+         {
+             IMount part = m_parts[i];
+             if( part.exists( path ) && !part.isDirectory( path ) )
+             {
+-                return part.openForRead( path );
+-            }
+-        }
+-        throw new IOException( "/" + path + ": No such file" );
+-    }
+-
+-    @Nonnull
+-    @Override
+-    public ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException
+-    {
+-        for( int i = m_parts.length - 1; i >= 0; --i )
+-        {
+-            IMount part = m_parts[i];
+-            if( part.exists( path ) && !part.isDirectory( path ) )
+-            {
+                 return part.openChannelForRead( path );
+             }
+         }

@@ -1,0 +1,65 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\Tracking.java
++++ src\main\java\dan200\computercraft\core\tracking\Tracking.java
+@@ -16,6 +16,7 @@
+ 
+ public final class Tracking
+ {
++    /*
+     static final AtomicInteger tracking = new AtomicInteger( 0 );
+ 
+     private static final Object lock = new Object();
+@@ -42,9 +43,11 @@
+             tracking.incrementAndGet();
+         }
+     }
++    */
+ 
+     public static void addTaskTiming( Computer computer, long time )
+     {
++        /*
+         if( tracking.get() == 0 ) return;
+ 
+         synchronized( contexts )
+@@ -52,10 +55,12 @@
+             for( TrackingContext context : contexts.values() ) context.addTaskTiming( computer, time );
+             for( Tracker tracker : trackers ) tracker.addTaskTiming( computer, time );
+         }
++        */
+     }
+ 
+     public static void addServerTiming( Computer computer, long time )
+     {
++        /*
+         if( tracking.get() == 0 ) return;
+ 
+         synchronized( contexts )
+@@ -63,10 +68,12 @@
+             for( TrackingContext context : contexts.values() ) context.addServerTiming( computer, time );
+             for( Tracker tracker : trackers ) tracker.addServerTiming( computer, time );
+         }
++        */
+     }
+ 
+     public static void addValue( Computer computer, TrackingField field, long change )
+     {
++        /*
+         if( tracking.get() == 0 ) return;
+ 
+         synchronized( lock )
+@@ -74,8 +81,10 @@
+             for( TrackingContext context : contexts.values() ) context.addValue( computer, field, change );
+             for( Tracker tracker : trackers ) tracker.addValue( computer, field, change );
+         }
++        */
+     }
+ 
++    /*
+     public static void reset()
+     {
+         synchronized( lock )
+@@ -85,4 +94,5 @@
+             tracking.set( 0 );
+         }
+     }
++    */
+ }

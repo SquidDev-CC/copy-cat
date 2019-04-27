@@ -1,0 +1,147 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
++++ src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
+@@ -6,7 +6,10 @@
+ 
+ package dan200.computercraft.core.filesystem;
+ 
+-import com.google.common.io.ByteStreams;
++import cc.squiddev.cct.stub.Channel;
++import cc.squiddev.cct.stub.ChannelHelpers;
++import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import dan200.computercraft.ComputerCraft;
+ import dan200.computercraft.api.filesystem.IFileSystem;
+ import dan200.computercraft.api.filesystem.IMount;
+@@ -19,10 +22,6 @@
+ import java.lang.ref.Reference;
+ import java.lang.ref.ReferenceQueue;
+ import java.lang.ref.WeakReference;
+-import java.nio.channels.Channel;
+-import java.nio.channels.ReadableByteChannel;
+-import java.nio.channels.WritableByteChannel;
+-import java.nio.file.AccessDeniedException;
+ import java.util.*;
+ import java.util.function.Function;
+ import java.util.regex.Pattern;
+@@ -158,7 +157,7 @@
+             }
+         }
+ 
+-        public ReadableByteChannel openForRead( String path ) throws FileSystemException
++        public ReadableByteChannel openForRead(String path ) throws FileSystemException
+         {
+             path = toLocal( path );
+             try
+@@ -221,17 +220,13 @@
+                     m_writableMount.delete( path );
+                 }
+             }
+-            catch( AccessDeniedException e )
+-            {
+-                throw new FileSystemException( "Access denied" );
+-            }
+             catch( IOException e )
+             {
+                 throw new FileSystemException( e.getMessage() );
+             }
+         }
+ 
+-        public WritableByteChannel openForWrite( String path ) throws FileSystemException
++        public WritableByteChannel openForWrite(String path ) throws FileSystemException
+         {
+             if( m_writableMount == null )
+             {
+@@ -257,10 +252,6 @@
+                     return m_writableMount.openChannelForWrite( path );
+                 }
+             }
+-            catch( AccessDeniedException e )
+-            {
+-                throw new FileSystemException( "Access denied" );
+-            }
+             catch( IOException e )
+             {
+                 throw new FileSystemException( e.getMessage() );
+@@ -297,10 +288,6 @@
+                     return m_writableMount.openChannelForAppend( path );
+                 }
+             }
+-            catch( AccessDeniedException e )
+-            {
+-                throw new FileSystemException( "Access denied" );
+-            }
+             catch( IOException e )
+             {
+                 throw new FileSystemException( e.getMessage() );
+@@ -636,12 +623,8 @@
+                  WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
+             {
+                 // Copy bytes as fast as we can
+-                ByteStreams.copy( source, destination );
++                ChannelHelpers.copy( source, destination );
+             }
+-            catch( AccessDeniedException e )
+-            {
+-                throw new FileSystemException( "Access denied" );
+-            }
+             catch( IOException e )
+             {
+                 throw new FileSystemException( e.getMessage() );
+@@ -662,7 +645,7 @@
+         }
+     }
+ 
+-    private synchronized <T extends Closeable> FileSystemWrapper<T> openFile( @Nonnull Channel channel, @Nonnull T file ) throws FileSystemException
++    private synchronized <T extends Closeable> FileSystemWrapper<T> openFile(@Nonnull Channel channel, @Nonnull T file ) throws FileSystemException
+     {
+         synchronized( m_openFiles )
+         {
+@@ -785,7 +768,7 @@
+ 
+         // Collapse the string into its component parts, removing ..'s
+         String[] parts = path.split( "/" );
+-        Stack<String> outputParts = new Stack<>();
++        List<String> outputParts = new ArrayList<>();
+         for( String part : parts )
+         {
+             if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
+@@ -798,32 +781,32 @@
+             if( part.equals( ".." ) )
+             {
+                 // .. can cancel out the last folder entered
+-                if( !outputParts.empty() )
++                if( !outputParts.isEmpty() )
+                 {
+-                    String top = outputParts.peek();
++                    String top = outputParts.get(outputParts.size() - 1);
+                     if( !top.equals( ".." ) )
+                     {
+-                        outputParts.pop();
++                        outputParts.remove(outputParts.size() - 1);
+                     }
+                     else
+                     {
+-                        outputParts.push( ".." );
++                        outputParts.add( ".." );
+                     }
+                 }
+                 else
+                 {
+-                    outputParts.push( ".." );
++                    outputParts.add( ".." );
+                 }
+             }
+             else if( part.length() >= 255 )
+             {
+                 // If part length > 255 and it is the last part
+-                outputParts.push( part.substring( 0, 255 ) );
++                outputParts.add( part.substring( 0, 255 ) );
+             }
+             else
+             {
+                 // Anything else we add to the stack
+-                outputParts.push( part );
++                outputParts.add( part );
+             }
+         }
+ 

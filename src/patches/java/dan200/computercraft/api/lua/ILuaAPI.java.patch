@@ -1,0 +1,19 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\api\lua\ILuaAPI.java
++++ src\main\java\dan200\computercraft\api\lua\ILuaAPI.java
+@@ -6,8 +6,6 @@
+ 
+ package dan200.computercraft.api.lua;
+ 
+-import dan200.computercraft.api.ComputerCraftAPI;
+-
+ /**
+  * Represents a {@link ILuaObject} which is stored as a global variable on computer startup.
+  *
+@@ -15,7 +13,6 @@
+  * to use peripherals to provide functionality to users.
+  *
+  * @see ILuaAPIFactory
+- * @see ComputerCraftAPI#registerAPIFactory(ILuaAPIFactory)
+  */
+ public interface ILuaAPI extends ILuaObject
+ {

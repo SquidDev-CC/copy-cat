@@ -1,0 +1,23 @@
+{
+  "name": "copy-cat",
+  "version": "1.0.0",
+  "description": "A ComputerCraft emulator for the web",
+  "main": "src/server/index.js",
+  "keywords": [
+    "computercraft"
+  ],
+  "author": "SquidDev",
+  "license": "MIT",
+  "dependencies": {
+    "preact": "^8.4.2",
+    "setimmediate": "^1.0.5"
+  },
+  "devDependencies": {
+    "rollup": "^1.4.1",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "tslint": "^5.13.1",
+    "typescript": "^3.3.3333",
+    "uglify-es": "github:mishoo/UglifyJS2#harmony",
+    "uglifycss": "0.0.29"
+  }
+}

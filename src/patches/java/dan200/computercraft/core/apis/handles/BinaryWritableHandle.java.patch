@@ -1,0 +1,32 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
++++ src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
+@@ -16,9 +16,8 @@
+ import java.io.Closeable;
+ import java.io.IOException;
+ import java.nio.ByteBuffer;
+-import java.nio.channels.FileChannel;
+-import java.nio.channels.SeekableByteChannel;
+-import java.nio.channels.WritableByteChannel;
++import cc.squiddev.cct.stub.SeekableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
+ 
+ public class BinaryWritableHandle extends HandleGeneric
+ {
+@@ -83,17 +82,10 @@
+                 }
+             case 1: // flush
+                 checkOpen();
+-                try
+                 {
+                     // Technically this is not needed
+-                    if( m_writer instanceof FileChannel ) ((FileChannel) m_writer).force( false );
+-
+                     return null;
+                 }
+-                catch( IOException e )
+-                {
+-                    return null;
+-                }
+             case 2: // close
+                 close();
+                 return null;

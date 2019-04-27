@@ -1,0 +1,24 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\shared\util\StringUtil.java
++++ src\main\java\dan200\computercraft\shared\util\StringUtil.java
+@@ -34,7 +34,6 @@
+ 
+     /**
+      * Translates a Stat name
+-     */
+     @SuppressWarnings( "deprecation" )
+     public static String translate( String key )
+     {
+@@ -43,12 +42,12 @@
+ 
+     /**
+      * Translates a Stat name with format args
+-     */
+     @SuppressWarnings( "deprecation" )
+     public static String translateFormatted( String key, Object... format )
+     {
+         return net.minecraft.util.text.translation.I18n.translateToLocalFormatted( key, format );
+     }
++    */
+ 
+     public static byte[] encodeString( String string )
+     {

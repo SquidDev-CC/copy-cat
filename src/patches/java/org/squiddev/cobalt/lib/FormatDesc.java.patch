@@ -1,0 +1,11 @@
+--- original\Cobalt\src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
++++ src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
+@@ -274,7 +274,7 @@
+ 			format.append('.').append(precision >= 0 ? precision : 6);
+ 			format.append((char) conversion);
+ 
+-			buf.append(String.format(format.toString(), number));
++			// buf.append(String.format(format.toString(), number));
+ 		}
+ 	}
+ 

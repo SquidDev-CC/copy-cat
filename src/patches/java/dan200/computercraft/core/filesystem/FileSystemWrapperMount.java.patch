@@ -1,0 +1,70 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
++++ src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
+@@ -6,15 +6,14 @@
+ 
+ package dan200.computercraft.core.filesystem;
+ 
++import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import dan200.computercraft.api.filesystem.IFileSystem;
+ 
+ import javax.annotation.Nonnull;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
+-import java.nio.channels.Channels;
+-import java.nio.channels.ReadableByteChannel;
+-import java.nio.channels.WritableByteChannel;
+ import java.util.Collections;
+ import java.util.List;
+ import java.util.function.Function;
+@@ -56,7 +55,7 @@
+ 
+     @Nonnull
+     @Override
+-    public ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException
++    public ReadableByteChannel openChannelForRead(@Nonnull String path ) throws IOException
+     {
+         try
+         {
+@@ -71,7 +70,7 @@
+ 
+     @Nonnull
+     @Override
+-    public WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException
++    public WritableByteChannel openChannelForWrite(@Nonnull String path ) throws IOException
+     {
+         try
+         {
+@@ -97,31 +96,7 @@
+         }
+     }
+ 
+-    @Nonnull
+     @Override
+-    @Deprecated
+-    public InputStream openForRead( @Nonnull String path ) throws IOException
+-    {
+-        return Channels.newInputStream( openChannelForRead( path ) );
+-    }
+-
+-    @Nonnull
+-    @Override
+-    @Deprecated
+-    public OutputStream openForWrite( @Nonnull String path ) throws IOException
+-    {
+-        return Channels.newOutputStream( openChannelForWrite( path ) );
+-    }
+-
+-    @Nonnull
+-    @Override
+-    @Deprecated
+-    public OutputStream openForAppend( @Nonnull String path ) throws IOException
+-    {
+-        return Channels.newOutputStream( openChannelForAppend( path ) );
+-    }
+-
+-    @Override
+     public long getRemainingSpace() throws IOException
+     {
+         try

@@ -1,0 +1,44 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
++++ src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
+@@ -6,6 +6,7 @@
+ 
+ package dan200.computercraft.core.apis.handles;
+ 
++import cc.squiddev.cct.stub.ReadableByteChannel;
+ import dan200.computercraft.api.lua.ILuaContext;
+ import dan200.computercraft.api.lua.LuaException;
+ 
+@@ -13,12 +14,11 @@
+ import java.io.BufferedReader;
+ import java.io.Closeable;
+ import java.io.IOException;
++import java.io.InputStreamReader;
+ import java.nio.channels.Channels;
+-import java.nio.channels.ReadableByteChannel;
+ import java.nio.charset.Charset;
+ import java.nio.charset.CharsetDecoder;
+ import java.nio.charset.CodingErrorAction;
+-import java.nio.charset.StandardCharsets;
+ 
+ import static dan200.computercraft.core.apis.ArgumentHelper.optBoolean;
+ import static dan200.computercraft.core.apis.ArgumentHelper.optInt;
+@@ -161,16 +161,15 @@
+ 
+     public static BufferedReader openUtf8( ReadableByteChannel channel )
+     {
+-        return open( channel, StandardCharsets.UTF_8 );
++        return new BufferedReader(new InputStreamReader(channel.asInputStream()));
+     }
+ 
+-    public static BufferedReader open( ReadableByteChannel channel, Charset charset )
+-    {
++    public static BufferedReader open(ReadableByteChannel channel, Charset charset) {
+         // Create a charset decoder with the same properties as StreamDecoder does for
+         // InputStreams: namely, replace everything instead of erroring.
+         CharsetDecoder decoder = charset.newDecoder()
+             .onMalformedInput( CodingErrorAction.REPLACE )
+             .onUnmappableCharacter( CodingErrorAction.REPLACE );
+-        return new BufferedReader( Channels.newReader( channel, decoder, -1 ) );
++        return new BufferedReader( Channels.newReader( null, decoder, -1 ) );
+     }
+ }

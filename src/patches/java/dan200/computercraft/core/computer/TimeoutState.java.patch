@@ -1,0 +1,30 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\TimeoutState.java
++++ src\main\java\dan200\computercraft\core\computer\TimeoutState.java
+@@ -6,11 +6,10 @@
+ 
+ package dan200.computercraft.core.computer;
+ 
++import cc.squiddev.cct.stub.ComputerThread;
+ import dan200.computercraft.core.lua.ILuaMachine;
+ import dan200.computercraft.core.lua.MachineResult;
+ 
+-import java.util.concurrent.TimeUnit;
+-
+ /**
+  * Used to measure how long a computer has executed for, and thus the relevant timeout states.
+  *
+@@ -38,12 +37,12 @@
+     /**
+      * The total time a task is allowed to run before aborting in nanoseconds
+      */
+-    static final long TIMEOUT = TimeUnit.MILLISECONDS.toNanos( 7000 );
++    static final long TIMEOUT = 7000 * 1_000_000L;
+ 
+     /**
+      * The time the task is allowed to run after each abort in nanoseconds
+      */
+-    static final long ABORT_TIMEOUT = TimeUnit.MILLISECONDS.toNanos( 1500 );
++    static final long ABORT_TIMEOUT = 1500 * 1_000_000L;
+ 
+     /**
+      * The error message to display when we trigger an abort.

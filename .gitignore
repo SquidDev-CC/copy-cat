@@ -1,0 +1,16 @@
+# Project files
+/.idea
+*.iml
+/classes
+/build
+/out
+/node_modules
+/.gradle
+
+# Original sources
+/original
+
+# Exclude modified sources
+/src/main/java/org/squiddev/cobalt/
+/src/main/java/dan200/computercraft/
+/src/main/resources/assets/computercraft

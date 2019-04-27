@@ -1,0 +1,11 @@
+--- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaDouble.java
++++ src\main\java\org\squiddev\cobalt\LuaDouble.java
+@@ -177,7 +177,7 @@
+ 		if (Double.isNaN(v)) return JSTR_NAN;
+ 		if (Double.isInfinite(v)) return v < 0 ? JSTR_NEGINF : JSTR_POSINF;
+ 
+-		String formatted = String.format(Locale.ROOT, "%.14g", v);
++		String formatted = ""; // TODO: String.format(Locale.ROOT, "%.14g", v);
+ 
+ 		// Attempt to trim 0s after the decimal point
+ 		int pos = formatted.indexOf('.');

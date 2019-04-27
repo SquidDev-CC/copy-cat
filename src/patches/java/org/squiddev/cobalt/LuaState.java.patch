@@ -1,0 +1,81 @@
+--- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaState.java
++++ src\main\java\org\squiddev\cobalt\LuaState.java
+@@ -28,15 +28,12 @@
+ import org.squiddev.cobalt.compiler.LoadState;
+ import org.squiddev.cobalt.compiler.LuaC;
+ import org.squiddev.cobalt.debug.DebugHandler;
+-import org.squiddev.cobalt.lib.platform.FileResourceManipulator;
++import org.squiddev.cobalt.lib.platform.VoidResourceManipulator;
+ import org.squiddev.cobalt.lib.platform.ResourceManipulator;
+ 
+ import java.io.InputStream;
+ import java.io.PrintStream;
+ import java.util.Random;
+-import java.util.concurrent.Executor;
+-import java.util.concurrent.Executors;
+-import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.function.Function;
+ 
+ /**
+@@ -119,11 +116,6 @@
+ 	private LuaThread mainThread;
+ 
+ 	/**
+-	 * The currently active {@link YieldThreader}.
+-	 */
+-	final YieldThreader threader;
+-
+-	/**
+ 	 * If this state has been abandoned, and threads should be cleaned up.
+ 	 *
+ 	 * @see LuaThread#orphanCheckInterval
+@@ -147,7 +139,6 @@
+ 		this.compiler = builder.compiler;
+ 		this.random = builder.random;
+ 		this.debug = builder.debug;
+-		this.threader = new YieldThreader(builder.coroutineExecutor);
+ 	}
+ 
+ 	/**
+@@ -204,10 +195,6 @@
+ 	 * A mutable builder for {@link LuaState}s.
+ 	 */
+ 	public static class Builder {
+-		private static final AtomicInteger coroutineCount = new AtomicInteger();
+-		private static final Executor defaultCoroutineExecutor = Executors.newCachedThreadPool(command ->
+-			new Thread(command, "Coroutine-" + coroutineCount.getAndIncrement()));
+-
+ 		private InputStream stdin = System.in;
+ 		private PrintStream stdout = System.out;
+ 		private LuaTable stringMetatable;
+@@ -216,11 +203,10 @@
+ 		private LuaTable nilMetatable;
+ 		private LuaTable functionMetatable;
+ 		private LuaTable threadMetatable;
+-		private ResourceManipulator resourceManipulator = new FileResourceManipulator();
++		private ResourceManipulator resourceManipulator = new VoidResourceManipulator();
+ 		private LoadState.LuaCompiler compiler = LuaC.INSTANCE;
+ 		private Random random = new Random();
+ 		private DebugHandler debug = DebugHandler.INSTANCE;
+-		private Executor coroutineExecutor = defaultCoroutineExecutor;
+ 
+ 		/**
+ 		 * Build a Lua state from this builder
+@@ -372,17 +358,5 @@
+ 			this.debug = debug;
+ 			return this;
+ 		}
+-
+-		/**
+-		 * Set the coroutine executor for this state.
+-		 *
+-		 * @param coroutineExecutor The new executor
+-		 * @return This builder
+-		 */
+-		public Builder coroutineExecutor(Executor coroutineExecutor) {
+-			if (coroutineExecutor == null) throw new NullPointerException("coroutineExecutor cannot be null");
+-			this.coroutineExecutor = coroutineExecutor;
+-			return this;
+-		}
+ 	}
+ }

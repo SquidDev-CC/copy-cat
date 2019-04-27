@@ -1,0 +1,23 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\ComputerThread.java
++++ src\main\java\dan200\computercraft\core\computer\ComputerThread.java
+@@ -292,7 +292,7 @@
+     private static void afterWork( TaskRunner runner, ComputerExecutor executor )
+     {
+         // Clear the executor's thread.
+-        Thread currentThread = executor.executingThread.getAndSet( null );
++        Thread currentThread = null;
+         if( currentThread != runner.owner )
+         {
+             ComputerCraft.log.error(
+@@ -467,9 +467,9 @@
+ 
+                 // If we're trying to executing some task on this computer while someone else is doing work, something
+                 // is seriously wrong.
+-                while( !executor.executingThread.compareAndSet( null, owner ) )
++                while (Thread.currentThread() == Thread.currentThread())
+                 {
+-                    Thread existing = executor.executingThread.get();
++                    Thread existing = null;
+                     if( existing != null )
+                     {
+                         ComputerCraft.log.error(

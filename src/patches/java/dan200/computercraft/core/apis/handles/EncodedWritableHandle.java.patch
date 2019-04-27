@@ -1,0 +1,70 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
++++ src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
+@@ -6,31 +6,27 @@
+ 
+ package dan200.computercraft.core.apis.handles;
+ 
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import dan200.computercraft.api.lua.ILuaContext;
+ import dan200.computercraft.api.lua.LuaException;
+ 
+ import javax.annotation.Nonnull;
+-import java.io.BufferedWriter;
+ import java.io.Closeable;
+ import java.io.IOException;
+-import java.nio.channels.Channels;
+-import java.nio.channels.WritableByteChannel;
+-import java.nio.charset.Charset;
+-import java.nio.charset.CharsetEncoder;
+-import java.nio.charset.CodingErrorAction;
+-import java.nio.charset.StandardCharsets;
++import java.io.OutputStreamWriter;
++import java.io.Writer;
+ 
+ public class EncodedWritableHandle extends HandleGeneric
+ {
+-    private BufferedWriter m_writer;
++    private Writer m_writer;
+ 
+-    public EncodedWritableHandle( @Nonnull BufferedWriter writer, @Nonnull Closeable closable )
++    public EncodedWritableHandle( @Nonnull Writer writer, @Nonnull Closeable closable )
+     {
+         super( closable );
+         m_writer = writer;
+     }
+ 
+-    public EncodedWritableHandle( @Nonnull BufferedWriter writer )
++    public EncodedWritableHandle( @Nonnull Writer writer )
+     {
+         this( writer, writer );
+     }
+@@ -73,7 +69,7 @@
+                 try
+                 {
+                     m_writer.write( text, 0, text.length() );
+-                    m_writer.newLine();
++                    m_writer.write('\n');
+                     return null;
+                 }
+                 catch( IOException e )
+@@ -101,18 +97,8 @@
+     }
+ 
+ 
+-    public static BufferedWriter openUtf8( WritableByteChannel channel )
++    public static Writer openUtf8( WritableByteChannel channel )
+     {
+-        return open( channel, StandardCharsets.UTF_8 );
++        return new OutputStreamWriter(channel.asOutputStream());
+     }
+-
+-    public static BufferedWriter open( WritableByteChannel channel, Charset charset )
+-    {
+-        // Create a charset encoder with the same properties as StreamEncoder does for
+-        // OutputStreams: namely, replace everything instead of erroring.
+-        CharsetEncoder encoder = charset.newEncoder()
+-            .onMalformedInput( CodingErrorAction.REPLACE )
+-            .onUnmappableCharacter( CodingErrorAction.REPLACE );
+-        return new BufferedWriter( Channels.newWriter( channel, encoder, -1 ) );
+-    }
+ }

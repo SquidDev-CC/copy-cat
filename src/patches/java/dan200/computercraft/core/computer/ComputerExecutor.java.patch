@@ -1,0 +1,275 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\ComputerExecutor.java
++++ src\main\java\dan200\computercraft\core\computer\ComputerExecutor.java
+@@ -6,6 +6,7 @@
+ 
+ package dan200.computercraft.core.computer;
+ 
++import cc.squiddev.cct.stub.ComputerThread;
+ import dan200.computercraft.ComputerCraft;
+ import dan200.computercraft.api.filesystem.IMount;
+ import dan200.computercraft.api.filesystem.IWritableMount;
+@@ -21,6 +22,7 @@
+ import dan200.computercraft.core.tracking.Tracking;
+ import dan200.computercraft.shared.util.Colour;
+ import dan200.computercraft.shared.util.IoUtil;
++import org.teavm.interop.Sync;
+ 
+ import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
+@@ -29,8 +31,6 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Queue;
+-import java.util.concurrent.atomic.AtomicReference;
+-import java.util.concurrent.locks.ReentrantLock;
+ 
+ /**
+  * The main task queue and executor for a single computer. This handles turning on and off a computer, as well as
+@@ -52,12 +52,11 @@
+  * One final responsibility for the executor is calling {@link ILuaAPI#update()} every tick, via the {@link #tick()}
+  * method. This should only be called when the computer is actually on ({@link #isOn}).
+  */
+-final class ComputerExecutor
++public final class ComputerExecutor
+ {
+     private static final int QUEUE_LIMIT = 256;
+ 
+     private static IMount romMount;
+-    private static final Object romMountLock = new Object();
+ 
+     private final Computer computer;
+     private final List<ILuaAPI> apis = new ArrayList<>();
+@@ -70,38 +69,16 @@
+     /**
+      * Whether the computer is currently on. This is set to false when a shutdown starts, or when turning on completes
+      * (but just before the Lua machine is started).
+-     *
+-     * @see #isOnLock
+      */
+     private volatile boolean isOn = false;
+ 
+     /**
+-     * The lock to acquire when you need to modify the "on state" of a computer.
+-     *
+-     * We hold this lock when running any command, and attempt to hold it when updating APIs. This ensures you don't
+-     * update APIs while also starting/stopping them.
+-     *
+-     * @see #isOn
+-     * @see #tick()
+-     * @see #turnOn()
+-     * @see #shutdown()
+-     */
+-    private final ReentrantLock isOnLock = new ReentrantLock();
+-
+-    /**
+-     * A lock used for any changes to {@link #eventQueue}, {@link #command} or {@link #onComputerQueue}. This will be
+-     * used on the main thread, so locks should be kept as brief as possible.
+-     */
+-    private final Object queueLock = new Object();
+-
+-    /**
+      * Determines if this executor is present within {@link ComputerThread}.
+      *
+-     * @see #queueLock
+      * @see #enqueue()
+      * @see #afterWork()
+      */
+-    volatile boolean onComputerQueue = false;
++    public volatile boolean onComputerQueue = false;
+ 
+     /**
+      * The amount of time this computer has used on a theoretical machine which shares work evenly amongst computers.
+@@ -152,19 +129,8 @@
+ 
+     private IWritableMount rootMount;
+ 
+-    /**
+-     * The thread the executor is running on. This is non-null when performing work. We use this to ensure we're only
+-     * doing one bit of work at one time.
+-     *
+-     * @see ComputerThread
+-     */
+-    final AtomicReference<Thread> executingThread = new AtomicReference<>();
+-
+     ComputerExecutor( Computer computer )
+     {
+-        // Ensure the computer thread is running as required.
+-        ComputerThread.start();
+-
+         this.computer = computer;
+ 
+         Environment environment = computer.getEnvironment();
+@@ -175,7 +141,7 @@
+         apis.add( new FSAPI( environment ) );
+         apis.add( new PeripheralAPI( environment ) );
+         apis.add( new OSAPI( environment ) );
+-        if( ComputerCraft.http_enable ) apis.add( new HTTPAPI( environment ) );
++        // TODO: if( ComputerCraft.http_enable ) apis.add( new HTTPAPI( environment ) );
+ 
+         // Load in the externally registered APIs.
+         for( ILuaAPIFactory factory : ApiFactories.getAll() )
+@@ -211,7 +177,6 @@
+      */
+     void queueStart()
+     {
+-        synchronized( queueLock )
+         {
+             // We should only schedule a start if we're not currently on and there's turn on.
+             if( closed || isOn || command != null ) return;
+@@ -230,7 +195,6 @@
+      */
+     void queueStop( boolean reboot, boolean close )
+     {
+-        synchronized( queueLock )
+         {
+             if( closed ) return;
+             closed = close;
+@@ -259,7 +223,6 @@
+         ILuaMachine machine = this.machine;
+         if( machine != null ) machine.close();
+ 
+-        synchronized( queueLock )
+         {
+             if( closed ) return;
+             command = StateCommand.ABORT;
+@@ -278,7 +241,6 @@
+         // Events should be skipped if we're not on.
+         if( !isOn ) return;
+ 
+-        synchronized( queueLock )
+         {
+             // And if we've got some command in the pipeline, then don't queue events - they'll
+             // probably be disposed of anyway.
+@@ -295,7 +257,6 @@
+      */
+     private void enqueue()
+     {
+-        synchronized( queueLock )
+         {
+             if( !onComputerQueue ) ComputerThread.queue( this );
+         }
+@@ -306,13 +267,12 @@
+      */
+     void tick()
+     {
+-        if( isOn && isOnLock.tryLock() )
++        if( isOn )
+         {
+             // This horrific structure means we don't try to update APIs while the state is being changed
+             // (and so they may be running startup/shutdown).
+             // We use tryLock here, as it has minimal delay, and it doesn't matter if we miss an advance at the
+             // beginning or end of a computer's lifetime.
+-            try
+             {
+                 if( isOn )
+                 {
+@@ -320,10 +280,6 @@
+                     for( ILuaAPI api : apis ) api.update();
+                 }
+             }
+-            finally
+-            {
+-                isOnLock.unlock();
+-            }
+         }
+     }
+ 
+@@ -331,7 +287,6 @@
+     {
+         if( romMount != null ) return romMount;
+ 
+-        synchronized( romMountLock )
+         {
+             if( romMount != null ) return romMount;
+             return romMount = computer.getComputerEnvironment().createResourceMount( "computercraft", "lua/rom" );
+@@ -417,13 +372,10 @@
+ 
+     private void turnOn() throws InterruptedException
+     {
+-        isOnLock.lockInterruptibly();
+-        try
+         {
+             // Reset the terminal and event queue
+             computer.getTerminal().reset();
+             interruptedEvent = false;
+-            synchronized( queueLock )
+             {
+                 eventQueue.clear();
+             }
+@@ -449,10 +401,6 @@
+             isOn = true;
+             computer.markChanged();
+         }
+-        finally
+-        {
+-            isOnLock.unlock();
+-        }
+ 
+         // Now actually start the computer, now that everything is set up.
+         resumeMachine( null, null );
+@@ -460,12 +408,9 @@
+ 
+     private void shutdown() throws InterruptedException
+     {
+-        isOnLock.lockInterruptibly();
+-        try
+         {
+             isOn = false;
+             interruptedEvent = false;
+-            synchronized( queueLock )
+             {
+                 eventQueue.clear();
+             }
+@@ -490,16 +435,12 @@
+             computer.getEnvironment().resetOutput();
+             computer.markChanged();
+         }
+-        finally
+-        {
+-            isOnLock.unlock();
+-        }
+     }
+ 
+     /**
+      * Called before calling {@link #work()}, setting up any important state.
+      */
+-    void beforeWork()
++    public void beforeWork()
+     {
+         vRuntimeStart = System.nanoTime();
+         timeout.startTimer();
+@@ -510,7 +451,7 @@
+      *
+      * @return If we have more work to do.
+      */
+-    boolean afterWork()
++    public boolean afterWork()
+     {
+         if( interruptedEvent )
+         {
+@@ -525,7 +466,6 @@
+ 
+         if( interruptedEvent ) return true;
+ 
+-        synchronized( queueLock )
+         {
+             if( eventQueue.isEmpty() && command == null ) return onComputerQueue = false;
+             return true;
+@@ -541,7 +481,8 @@
+      * @see #command
+      * @see #eventQueue
+      */
+-    void work() throws InterruptedException
++    @Sync
++    public void work() throws InterruptedException
+     {
+         if( interruptedEvent )
+         {
+@@ -555,7 +496,6 @@
+ 
+         StateCommand command;
+         Event event = null;
+-        synchronized( queueLock )
+         {
+             command = this.command;
+             this.command = null;

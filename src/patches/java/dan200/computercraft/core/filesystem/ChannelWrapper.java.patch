@@ -1,0 +1,14 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
++++ src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
+@@ -6,9 +6,10 @@
+ 
+ package dan200.computercraft.core.filesystem;
+ 
++import cc.squiddev.cct.stub.Channel;
++
+ import java.io.Closeable;
+ import java.io.IOException;
+-import java.nio.channels.Channel;
+ 
+ /**
+  * Wraps some closeable object such as a buffered writer, and the underlying stream.

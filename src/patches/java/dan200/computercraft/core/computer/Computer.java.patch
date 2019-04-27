@@ -1,0 +1,88 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\Computer.java
++++ src\main\java\dan200\computercraft\core\computer\Computer.java
+@@ -42,12 +42,11 @@
+     private final IComputerEnvironment m_environment;
+     private final Terminal m_terminal;
+     private final ComputerExecutor executor;
+-    private final MainThreadExecutor serverExecutor;
+ 
+     // Additional state about the computer and its environment.
+     private boolean m_blinking = false;
+     private final Environment internalEnvironment = new Environment( this );
+-    private AtomicBoolean externalOutputChanged = new AtomicBoolean();
++    private boolean externalOutputChanged = false;
+ 
+     private boolean startRequested;
+     private int m_ticksSinceStart = -1;
+@@ -59,7 +58,6 @@
+         m_terminal = terminal;
+ 
+         executor = new ComputerExecutor( this );
+-        serverExecutor = new MainThreadExecutor( this );
+     }
+ 
+     IComputerEnvironment getComputerEnvironment()
+@@ -117,20 +115,9 @@
+         executor.queueEvent( event, args );
+     }
+ 
+-    /**
+-     * Queue a task to be run on the main thread, using {@link MainThread}.
+-     *
+-     * @param runnable The task to run
+-     * @return If the task was successfully queued (namely, whether there is space on it).
+-     */
+-    public boolean queueMainThread( Runnable runnable )
+-    {
+-        return serverExecutor.enqueue( runnable );
+-    }
+-
+     public IWorkMonitor getMainThreadMonitor()
+     {
+-        return serverExecutor;
++        return null;
+     }
+ 
+     public int getID()
+@@ -162,7 +149,7 @@
+         if( !Objects.equal( label, m_label ) )
+         {
+             m_label = label;
+-            externalOutputChanged.set( true );
++            externalOutputChanged = true;
+         }
+     }
+ 
+@@ -187,7 +174,7 @@
+         internalEnvironment.update();
+ 
+         // Propagate the environment's output to the world.
+-        if( internalEnvironment.updateOutput() ) externalOutputChanged.set( true );
++        if( internalEnvironment.updateOutput() ) externalOutputChanged = true;
+ 
+         // Set output changed if the terminal has changed from blinking to not
+         boolean blinking = m_terminal.getCursorBlink() &&
+@@ -196,18 +183,20 @@
+         if( blinking != m_blinking )
+         {
+             m_blinking = blinking;
+-            externalOutputChanged.set( true );
++            externalOutputChanged = true;
+         }
+     }
+ 
+     void markChanged()
+     {
+-        externalOutputChanged.set( true );
++        externalOutputChanged = true;
+     }
+ 
+     public boolean pollAndResetChanged()
+     {
+-        return externalOutputChanged.getAndSet( false );
++        boolean changed = externalOutputChanged;
++        externalOutputChanged = false;
++        return changed;
+     }
+ 
+     public boolean isBlinking()

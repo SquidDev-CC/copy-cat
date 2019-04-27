@@ -1,0 +1,41 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\api\lua\ILuaContext.java
++++ src\main\java\dan200\computercraft\api\lua\ILuaContext.java
+@@ -32,6 +32,7 @@
+      *                              intercepted, or the computer will leak memory and end up in a broken state.
+      */
+     @Nonnull
++    @Deprecated
+     default Object[] pullEvent( @Nullable String filter ) throws LuaException, InterruptedException
+     {
+         Object[] results = pullEventRaw( filter );
+@@ -52,6 +53,7 @@
+      * @see #pullEvent(String)
+      */
+     @Nonnull
++    @Deprecated
+     default Object[] pullEventRaw( @Nullable String filter ) throws InterruptedException
+     {
+         return yield( new Object[] { filter } );
+@@ -69,6 +71,7 @@
+      * @see #pullEvent(String)
+      */
+     @Nonnull
++    @Deprecated
+     Object[] yield( @Nullable Object[] arguments ) throws InterruptedException;
+ 
+     /**
+@@ -86,6 +89,7 @@
+      *                              intercepted, or the computer will leak memory and end up in a broken state.
+      */
+     @Nullable
++    @Deprecated
+     Object[] executeMainThreadTask( @Nonnull ILuaTask task ) throws LuaException, InterruptedException;
+ 
+     /**
+@@ -101,5 +105,6 @@
+      * @return The "id" of the task. This will be the first argument to the {@code task_completed} event.
+      * @throws LuaException If the task could not be queued.
+      */
++    @Deprecated
+     long issueMainThreadTask( @Nonnull ILuaTask task ) throws LuaException;
+ }

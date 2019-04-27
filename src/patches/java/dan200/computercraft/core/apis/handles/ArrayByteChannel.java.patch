@@ -1,0 +1,147 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\ArrayByteChannel.java
++++ src\main\java\dan200\computercraft\core\apis\handles\ArrayByteChannel.java
+@@ -6,90 +6,105 @@
+ 
+ package dan200.computercraft.core.apis.handles;
+ 
++import cc.squiddev.cct.stub.SeekableByteChannel;
++
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
+ import java.nio.ByteBuffer;
+-import java.nio.channels.ClosedChannelException;
+-import java.nio.channels.NonWritableChannelException;
+-import java.nio.channels.SeekableByteChannel;
+ import java.util.Objects;
+ 
+ /**
+  * A seekable, readable byte channel which is backed by a simple byte array.
+  */
+-public class ArrayByteChannel implements SeekableByteChannel
+-{
++public class ArrayByteChannel extends InputStream implements SeekableByteChannel {
+     private boolean closed = false;
+     private int position = 0;
+ 
+     private final byte[] backing;
+ 
+-    public ArrayByteChannel( byte[] backing )
+-    {
++    public ArrayByteChannel(byte[] backing) {
+         this.backing = backing;
+     }
+ 
+     @Override
+-    public int read( ByteBuffer destination ) throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
+-        Objects.requireNonNull( destination, "destination" );
++    public int read(ByteBuffer destination) throws IOException {
++        if (closed) throw new IOException("Closed");
++        Objects.requireNonNull(destination, "destination");
+ 
+-        if( position >= backing.length ) return -1;
++        if (position >= backing.length) return -1;
+ 
+-        int remaining = Math.min( backing.length - position, destination.remaining() );
+-        destination.put( backing, position, remaining );
++        int remaining = Math.min(backing.length - position, destination.remaining());
++        destination.put(backing, position, remaining);
+         position += remaining;
+         return remaining;
+     }
+ 
+     @Override
+-    public int write( ByteBuffer src ) throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
+-        throw new NonWritableChannelException();
++    public int write(ByteBuffer src) throws IOException {
++        if (closed) throw new IOException("Closed");
++        throw new IOException("Not writable");
+     }
+ 
+     @Override
+-    public long position() throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
++    public long position() throws IOException {
++        if (closed) throw new IOException("Closed");
+         return position;
+     }
+ 
+     @Override
+-    public SeekableByteChannel position( long newPosition ) throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
+-        if( newPosition < 0 || newPosition > Integer.MAX_VALUE )
+-        {
+-            throw new IllegalArgumentException( "Position out of bounds" );
++    public SeekableByteChannel position(long newPosition) throws IOException {
++        if (closed) throw new IOException("Closed");
++        if (newPosition < 0 || newPosition > Integer.MAX_VALUE) {
++            throw new IllegalArgumentException("Position out of bounds");
+         }
+         position = (int) newPosition;
+         return this;
+     }
+ 
+     @Override
+-    public long size() throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
++    public long size() throws IOException {
++        if (closed) throw new IOException("Closed");
+         return backing.length;
+     }
+ 
+     @Override
+-    public SeekableByteChannel truncate( long size ) throws ClosedChannelException
+-    {
+-        if( closed ) throw new ClosedChannelException();
+-        throw new NonWritableChannelException();
++    public int read(byte[] into, int off, int len) throws IOException {
++        if (closed) throw new IOException("Closed");
++        if (into == null) {
++            throw new NullPointerException();
++        } else if (off < 0 || len < 0 || len > into.length - off) {
++            throw new IndexOutOfBoundsException();
++        }
++
++        if (position >= backing.length) return -1;
++
++        int available = backing.length - position;
++        if (len > available) len = available;
++        if (len <= 0) return 0;
++        System.arraycopy(backing, position, into, off, len);
++        position += len;
++        return len;
+     }
+ 
+     @Override
+-    public boolean isOpen()
+-    {
+-        return !closed;
++    public int read() throws IOException {
++        if (closed) throw new IOException("Closed");
++        return position < backing.length ? backing[position++] & 0xff : -1;
+     }
+ 
+     @Override
+-    public void close()
+-    {
++    public void close() {
+         closed = true;
+     }
++
++    @Override
++    public InputStream asInputStream() {
++        return this;
++    }
++
++    @Override
++    public OutputStream asOutputStream() {
++        throw new IllegalStateException("Not writable");
++    }
+ }

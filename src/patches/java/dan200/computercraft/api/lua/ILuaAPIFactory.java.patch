@@ -1,0 +1,19 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\api\lua\ILuaAPIFactory.java
++++ src\main\java\dan200\computercraft\api\lua\ILuaAPIFactory.java
+@@ -6,8 +6,6 @@
+ 
+ package dan200.computercraft.api.lua;
+ 
+-import dan200.computercraft.api.ComputerCraftAPI;
+-
+ import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
+ 
+@@ -15,7 +13,6 @@
+  * Construct an {@link ILuaAPI} for a specific computer.
+  *
+  * @see ILuaAPI
+- * @see ComputerCraftAPI#registerAPIFactory(ILuaAPIFactory)
+  */
+ @FunctionalInterface
+ public interface ILuaAPIFactory

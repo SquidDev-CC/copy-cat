@@ -1,0 +1,18 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
++++ src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
+@@ -29,7 +29,6 @@
+ 
+     public synchronized void start()
+     {
+-        if( !tracking ) Tracking.tracking.incrementAndGet();
+         tracking = true;
+ 
+         timings.clear();
+@@ -40,7 +39,6 @@
+     {
+         if( !tracking ) return false;
+ 
+-        Tracking.tracking.decrementAndGet();
+         tracking = false;
+         timingLookup.clear();
+         return true;

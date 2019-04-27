@@ -1,0 +1,27 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\SubMount.java
++++ src\main\java\dan200\computercraft\core\filesystem\SubMount.java
+@@ -10,8 +10,7 @@
+ 
+ import javax.annotation.Nonnull;
+ import java.io.IOException;
+-import java.io.InputStream;
+-import java.nio.channels.ReadableByteChannel;
++import cc.squiddev.cct.stub.ReadableByteChannel;
+ import java.util.List;
+ 
+ public class SubMount implements IMount
+@@ -53,14 +52,6 @@
+ 
+     @Nonnull
+     @Override
+-    @Deprecated
+-    public InputStream openForRead( @Nonnull String path ) throws IOException
+-    {
+-        return m_parent.openForRead( getFullPath( path ) );
+-    }
+-
+-    @Nonnull
+-    @Override
+     public ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException
+     {
+         return m_parent.openChannelForRead( getFullPath( path ) );
