@@ -1,12 +1,12 @@
 --- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaState.java
 +++ src\main\java\org\squiddev\cobalt\LuaState.java
-@@ -28,15 +28,12 @@
+@@ -28,16 +28,12 @@
  import org.squiddev.cobalt.compiler.LoadState;
  import org.squiddev.cobalt.compiler.LuaC;
  import org.squiddev.cobalt.debug.DebugHandler;
 -import org.squiddev.cobalt.lib.platform.FileResourceManipulator;
-+import org.squiddev.cobalt.lib.platform.VoidResourceManipulator;
  import org.squiddev.cobalt.lib.platform.ResourceManipulator;
++import org.squiddev.cobalt.lib.platform.VoidResourceManipulator;
  
  import java.io.InputStream;
  import java.io.PrintStream;
@@ -14,10 +14,11 @@
 -import java.util.concurrent.Executor;
 -import java.util.concurrent.Executors;
 -import java.util.concurrent.atomic.AtomicInteger;
- import java.util.function.Function;
+-import java.util.function.Function;
  
  /**
-@@ -119,11 +116,6 @@
+  * Global lua state
+@@ -119,11 +115,6 @@
  	private LuaThread mainThread;
  
  	/**
@@ -29,7 +30,7 @@
  	 * If this state has been abandoned, and threads should be cleaned up.
  	 *
  	 * @see LuaThread#orphanCheckInterval
-@@ -147,7 +139,6 @@
+@@ -147,7 +138,6 @@
  		this.compiler = builder.compiler;
  		this.random = builder.random;
  		this.debug = builder.debug;
@@ -37,7 +38,7 @@
  	}
  
  	/**
-@@ -204,10 +195,6 @@
+@@ -204,10 +194,6 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
@@ -48,7 +49,7 @@
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
  		private LuaTable stringMetatable;
-@@ -216,11 +203,10 @@
+@@ -216,11 +202,10 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
@@ -61,7 +62,7 @@
  
  		/**
  		 * Build a Lua state from this builder
-@@ -372,17 +358,5 @@
+@@ -372,17 +357,5 @@
  			this.debug = debug;
  			return this;
  		}

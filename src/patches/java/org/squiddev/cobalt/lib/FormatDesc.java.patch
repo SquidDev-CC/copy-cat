@@ -1,11 +1,19 @@
 --- original\Cobalt\src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
 +++ src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
-@@ -274,7 +274,7 @@
- 			format.append('.').append(precision >= 0 ? precision : 6);
+@@ -216,6 +216,7 @@
+ 				}
+ 			}
+ 
++			/*
+ 			StringBuilder format = new StringBuilder("%");
+ 			if (alternateForm) format.append('#');
+ 			if (explicitPlus) format.append('+');
+@@ -229,6 +230,8 @@
  			format.append((char) conversion);
  
--			buf.append(String.format(format.toString(), number));
-+			// buf.append(String.format(format.toString(), number));
+ 			buf.append(String.format(format.toString(), number));
++			*/
++			buf.append(Double.toString(number));
  		}
  	}
  
