@@ -39,7 +39,7 @@ The resulting website should be in `build/web`.
 If making further modifications to the files in `src/main/java`, run
 `./gradlew makePatches` to regenerate the patch directory.
 
-[copy-cat]: https://copy-cat.squiddev.cc "Try Copy Cat online"
+[copycat]: https://copy-cat.squiddev.cc "Try Copy Cat online"
 [mimic]: https://gravlann.github.io/ "The Mimic ComputerCraft emulator"
 [cloud]: https://github.com/SquidDev-CC/cloud-catcher "The Cloud Catcher repository"
 [cobalt]: https://github.com/SquidDev/Cobalt "The Cobalt repository"
