@@ -95,7 +95,7 @@ pre { padding: 10px; }
   font-size: 0.8em;
 }
 
-.terminal-info, .terminal-terminate {
+.terminal-info, .terminal-terminate, .terminal-power {
   padding: 3px;
   display: inline-block;
 }
@@ -109,8 +109,12 @@ pre { padding: 10px; }
   float: right;
 }
 
-.terminal-terminate:hover {
+.terminal-terminate:hover, .terminal-power:hover {
   background: #ddd;
+}
+
+.computer-state-on path {
+  fill: green;
 }
 
 .terminal-input {

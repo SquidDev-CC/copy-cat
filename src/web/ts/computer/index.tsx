@@ -18,6 +18,7 @@ type ComputerState = {
 
   id?: number,
   label?: string,
+  on: boolean,
 };
 
 export class Computer extends Component<ComputerProps, ComputerState> {
@@ -28,9 +29,10 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     const terminalChanged = new Semaphore();
     this.state = {
       terminal, terminalChanged,
+      id: 0, on: false,
       computer: new ComputerAccess(
         terminal, terminalChanged,
-        (label, _) => this.setState({ label: label ? label : undefined}),
+        (label, on) => this.setState({ label: label ? label : undefined, on }),
       ),
     };
   }
@@ -45,21 +47,21 @@ export class Computer extends Component<ComputerProps, ComputerState> {
 
   public shouldComponentUpdate(
     { focused, settings }: Readonly<ComputerProps>,
-    { id, label }: Readonly<ComputerState>,
+    { id, label, on }: Readonly<ComputerState>,
   ): boolean {
     return focused !== this.props.focused || settings !== this.props.settings ||
-      id !== this.state.id || label !== this.state.label;
+      id !== this.state.id || label !== this.state.label || on !== this.state.on;
   }
 
   public render(
     { settings, focused }: ComputerProps,
-    { terminal, terminalChanged, computer, id, label }: ComputerState,
+    { terminal, terminalChanged, computer, id, label, on }: ComputerState,
   ) {
     console.log(`Render computer with id=${id}, label=${label}`);
     return <div class="computer-view">
         <div class="computer-split">
           <Terminal terminal={terminal} changed={terminalChanged} focused={focused}
-          computer={computer} font={settings.terminalFont} id={id} label={label}/>
+            computer={computer} font={settings.terminalFont} id={id} label={label} on={on}/>
         </div>
       </div>;
   }

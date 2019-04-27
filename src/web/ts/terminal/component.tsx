@@ -1,6 +1,6 @@
 import { Component, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
-import { NoEntry } from "../font";
+import { NoEntry, Off, On } from "../font";
 import { TerminalData } from "./data";
 import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
@@ -14,6 +14,7 @@ export type TerminalProps = {
 
   id?: number,
   label?: string,
+  on: boolean,
 };
 
 const clamp = (value: number, min: number, max: number) => {
@@ -27,7 +28,7 @@ const labelElement = (id?: number, label?: string) => {
   if (id === undefined && label === undefined) return "Unlabeled computer";
   if (id === undefined) return `${label}`;
   if (label === undefined) return `Computer #${id}`;
-  return `${label} (${id})`;
+  return `${label} (Computer #${id})`;
 };
 
 export class Terminal extends Component<TerminalProps, {}> {
@@ -95,10 +96,15 @@ export class Terminal extends Component<TerminalProps, {}> {
     this.drawQueued = false;
   }
 
-  public render({ id, label }: TerminalProps) {
+  public render({ id, label, on }: TerminalProps) {
     return <div class="terminal-view">
       {...this.vdom}
       <div class="terminal-bar">
+        <button type="none" class="action-button terminal-power"
+          title={on ? "Turn this computer off" : "Turn this computer on"}
+          onClick={on ? this.onPowerOff : this.onPowerOn}>
+          {on ? <On /> : <Off />}
+        </button>
         <span class="terminal-info">{labelElement(id, label)}</span>
         <button type="none" class="action-button terminal-terminate"
           title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
@@ -354,5 +360,15 @@ export class Terminal extends Component<TerminalProps, {}> {
   private onChanged = () => {
     this.changed = true;
     this.queueDraw();
+  }
+
+  private onPowerOff = (event: Event) => {
+    this.onEventDefault(event);
+    this.props.computer.shutdown();
+  }
+
+  private onPowerOn = (event: Event) => {
+    this.onEventDefault(event);
+    this.props.computer.turnOn();
   }
 }
