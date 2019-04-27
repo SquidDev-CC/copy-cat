@@ -1,5 +1,7 @@
 /**
  * Icon fonts, generated with https://icomoon.io
+ *
+ * Might be worth trying http://fontello.com/ next time.
  */
 import { h } from "preact";
 

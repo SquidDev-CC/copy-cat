@@ -4,7 +4,7 @@ import org.teavm.classlib.ResourceSupplier;
 import org.teavm.classlib.ResourceSupplierContext;
 
 public class Resources implements ResourceSupplier {
-    public static final String[] FILES = new String[]{
+    static final String[] FILES = new String[]{
         "startup.lua",
         "apis/colors.lua",
         "apis/colours.lua",

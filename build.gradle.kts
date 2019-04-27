@@ -225,13 +225,16 @@ tasks {
 
                     // Core is pretty simple. We just exclude some FS stuff, as it's a bit of a faff to deal with.
                     include("java/dan200/computercraft/core/**")
-                    exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/ComboMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/EmptyMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/FileMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/SubMount.java")
 
                     include("java/dan200/computercraft/shared/util/Colour.java")
                     include("java/dan200/computercraft/shared/util/IoUtil.java")
-                    include("java/dan200/computercraft/shared/util/StringUtil.java")
                     include("java/dan200/computercraft/shared/util/Palette.java")
+                    include("java/dan200/computercraft/shared/util/StringUtil.java")
                     include("java/dan200/computercraft/shared/util/ThreadUtils.java")
                     include("java/dan200/computercraft/ComputerCraft.java")
                 },

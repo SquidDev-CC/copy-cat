@@ -4,6 +4,43 @@
 export type QueueEventHandler = (event: string, args: string[]) => void;
 
 /**
+ * A naive Either type, instead of wrangling JS/Java exceptions.
+ */
+export type Result<T> = { value: T } | { error: string, value: null };
+
+export interface IFileSystemEntry {
+  /**
+   * If this entry is a directory.
+   */
+  isDirectory(): boolean;
+
+  /**
+   * Get the filenames of all child entries
+   *
+   * @return The child entries. Note, this is the relative path, rather than the absolute one.
+   * @throws If this is not a directory
+   */
+  getChildren(): string[];
+
+  /**
+   * Get the contents of this filesystem entry
+   *
+   * @return This file's contents
+   * @throws If this is not a file
+   */
+  getContents(): string;
+
+  /**
+   * Set the contents of this filesystem entry
+   *
+   * @param contents This entry's contents
+   * @return Whether this file's contents was set or not
+   * @throws If this is not a file
+   */
+  setContents(contents: string): Result<true>;
+}
+
+/**
  * Controls a specific computer on the Javascript side. See {@code js/ComputerAccess.java}.
  */
 export interface IComputerAccess {
@@ -16,6 +53,8 @@ export interface IComputerAccess {
   setState(label: string | null, on: boolean): void;
 
   /**
+   * Update the terminal's properties
+   *
    * @param width        The terminal width
    * @param height       The terminal height
    * @param x            The X cursor
@@ -49,6 +88,37 @@ export interface IComputerAccess {
    * Mark the terminal as having changed. Should be called after all other terminal methods.
    */
   flushTerminal(): void;
+
+  /**
+   * Find a file system entry with the given name.
+   *
+   * @param path The path to find
+   * @return A file entry, or {@code null} if none could be found.
+   */
+  getEntry(path: string): IFileSystemEntry | null;
+
+  /**
+   * Create a new directory with the given path
+   *
+   * @param path The directory to create
+   * @return A file entry if the directory exists or could be created, an empty one otherwise.
+   */
+  createDirectory(path: string): Result<IFileSystemEntry>;
+
+  /**
+   * Create a new file with the given path. The owning folder must exist already.
+   *
+   * @param path The file to create
+   * @return A file entry if the file exists or could be created, an empty one otherwise.
+   */
+  createFile(path: string): Result<IFileSystemEntry>;
+
+  /**
+   * Recursively delete a file system entry.
+   *
+   * @param path The path to delete
+   */
+  deleteEntry(path: string): void;
 
   /**
    * Set the callback used when an event is received.

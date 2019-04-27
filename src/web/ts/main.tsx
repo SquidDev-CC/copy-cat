@@ -32,8 +32,8 @@ export class Main extends Component<MainProps, MainState> {
 
     // Sync settings from local storage
     try {
-      const settingJson = window.localStorage.settings;
-      if (settings !== undefined) {
+      const settingJson = window.localStorage.getItem("settings");
+      if (settingJson !== null) {
         const settingStorage = JSON.parse(settingJson);
         for (const key of Object.keys(settings)) {
           const value = settingStorage[key];
@@ -41,7 +41,7 @@ export class Main extends Component<MainProps, MainState> {
         }
       }
     } catch {
-      // Ignore
+      // Ignore localStorage errors - either the API isn't present, or it's disabled.
     }
 
     this.state = {
@@ -59,7 +59,7 @@ export class Main extends Component<MainProps, MainState> {
   public componentDidUpdate() {
     // Sync settings back to local storage
     try {
-      window.localStorage.settings = JSON.stringify(this.state.settings);
+      window.localStorage.setItem("settings", JSON.stringify(this.state.settings));
     } catch {
       // Ignore
     }

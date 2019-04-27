@@ -3,7 +3,7 @@ package cc.squiddev.cct;
 import cc.squiddev.cct.js.Callbacks;
 import cc.squiddev.cct.js.ComputerAccess;
 import cc.squiddev.cct.js.JsonParse;
-import cc.squiddev.cct.mount.EmptyWritableMount;
+import cc.squiddev.cct.mount.ComputerAccessMount;
 import cc.squiddev.cct.mount.ResourceMount;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.filesystem.IMount;
@@ -101,7 +101,7 @@ public class Main implements IComputerEnvironment {
 
     @Override
     public IWritableMount createSaveDirMount(String subPath, long capacity) {
-        return new EmptyWritableMount();
+        return new ComputerAccessMount(Callbacks.computer());
     }
 
     @Override
