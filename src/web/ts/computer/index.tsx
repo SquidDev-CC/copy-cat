@@ -5,6 +5,7 @@ import { Terminal } from "../terminal/component";
 import { TerminalData } from "../terminal/data";
 import { ComputerAccess } from "./access";
 import { Semaphore } from "./actions";
+import { FileTree } from "./files";
 
 export type ComputerProps = {
   focused: boolean,
@@ -57,9 +58,14 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, id, label, on }: ComputerState,
   ) {
-    console.log(`Render computer with id=${id}, label=${label}`);
+
+    const root = computer.getEntry("")!;
+
     return <div class="computer-view">
         <div class="computer-split">
+          <div class="file-list">
+            <FileTree computer={computer} entry={root} path="" />
+          </div>
           <Terminal terminal={terminal} changed={terminalChanged} focused={focused}
             computer={computer} font={settings.terminalFont} id={id} label={label} on={on}/>
         </div>

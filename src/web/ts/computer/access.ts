@@ -6,16 +6,19 @@ import "setimmediate";
 
 const colours = "0123456789abcdef";
 
-const splitName = (file: string) => {
+export const splitName = (file: string) => {
   const lastIndex = file.lastIndexOf("/");
   if (lastIndex < 0) return ["", file];
   return [file.substring(0, lastIndex), file.substring(lastIndex + 1)];
 };
 
-class FileSystemEntry implements IFileSystemEntry {
-  private readonly children: string[] | null;
+export const joinName = (parent: string, child: string) => parent === "" ? child : `${parent}/${child}`;
+
+export class FileSystemEntry implements IFileSystemEntry {
+  private children: string[] | null;
   private contents: string | null;
-  public exists: boolean = true;
+  private exists: boolean = true;
+  private semaphore?: Semaphore;
 
   constructor(children: string[] | null, contents: string | null) {
     this.children = children;
@@ -31,6 +34,12 @@ class FileSystemEntry implements IFileSystemEntry {
     return this.children;
   }
 
+  public setChildren(children: string[]): void {
+    if (this.children == null) throw Error("Not a directory");
+    this.children = children;
+    if (this.semaphore) this.semaphore.signal();
+  }
+
   public getContents(): string {
     if (this.contents == null) throw Error("Not a file");
     return this.contents;
@@ -41,6 +50,14 @@ class FileSystemEntry implements IFileSystemEntry {
     if (!this.exists) return { error: "File has been deleted", value: null };
     this.contents = contents;
     return { value: true };
+  }
+
+  public delete(): void {
+    this.exists = false;
+  }
+
+  public getSemaphore(): Semaphore {
+    return this.semaphore || (this.semaphore = new Semaphore());
   }
 }
 
@@ -97,11 +114,11 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
     this.semaphore.signal();
   }
 
-  public getEntry(path: string): IFileSystemEntry | null {
+  public getEntry(path: string): FileSystemEntry | null {
     return this.filesystem.get(path) || null;
   }
 
-  public createDirectory(path: string): Result<IFileSystemEntry> {
+  public createDirectory(path: string): Result<FileSystemEntry> {
     const entry = this.filesystem.get(path);
     if (!entry) {
       const [parentName, fileName] = splitName(path);
@@ -109,7 +126,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       if (parent.value === null) return parent;
 
       const file = new FileSystemEntry([], null);
-      parent.value.getChildren().push(fileName);
+      parent.value.setChildren([...parent.value.getChildren(), fileName]);
       this.filesystem.set(path, file);
       return { value: file };
     } else if (entry.isDirectory()) {
@@ -119,7 +136,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
     }
   }
 
-  public createFile(path: string): Result<IFileSystemEntry> {
+  public createFile(path: string): Result<FileSystemEntry> {
     const entry = this.filesystem.get(path);
     if (!entry) {
       const [parentName, fileName] = splitName(path);
@@ -127,7 +144,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       if (parent == null || !parent.isDirectory()) return { error: `/${path}: Access denied`, value: null };
 
       const file = new FileSystemEntry(null, "");
-      parent.getChildren().push(fileName);
+      parent.setChildren([...parent.getChildren(), fileName]);
       this.filesystem.set(path, file);
       return { value: file };
     } else if (entry.isDirectory()) {
@@ -138,8 +155,16 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
   }
 
   public deleteEntry(path: string): void {
-    const queue = [path];
+    const pathEntry = this.filesystem.get(path);
+    if (!pathEntry) return pathEntry;
 
+    // Remove from the parent
+    const [parentName, fileName] = splitName(path);
+    const parent = this.filesystem.get(parentName)!;
+    parent.setChildren(parent.getChildren().filter(x => x !== fileName));
+
+    // And delete any children
+    const queue = [path];
     while (true) {
       const file = queue.pop();
       if (file === undefined) break;
@@ -147,11 +172,11 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const entry = this.filesystem.get(file);
       if (!entry) continue;
 
-      entry.exists = false;
+      entry.delete();
       this.filesystem.delete(path);
 
       if (entry.isDirectory()) continue;
-      for (const child of entry.getChildren()) queue.push(`${file}/${child}`);
+      for (const child of entry.getChildren()) queue.push(joinName(file, child));
     }
   }
 

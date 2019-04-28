@@ -161,7 +161,9 @@ tasks {
             into("assets")
         }
 
-        from("src/web/public")
+        from("src/web/public") {
+            exclude("assets/font/config.json")
+        }
 
         into("$buildDir/web")
     }

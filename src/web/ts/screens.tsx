@@ -35,8 +35,8 @@ export const About = () => <div class="dialogue-box">
   <p>
     If you need help writing a program, I'd recommend checking out the <a href="https://forums.computercraft.cc/"
     target="_blank" title ="The CC: Tweaked forums">CC: Tweaked</a> or <a href="http://www.computercraft.info/forums2/"
-    title="The ComputerCraft forums" target="_blank">ComputerCraft</a> forums.
-    <a href="http://www.computercraft.info/wiki/Main_Page" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
+    title="The ComputerCraft forums" target="_blank">ComputerCraft</a> forums. <a
+    href="http://www.computercraft.info/wiki/Main_Page" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
     wiki</a> may also be a good source of documentation.
   </p>
 
