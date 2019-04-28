@@ -237,15 +237,18 @@ pre { padding: 10px; }
 .notification-ok .notification-kind { background-color: #2dff31; }
 .notification-ok .notification-kind span:before { content: "Success"; }
 
-.settings-cog {
+.info-buttons {
     position: fixed;
     bottom: 5px;
     left: 5px;
-    opacity: 0.6;
     z-index: 50;
 }
 
-.settings-cog:hover { opacity: 1; }
+.info-buttons > button {
+  opacity: 0.6;
+  padding: 0 3px;
+}
+.info-buttons > button:hover { opacity: 1; }
 
 .dialogue-overlay {
   position: fixed;
@@ -261,10 +264,14 @@ pre { padding: 10px; }
 
 .dialogue-box {
   position: relative;
-  top: 80px;
+  top: 5vh;
   margin: 0px auto;
   padding: 20px;
-  width: 800px;
+  box-sizing: border-box;
+  width: 90vw;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: scroll;
 
   background: white;
 }
@@ -283,4 +290,10 @@ pre { padding: 10px; }
 
 .form-group input, .form-group select {
   margin: 0px 5px;
+}
+
+@media(max-width: 800px) {
+  .form-group > label {
+    flex-basis: 100%;
+  }
 }

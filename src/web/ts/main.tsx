@@ -1,7 +1,8 @@
 import { Component, h } from "preact";
 import { Computer } from "./computer";
-import { Cog } from "./font";
+import { Cog, Info } from "./font";
 import { Settings } from "./settings";
+import { About } from "./screens";
 
 export type MainProps = {};
 
@@ -68,9 +69,16 @@ export class Main extends Component<MainProps, MainState> {
   public render(_props: MainProps, state: MainState) {
     return <div class="container">
       {state.currentVDom(state)}
-      <button class="action-button settings-cog" title="Configure how the emulator behaves" onClick={this.openSettings}>
-        <Cog />
-      </button>
+      <div class="info-buttons">
+        <button class="action-button" title="Configure how the emulator behaves"
+          onClick={this.openSettings}>
+          <Cog />
+        </button>
+        <button class="action-button" title="Find out more about the emulator"
+          onClick={() => this.setState({ dialogue: () => <About />})}>
+          <Info />
+        </button>
+      </div>
       {
         state.dialogue ?
           <div class="dialogue-overlay" onClick={this.closeDialogueClick}>

@@ -32,15 +32,19 @@ installed and on the path.
  - Clone Copy Cat with submodules: `git clone --recursive https://github.com/SquidDev-CC/copy-cat`
  - Install NodeJS packages: `npm install`
  - Apply patches: `./gradlew applyPatches`
- - Build: `./gradlew assemble`
+ - Build: `./gradlew assemble`. You can also automatically build everything when
+   a file changes using `./gradlew assemble --continuous`.
 
 The resulting website should be in `build/web`.
 
 If making further modifications to the files in `src/main/java`, run
 `./gradlew makePatches` to regenerate the patch directory.
 
+Use `git submodule foreach git pull` in order to update all source repositories.
+You will probably need to apply and then regenerate patches after doing so.
+
 [copycat]: https://copy-cat.squiddev.cc "Try Copy Cat online"
 [mimic]: https://gravlann.github.io/ "The Mimic ComputerCraft emulator"
 [cloud]: https://github.com/SquidDev-CC/cloud-catcher "The Cloud Catcher repository"
 [cobalt]: https://github.com/SquidDev/Cobalt "The Cobalt repository"
-[cct]: https://github.com/SquidDev-CC/CC-Tweaked "The CC:Tweaked repository"
+[cct]: https://github.com/SquidDev-CC/CC-Tweaked "The CC: Tweaked repository"
