@@ -8,6 +8,11 @@
   ],
   "author": "SquidDev",
   "license": "MIT",
+  "scripts": {
+    "tsc": "tsc --project .",
+    "tslint": "tslint --project .",
+    "rollup": "rollup -c"
+  },
   "dependencies": {
     "preact": "^8.4.2",
     "setimmediate": "^1.0.5"

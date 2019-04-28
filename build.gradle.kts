@@ -1,5 +1,6 @@
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.teavm.tooling.RuntimeCopyOperation
 import org.teavm.tooling.TeaVMTargetType
 import org.teavm.tooling.TeaVMTool
@@ -109,14 +110,28 @@ tasks {
         }
     }
 
+    /**
+     * Build a command which runs a specific program. Gradle daemons may not be started with the correct PATH, and so
+     * will not find the required programs.
+     */
+    fun mkCommand(cmd: String) =
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            listOf("cmd", "/c", cmd)
+        } else {
+            listOf("sh", "-c", cmd)
+        }
+
     val compileTypescript by registering(Exec::class) {
         group = "build"
         description = "Converts TypeScript code to Javascript"
 
         inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
+        inputs.file("package.json").withPropertyName("package.json")
+        inputs.file("tsconfig.json").withPropertyName("TypeScript config")
+
         outputs.dir("$buildDir/typescript").withPropertyName("output")
 
-        commandLine("node_modules/.bin/tsc.cmd", "--project", "tsconfig.json")
+        commandLine(mkCommand("npm run --silent tsc"))
     }
 
     val rollup by registering(Exec::class) {
@@ -125,9 +140,12 @@ tasks {
 
         dependsOn(compileTypescript)
         inputs.files(fileTree("$buildDir/typescript")).withPropertyName("sources")
+        inputs.file("package.json").withPropertyName("package.json")
+        inputs.file("rollup.config.js").withPropertyName("Rollup config")
+
         outputs.file("$buildDir/rollup/main.js").withPropertyName("output")
 
-        commandLine("node_modules/.bin/rollup.cmd", "-c")
+        commandLine(mkCommand("npm run rollup --silent"))
     }
 
     val website by registering(Sync::class) {
