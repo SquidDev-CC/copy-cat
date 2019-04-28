@@ -1,8 +1,9 @@
 import { Component, h } from "preact";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
-import { Settings } from "./settings";
 import { About } from "./screens";
+import { Settings } from "./settings";
+import { getStorage, setStorage } from "./storage";
 
 export type MainProps = {};
 
@@ -32,17 +33,17 @@ export class Main extends Component<MainProps, MainState> {
     };
 
     // Sync settings from local storage
-    try {
-      const settingJson = window.localStorage.getItem("settings");
-      if (settingJson !== null) {
+    const settingJson = getStorage("settings");
+    if (settingJson !== null) {
+      try {
         const settingStorage = JSON.parse(settingJson);
         for (const key of Object.keys(settings)) {
           const value = settingStorage[key];
           if (value !== undefined) (settings as any)[key] = value;
         }
+      } catch (e) {
+        console.error("Cannot read settings", e);
       }
-    } catch {
-      // Ignore localStorage errors - either the API isn't present, or it's disabled.
     }
 
     this.state = {
@@ -58,12 +59,7 @@ export class Main extends Component<MainProps, MainState> {
   }
 
   public componentDidUpdate() {
-    // Sync settings back to local storage
-    try {
-      window.localStorage.setItem("settings", JSON.stringify(this.state.settings));
-    } catch {
-      // Ignore
-    }
+    setStorage("settings", JSON.stringify(this.state.settings));
   }
 
   public render(_props: MainProps, state: MainState) {
