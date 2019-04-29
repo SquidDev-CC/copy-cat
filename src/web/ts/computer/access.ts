@@ -223,7 +223,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       entry.delete();
       this.filesystem.delete(path);
 
-      if (entry.isDirectory()) continue;
+      if (!entry.isDirectory()) continue;
       for (const child of entry.getChildren()) queue.push(joinName(file, child));
     }
   }

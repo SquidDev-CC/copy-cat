@@ -123,24 +123,11 @@ tasks {
 
         doLast {
             File(dir, "classes.js").bufferedWriter().use { writer ->
-                // writer.write("define(\"./classes\", [], () => {")
                 File(dir, "classes.raw.js").reader().use { it.copyTo(writer) }
-                // File(dir, "classes.raw.js").useLines { lines ->
-                //     lines.forEach {
-                //         if (it == "var \$rt_global = this;") {
-                //             writer.write("var \$rt_global = window;\n")
-                //         } else {
-                //             writer.write(it)
-                //             writer.write("\n")
-                //         }
-                //     }
-                // }
-
                 writer.write("export default callbacks => {\n");
                 writer.write("  window.callbacks = callbacks;\n")
                 writer.write("  main();\n");
                 writer.write("};\n");
-                // writer.write("});\n");
             }
         }
     }
@@ -174,7 +161,8 @@ tasks {
         description = "Combines multiple Javascript files into one"
 
         dependsOn(bundleTeaVM, compileTypescript)
-        inputs.files(fileTree("$buildDir/typescript")).withPropertyName("sources")
+        inputs.file("$buildDir/teaVM/classes.js").withPropertyName("teaVM")
+        inputs.files(fileTree("$buildDir/typescript")).withPropertyName("typescript")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
