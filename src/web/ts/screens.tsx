@@ -41,27 +41,56 @@ export const About = () => <div class="dialogue-box">
   </p>
 
   <p>
-    Of course, this emulator is sure to have lots of bugs and missing features. If you've found ap problem, why not put
+    Of course, this emulator is sure to have lots of bugs and missing features. If you've found a problem, why not put
     it on <a href="https://github.com/SquidDev-CC/copy-cat/issues" title="The Copy Cat GitHub issue tracker">the GitHub
     repo</a>?
   </p>
 
   <h3>Credits</h3>
   <p>
-    Copy Cat would not be possible without the help of several other projects:
+    Copy Cat would not be possible without the help of several Open Source projects.
   </p>
 
   <ul>
-    <li><a href="https://github.com/konsoletyper/teavm" target="_blank">TeaVM</a> (Apache 2.0)</li>
-    <li><a href="https://github.com/google/guava" target="_blank">Google Guava</a> (Apache 2.0)</li>
+    <li><a href="https://github.com/konsoletyper/teavm" target="_blank">TeaVM</a>: Apache 2.0</li>
+    <li><a href="https://github.com/google/guava" target="_blank">Google Guava</a>: Apache 2.0</li>
     <li>
-      <a href="https://commons.apache.org/proper/commons-lang/" target="_blank">Apache Commons Lang</a> (Apache 2.0)
+      <a href="https://github.com/apache/commons-lang" target="_blank">Apache Commons Lang</a>
+      : Apache 2.0, Copyright 2001-2018 The Apache Software Foundation
     </li>
-    <li><a href="https://github.com/SquidDev/Cobalt" target="_blank">Cobalt/LuaJ</a> (MIT)</li>
     <li>
-      <a href="https://github.com/SquidDev-CC/CC-Tweaked" target="_blank">CC: Tweaked</a> (ComputerCraft Public License)
+      <a href="https://github.com/SquidDev/Cobalt" target="_blank">Cobalt/LuaJ</a>
+      : MIT, Copyright (c) 2009-2011 Luaj.org. All rights reserved., modifications Copyright (c) 2015-2016 SquidDev
     </li>
-    <li><a href="https://github.com/developit/preact" target="_blank">Preact</a> (MIT)</li>
-    <li><a href="https://github.com/YuzuJS/setImmediate" target="_blank">setImmediate</a> (MIT)</li>
+    <li>
+      <a href="https://github.com/SquidDev-CC/CC-Tweaked" target="_blank">CC: Tweaked</a>
+      : ComputerCraft Public License
+    </li>
+    <li>
+      <a href="https://github.com/developit/preact" target="_blank">Preact</a>
+      : MIT, Copyright (c) 2015-present Jason Miller
+    </li>
+    <li>
+      <a href="https://github.com/YuzuJS/setImmediate" target="_blank">setImmediate</a>
+      : MIT, Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola
+    </li>
+    <li>
+      <a href="https://github.com/requirejs/requirejs" target="_blank">require.js</a>
+      : MIT, Copyright jQuery Foundation and other contributors, https://jquery.org
+    </li>
+    <li>
+      <a href="https://github.com/Microsoft/monaco-editor/" target="_blank">Monaco Editor</a>
+      : MIT, Copyright (c) 2019 Microsoft Corporation
+    </li>
   </ul>
+
+  <pre>
+    {
+`This product includes software developed by Alexey Andreev (http://teavm.org).
+
+This product includes software developed by The Apache Software Foundation (http://www.apache.org/).
+
+This product includes software developed by Joda.org (http://www.joda.org/).`
+}
+  </pre>
 </div>;

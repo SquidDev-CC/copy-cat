@@ -1,6 +1,6 @@
 let enabled = true;
 
-export const getStorage = (key: string): string | null => {
+export const get = (key: string): string | null => {
   if (!enabled) return null;
   try {
     return localStorage.getItem(key);
@@ -11,7 +11,7 @@ export const getStorage = (key: string): string | null => {
   }
 };
 
-export const setStorage = (key: string, value: string): void => {
+export const set = (key: string, value: string): void => {
   if (!enabled) return;
   try {
     localStorage.setItem(key, value);
@@ -21,7 +21,7 @@ export const setStorage = (key: string, value: string): void => {
   }
 };
 
-export const removeStorage = (key: string): void => {
+export const remove = (key: string): void => {
   if (!enabled) return;
   try {
     localStorage.removeItem(key);

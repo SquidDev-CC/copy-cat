@@ -1,9 +1,7 @@
 import { IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "../java";
-import { getStorage, removeStorage, setStorage } from "../storage";
+import * as storage from "../storage";
 import { TerminalData } from "../terminal/data";
 import { IComputerActionable, LuaValue, Semaphore } from "./actions";
-
-import "setimmediate";
 
 const colours = "0123456789abcdef";
 
@@ -54,7 +52,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     if (this.contents != null) return this.contents;
     if (this.children != null) throw Error("Not a file");
 
-    return this.contents = atob(getStorage(`computer[0].files[${this.path}].b64`) || "");
+    return this.contents = atob(storage.get(`computer[0].files[${this.path}].b64`) || "");
   }
 
   public setContents(contents: string): Result<true> {
@@ -67,18 +65,18 @@ export class FileSystemEntry implements IFileSystemEntry {
 
   public delete(): void {
     this.exists = false;
-    removeStorage(this.children == null
+    storage.remove(this.children == null
       ? `computer[0].files[${this.path}].b64`
       : `computer[0].files[${this.path}].children`);
   }
 
   private save(): void {
     if (this.children !== null) {
-      setStorage(`computer[0].files[${this.path}].children`, JSON.stringify(this.children));
+      storage.set(`computer[0].files[${this.path}].children`, JSON.stringify(this.children));
     }
 
     if (this.contents !== null) {
-      setStorage(`computer[0].files[${this.path}].b64`, btoa(this.contents));
+      storage.set(`computer[0].files[${this.path}].b64`, btoa(this.contents));
     }
   }
 
@@ -112,7 +110,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const path = queue.pop();
       if (path === undefined) break;
 
-      const children = getStorage(`computer[0].files[${path}].children`);
+      const children = storage.get(`computer[0].files[${path}].children`);
       if (children !== null) {
         let childList: string[];
         try {

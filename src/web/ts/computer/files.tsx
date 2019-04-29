@@ -1,12 +1,17 @@
 import { Component, VNode, h } from "preact";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 
+export type Opener = (path: string, entry: FileSystemEntry) => void;
+
 type FileEntryProperties = {
-  computer: ComputerAccess;
-  entry: FileSystemEntry;
-  name: string;
-  path: string;
-  depth: number;
+  computer: ComputerAccess,
+  entry: FileSystemEntry,
+  name: string,
+  path: string,
+  depth: number,
+
+  opened: string | null,
+  open: Opener,
 };
 
 type FileEntryState = {
@@ -20,18 +25,24 @@ const getExtension = (name: string, directory: boolean, expanded: boolean) => {
 };
 
 class FileEntry extends Component<FileEntryProperties, FileEntryState> {
-  public shouldComponentUpdate({ entry, depth }: FileEntryProperties, { expanded }: FileEntryState) {
-    return entry !== this.props.entry || depth !== this.props.depth || expanded !== this.state.expanded;
+  public shouldComponentUpdate({ entry, depth, opened }: FileEntryProperties, { expanded }: FileEntryState) {
+    return entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
+      expanded !== this.state.expanded;
   }
 
-  public render({ computer, entry, name, path, depth }: FileEntryProperties, { expanded }: FileEntryState) {
+  public render(
+    { computer, entry, name, path, depth, opened, open }: FileEntryProperties,
+    { expanded }: FileEntryState,
+  ) {
     return <li class="file-entry">
       <div class="file-entry-head" style={`padding-left: ${depth}em`}
-        onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : undefined}>
+        onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
         <span class={`file-entry-icon icon icon-${getExtension(name, entry.isDirectory(), expanded || false)}`}></span>
         <span class="file-entry-name">{name}</span>
       </div>
-      {expanded ? <FileTree computer={computer} entry={entry} path={path} depth={depth} /> : null}
+      {expanded
+        ? <FileTree computer={computer} entry={entry} path={path}  depth={depth} opened={opened} open={open} />
+        : null}
     </li>;
   }
 }
@@ -41,6 +52,9 @@ export type FileListProperties = {
   entry: FileSystemEntry;
   path: string;
   depth?: number;
+
+  opened: string | null,
+  open: Opener,
 };
 
 type FileListState = {
@@ -54,7 +68,7 @@ export class FileTree extends Component<FileListProperties, FileListState> {
     return entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children;
   }
 
-  public render({ computer, entry, path, depth }: FileListProperties, { children }: FileListState) {
+  public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState) {
     // Gather all children, and then sort them.
     const entries: ChildNode[] = (children || entry.getChildren()).map(childName => {
       const childPath = joinName(path, childName);
@@ -62,7 +76,7 @@ export class FileTree extends Component<FileListProperties, FileListState> {
       return {
         name: childName, dir: child.isDirectory(),
         node: <FileEntry computer={computer} entry={child} path={childPath} name={childName}
-          depth={depth === undefined ? 0 : depth + 1}/>,
+          depth={depth === undefined ? 0 : depth + 1} opened={opened} open={open} />,
       };
     });
 

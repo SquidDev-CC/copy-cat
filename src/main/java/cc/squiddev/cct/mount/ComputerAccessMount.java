@@ -150,7 +150,6 @@ public class ComputerAccessMount implements IWritableMount {
             preWrite(length);
             buffer.put(contents, (int) position, length);
             size = (int) (position += length);
-            System.out.println(buffer + " / " + Arrays.toString(contents));
             return length;
         }
 
@@ -161,7 +160,6 @@ public class ComputerAccessMount implements IWritableMount {
             preWrite(1);
             contents[(int) position] = (byte) b;
             size = (int) (position += 1);
-            System.out.println(Arrays.toString(contents));
         }
 
         @Override
@@ -171,7 +169,6 @@ public class ComputerAccessMount implements IWritableMount {
             preWrite(length);
             System.arraycopy(b, offset, contents, (int) position, length);
             size = (int) (position += length);
-            System.out.println(Arrays.toString(b) + " / " + Arrays.toString(contents));
         }
 
         @Override
@@ -181,7 +178,6 @@ public class ComputerAccessMount implements IWritableMount {
 
         @Override
         public void close() throws IOException {
-            System.out.println("Closing " + closed);
             if (closed) return;
             closed = true;
 

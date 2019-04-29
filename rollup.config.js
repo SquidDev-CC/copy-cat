@@ -1,13 +1,21 @@
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from "rollup-plugin-node-resolve";
 
 export default {
-  input: 'build/typescript/index.js',
-  output: {
-    file: 'build/rollup/main.js',
-    name: 'start',
-    format: "iife",
+  input: {
+    main: "build/typescript/main.js",
+    classes: "build/teaVM/classes.js",
+    editor: "build/typescript/editor/index.js",
   },
-  plugins: [
-    resolve(),
-  ],
+  output: {
+    dir: "build/rollup/",
+    format: "amd",
+    paths: {
+      "monaco-editor": "vs/editor/editor.main",
+    },
+    preferConst: true,
+  },
+  context: "window",
+  external: [ "monaco-editor" ],
+
+  plugins: [ resolve() ],
 };

@@ -1,11 +1,9 @@
-import { Component, h } from "preact";
+import { Component, h, render } from "preact";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { Settings } from "./settings";
-import { getStorage, setStorage } from "./storage";
-
-export type MainProps = {};
+import * as storage from "./storage";
 
 type MainState = {
   settings: Settings,
@@ -14,14 +12,12 @@ type MainState = {
   dialogue?: (state: MainState) => JSX.Element,
 };
 
-export class Main extends Component<MainProps, MainState> {
-  public constructor(props: MainProps, context: any) {
+class Main extends Component<{}, MainState> {
+  public constructor(props: {}, context: any) {
     super(props, context);
   }
 
   public componentWillMount() {
-    const {  } = this.props;
-
     const settings: Settings = {
       showInvisible: true,
       trimWhitespace: true,
@@ -33,7 +29,7 @@ export class Main extends Component<MainProps, MainState> {
     };
 
     // Sync settings from local storage
-    const settingJson = getStorage("settings");
+    const settingJson = storage.get("settings");
     if (settingJson !== null) {
       try {
         const settingStorage = JSON.parse(settingJson);
@@ -52,17 +48,17 @@ export class Main extends Component<MainProps, MainState> {
     };
   }
 
-  public shouldComponentUpdate(_props: MainProps, newState: MainState) {
+  public shouldComponentUpdate({}: {}, newState: MainState) {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
   }
 
   public componentDidUpdate() {
-    setStorage("settings", JSON.stringify(this.state.settings));
+    storage.set("settings", JSON.stringify(this.state.settings));
   }
 
-  public render(_props: MainProps, state: MainState) {
+  public render({}: {}, state: MainState) {
     return <div class="container">
       {state.currentVDom(state)}
       <div class="info-buttons">
@@ -97,3 +93,9 @@ export class Main extends Component<MainProps, MainState> {
     return <Computer settings={settings} focused={dialogue === undefined} />;
   }
 }
+
+export default () => {
+  // Start the window!
+  const page = document.getElementById("page") as HTMLElement;
+  render(<Main />, page, page.lastElementChild || undefined);
+};

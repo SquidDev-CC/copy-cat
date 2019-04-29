@@ -24,7 +24,6 @@ const clamp = (value: number, min: number, max: number) => {
 };
 
 const labelElement = (id?: number, label?: string) => {
-  console.log(`Render terminal with id=${id}, label=${label}`);
   if (id === undefined && label === undefined) return "Unlabeled computer";
   if (id === undefined) return `${label}`;
   if (label === undefined) return `Computer #${id}`;
@@ -115,6 +114,7 @@ export class Terminal extends Component<TerminalProps, {}> {
   }
 
   public componentDidUpdate() {
+    this.changed = true;
     this.queueDraw();
     if (this.props.focused && this.inputElem) this.inputElem.focus();
   }

@@ -14,10 +14,14 @@
     "rollup": "rollup -c"
   },
   "dependencies": {
+    "monaco-editor": "^0.16.2",
     "preact": "^8.4.2",
+    "requirejs": "^2.3.6",
+    "rollup-plugin-commonjs": "^9.3.4",
     "setimmediate": "^1.0.5"
   },
   "devDependencies": {
+    "@types/requirejs": "^2.1.31",
     "rollup": "^1.4.1",
     "rollup-plugin-node-resolve": "^4.0.1",
     "tslint": "^5.13.1",

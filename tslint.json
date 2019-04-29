@@ -13,9 +13,10 @@
       "member-ordering": false,
       "no-bitwise": false,
       "no-console": false,
-      "no-implicit-dependencies": [true, "dev"],
+      "no-implicit-dependencies": [true],
       "no-magic-numbers": false,
       "no-namespace": false,
+      "no-submodule-imports": false,
       "object-literal-key-quotes": [true, "consistent-as-needed"],
       "object-literal-sort-keys": false,
       "ordered-imports": [

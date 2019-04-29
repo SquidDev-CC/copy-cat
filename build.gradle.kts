@@ -8,19 +8,23 @@ import org.teavm.tooling.TeaVMToolLog
 import org.teavm.tooling.sources.DirectorySourceFileProvider
 import org.teavm.tooling.sources.JarSourceFileProvider
 import org.teavm.vm.TeaVMOptimizationLevel
+
+import java.io.Reader
+import java.io.FilterReader
 import java.net.URLClassLoader
 import javax.sound.midi.Patch
-
 
 buildscript {
     repositories {
         mavenCentral()
+        maven("https://dl.bintray.com/konsoletyper/teavm")
     }
 
     dependencies {
         classpath("org.teavm:teavm-core:${project.properties["teavm_version"]}")
         classpath("org.teavm:teavm-tooling:${project.properties["teavm_version"]}")
         classpath("io.github.java-diff-utils:java-diff-utils:4.0")
+        classpath("com.google.guava:guava:22.0")
     }
 }
 
@@ -57,8 +61,8 @@ tasks {
 
         inputs.files(project.configurations.getByName("runtime").allArtifacts.files).withPropertyName("jars")
 
-        val output = File(buildDir, "teaVM")
-        outputs.dir(output).withPropertyName("output")
+        val dir = File(buildDir, "teaVM")
+        outputs.file(File(dir, "classes.raw.js")).withPropertyName("output")
 
         doLast {
             val log = object : TeaVMToolLog {
@@ -85,7 +89,8 @@ tasks {
             URLClassLoader((dependencies + artifacts).toTypedArray(), log.javaClass.classLoader).use { classloader ->
                 val tool = TeaVMTool()
                 tool.classLoader = classloader
-                tool.targetDirectory = output
+                tool.targetDirectory = dir
+                tool.targetFileName = "classes.raw.js"
                 tool.mainClass = application.mainClassName
                 tool.runtime = RuntimeCopyOperation.MERGED
                 tool.isMinifying = true
@@ -103,9 +108,39 @@ tasks {
                 tool.generate()
 
                 if (!tool.problemProvider.severeProblems.isEmpty()) throw IllegalStateException("Build failed")
+            }
+        }
+    }
 
-                // "touch" the directory
-                output.setLastModified(System.currentTimeMillis())
+    val bundleTeaVM by registering {
+        group = "build"
+        description = "Converts the TeaVM file into a AMD module"
+
+        dependsOn(compileTeaVM)
+        val dir = File(buildDir, "teaVM")
+        inputs.file(File(dir, "classes.raw.js")).withPropertyName("input")
+        outputs.file(File(dir, "classes.js")).withPropertyName("output")
+
+        doLast {
+            File(dir, "classes.js").bufferedWriter().use { writer ->
+                // writer.write("define(\"./classes\", [], () => {")
+                File(dir, "classes.raw.js").reader().use { it.copyTo(writer) }
+                // File(dir, "classes.raw.js").useLines { lines ->
+                //     lines.forEach {
+                //         if (it == "var \$rt_global = this;") {
+                //             writer.write("var \$rt_global = window;\n")
+                //         } else {
+                //             writer.write(it)
+                //             writer.write("\n")
+                //         }
+                //     }
+                // }
+
+                writer.write("export default callbacks => {\n");
+                writer.write("  window.callbacks = callbacks;\n")
+                writer.write("  main();\n");
+                writer.write("};\n");
+                // writer.write("});\n");
             }
         }
     }
@@ -138,12 +173,12 @@ tasks {
         group = "build"
         description = "Combines multiple Javascript files into one"
 
-        dependsOn(compileTypescript)
+        dependsOn(bundleTeaVM, compileTypescript)
         inputs.files(fileTree("$buildDir/typescript")).withPropertyName("sources")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
-        outputs.file("$buildDir/rollup/main.js").withPropertyName("output")
+        outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
 
         commandLine(mkCommand("npm run rollup --silent"))
     }
@@ -152,12 +187,18 @@ tasks {
         group = "build"
         description = "Combines all resource files into one distribution."
 
-        dependsOn(compileTeaVM, rollup)
+        dependsOn(rollup)
 
-        from("$buildDir/teaVM/classes.js") {
+        from("$buildDir/rollup") {
+            include("*.js")
+            // So require.js thinks that files ending in '.js' must be absolute and so leaves off the baseUrl. Rollup
+            // will include the ".js" on non-external modules, and so we need to "fix" that.
+            // Yes, this is horrible and there's probably better ways to fix it.
+            filter { it.replace(".js\'],", "\'],") }
             into("assets")
         }
-        from("$buildDir/rollup/main.js") {
+
+        from("$buildDir/typescript/loader.js") {
             into("assets")
         }
 
