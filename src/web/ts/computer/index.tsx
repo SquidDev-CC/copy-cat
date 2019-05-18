@@ -83,7 +83,8 @@ export class Computer extends Component<ComputerProps, ComputerState> {
         {activeFile == null
           ? <Terminal terminal={terminal} changed={terminalChanged} focused={focused}
               computer={computer} font={settings.terminalFont} id={id} label={label} on={on}/>
-          : <Editor model={activeFile.model} settings={settings} focused={focused} />}
+          : <Editor model={activeFile.model} settings={settings} focused={focused}
+                doSave={contents => activeFile.file.setContents(contents)} />}
       </div>
     </div>;
   }

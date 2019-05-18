@@ -176,6 +176,13 @@ pre {
   padding: 0 5px;
 }
 
+.editor-placeholder {
+  font-size: 3em;
+  color: #aaa;
+  text-align: center;
+  margin: 1em;
+}
+
 .info-buttons {
     position: fixed;
     bottom: 5px;

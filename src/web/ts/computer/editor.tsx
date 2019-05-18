@@ -65,7 +65,7 @@ export type EditorProps = {
   model: LazyModel,
 
   // A set of actions to call
-  // doSave: (contents: string) => void,
+  doSave: (contents: string) => void,
 };
 
 export default class Editor extends Component<EditorProps, {}> {
@@ -91,6 +91,10 @@ export default class Editor extends Component<EditorProps, {}> {
 
     this.editorPromise = undefined;
 
+    // Clear the body of any elements
+    const base = this.base!;
+    while (base.firstChild) base.firstChild.remove();
+
     this.editor = monaco.editor.create(this.base!, {
       roundedSelection: false,
       autoIndent: true,
@@ -109,7 +113,7 @@ export default class Editor extends Component<EditorProps, {}> {
           editor.getAction("editor.action.trimTrailingWhitespace").run();
         }
 
-        // this.props.doSave(editor.getValue());
+        this.props.doSave(editor.getValue());
       },
     });
 
@@ -117,21 +121,22 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   public componentWillUnmount() {
-    if (this.editor) {
-      // Save the view state back to the model
-      forceModel(this.props.model).view = this.editor.saveViewState();
+    if (!this.editor) return;
 
-      // We set a new session to prevent destroying it when losing the editor
-      /* this.editor.setSession(new ace.EditSession("")); */
-      this.editor.dispose();
-    }
+    // Save the view state back to the model
+    forceModel(this.props.model).view = this.editor.saveViewState();
+    // And save the file
+    this.props.doSave(this.editor.getValue());
+
+    // We set a new session to prevent destroying it when losing the editor
+    this.editor.dispose();
   }
 
   public componentWillUpdate() {
+    if (!this.editor) return;
+
     // Save the view state back to the model
-    if (this.editor) {
-      forceModel(this.props.model).view = this.editor.saveViewState();
-    }
+    forceModel(this.props.model).view = this.editor.saveViewState();
   }
 
   public componentDidUpdate() {
@@ -150,7 +155,6 @@ export default class Editor extends Component<EditorProps, {}> {
     if (model.view) this.editor.restoreViewState(model.view);
 
     this.editor.updateOptions({
-      readOnly: true,
       renderWhitespace: settings.showInvisible ? "boundary" : "none",
     });
 
@@ -164,6 +168,8 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   public render() {
-    return <div class="editor-view"></div>;
+    return <div class="editor-view">
+      {monaco ? undefined : <div class="editor-placeholder">Loading...</div>}
+    </div>;
   }
 }
