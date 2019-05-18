@@ -1,6 +1,6 @@
 import { Component, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
-import { NoEntry, Off, On } from "../font";
+import { NoEntry, Off, On, Camera } from "../font";
 import { TerminalData } from "./data";
 import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
@@ -21,6 +21,11 @@ const clamp = (value: number, min: number, max: number) => {
   if (value < min) return min;
   if (value > max) return max;
   return value;
+};
+
+const pad = (val: number, len: number) => {
+  const str = val.toString();
+  return str.length >= len ? str : "0".repeat(len - str.length) + str;
 };
 
 const labelElement = (id?: number, label?: string) => {
@@ -99,16 +104,23 @@ export class Terminal extends Component<TerminalProps, {}> {
     return <div class="terminal-view">
       {...this.vdom}
       <div class="terminal-bar">
-        <button type="none" class="action-button terminal-power"
+        <button type="none" class="action-button terminal-button"
           title={on ? "Turn this computer off" : "Turn this computer on"}
           onClick={on ? this.onPowerOff : this.onPowerOn}>
           {on ? <On /> : <Off />}
         </button>
         <span class="terminal-info">{labelElement(id, label)}</span>
-        <button type="none" class="action-button terminal-terminate"
-          title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
-          <NoEntry />
-        </button>
+
+        <span class="terminal-buttons-right">
+          <button type="none" class="action-button terminal-button"
+            title="Take a screenshot of the terminal." onClick={this.onScreenshot}>
+            <Camera />
+          </button>
+          <button type="none" class="action-button terminal-button"
+            title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
+            <NoEntry />
+          </button>
+        </span>
       </div>
     </div>;
   }
@@ -370,5 +382,34 @@ export class Terminal extends Component<TerminalProps, {}> {
   private onPowerOn = (event: Event) => {
     this.onEventDefault(event);
     this.props.computer.turnOn();
+  }
+
+  private onScreenshot = (event: Event) => {
+    this.onEventDefault(event);
+    if (!this.canvasElem) return;
+
+    // Somewhat inspired by https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
+    // Goodness knows how well this works on non-modern browsers
+    this.canvasElem.toBlob(blob => {
+      const element = document.createElement("a") as HTMLAnchorElement;
+      const url = URL.createObjectURL(blob);
+
+      const now = new Date();
+      element.download = `computer-${now.getFullYear()}-${pad(now.getMonth() + 1, 2)}-${pad(now.getDate(), 2)}_` +
+        `${pad(now.getHours(), 2)}${pad(now.getMinutes(), 2)}.png`;
+      element.rel = "noopener";
+      element.href = url;
+
+      setTimeout(() => URL.revokeObjectURL(url), 60e3);
+      setTimeout(() => {
+        try {
+          element.dispatchEvent(new MouseEvent("click"));
+        } catch (e) {
+          const mouseEvent = document.createEvent("MouseEvents");
+          mouseEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+          element.dispatchEvent(mouseEvent);
+        }
+      }, 0);
+    }, "image/png", 1);
   }
 }

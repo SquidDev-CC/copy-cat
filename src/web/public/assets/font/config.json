@@ -61,6 +61,18 @@
       "css": "doc-text",
       "code": 61686,
       "src": "fontawesome"
+    },
+    {
+      "uid": "dc3f1d5b1d006f7f7b3b6295eccab9da",
+      "css": "camera",
+      "code": 59399,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "0f99ab40ab0b4d64a74f2d0deeb03e42",
+      "css": "videocam",
+      "code": 59400,
+      "src": "fontawesome"
     }
   ]
 }
