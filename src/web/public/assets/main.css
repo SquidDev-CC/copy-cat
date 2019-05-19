@@ -42,6 +42,11 @@ pre {
   cursor: pointer;
 }
 
+.action-button.disabled {
+  cursor: initial;
+  color: #888;
+}
+
 .icon-font {
   width: 1em;
   height: 1em;
@@ -79,6 +84,10 @@ pre {
   overflow-x: hidden;
 }
 
+.terminal-wrapper {
+  margin: 30px auto 0px auto;
+}
+
 .terminal-canvas {
   image-rendering: optimizeSpeed;
   image-rendering: -moz-crisp-edges;
@@ -88,11 +97,9 @@ pre {
   -ms-interpolation-mode: nearest-neighbor;
 
   display: block;
-  margin: 30px auto 0px auto;
 }
 
 .terminal-bar {
-  margin: 0px auto;
   background: #eee;
   font-size: 0.8em;
 }
@@ -112,11 +119,17 @@ pre {
 }
 
 .terminal-button:hover { background: #ddd; }
+.terminal-button.disabled:hover { background: none; }
 
 .terminal-input {
   position: absolute;
   left: -1000px;
   top: -1000px;
+}
+
+.terminal-progress {
+  height: 2px;
+  background: #333;
 }
 
 .computer-view {
@@ -282,4 +295,5 @@ pre {
 .icon-down-open:before { content: '\e806'; }
 .icon-camera:before { content: '\e807'; }
 .icon-videocam:before { content: '\e808'; }
+.icon-videocam-on:before { content: '\e808'; color: red; }
 .icon-doc-text:before { content: '\f0f6'; }

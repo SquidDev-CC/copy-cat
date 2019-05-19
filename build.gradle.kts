@@ -194,6 +194,12 @@ tasks {
             exclude("assets/font/config.json")
         }
 
+        from("node_modules/gif.js/dist") {
+            include("gif.js")
+            include("gif.worker.js")
+            into("assets")
+        }
+
         into("$buildDir/web")
     }
 

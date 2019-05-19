@@ -14,6 +14,7 @@
     "rollup": "rollup -c"
   },
   "dependencies": {
+    "gif.js": "git+https://git@github.com/jnordberg/gif.js.git",
     "monaco-editor": "^0.16.2",
     "preact": "^8.4.2",
     "requirejs": "^2.3.6",

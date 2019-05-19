@@ -1,9 +1,12 @@
 import { Component, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
-import { NoEntry, Off, On, Camera } from "../font";
+import { Camera, NoEntry, Off, On, Videocam, VideocamRecording } from "../font";
+import { GIF, create as createGif } from "../record";
 import { TerminalData } from "./data";
 import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
+
+enum RecordingState { None, Loading, Recording, Rendering }
 
 export type TerminalProps = {
   changed: Semaphore,
@@ -15,6 +18,11 @@ export type TerminalProps = {
   id?: number,
   label?: string,
   on: boolean,
+};
+
+type TerminalState = {
+  recording: RecordingState,
+  progress: number,
 };
 
 const clamp = (value: number, min: number, max: number) => {
@@ -35,11 +43,37 @@ const labelElement = (id?: number, label?: string) => {
   return `${label} (Computer #${id})`;
 };
 
-export class Terminal extends Component<TerminalProps, {}> {
+const saveBlob = (prefix: string, extension: string, blob: Blob | null) => {
+  if (!blob) return;
+
+  // Somewhat inspired by https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
+  // Goodness knows how well this works on non-modern browsers.
+  const element = document.createElement("a") as HTMLAnchorElement;
+  const url = URL.createObjectURL(blob);
+
+  const now = new Date();
+  element.download = `${prefix}-${now.getFullYear()}-${pad(now.getMonth() + 1, 2)}-${pad(now.getDate(), 2)}_` +
+    `${pad(now.getHours(), 2)}-${pad(now.getMinutes(), 2)}.${extension}`;
+  element.rel = "noopener";
+  element.href = url;
+
+  setTimeout(() => URL.revokeObjectURL(url), 60e3);
+  setTimeout(() => {
+    try {
+      element.dispatchEvent(new MouseEvent("click"));
+    } catch (e) {
+      const mouseEvent = document.createEvent("MouseEvents");
+      mouseEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+      element.dispatchEvent(mouseEvent);
+    }
+  }, 0);
+};
+
+export class Terminal extends Component<TerminalProps, TerminalState> {
   private canvasElem?: HTMLCanvasElement;
   private canvasContext?: CanvasRenderingContext2D;
   private inputElem?: HTMLInputElement;
-  private barElem?: HTMLDivElement;
+  private wrapperElem?: HTMLDivElement;
 
   private changed: boolean = false;
   private lastBlink: boolean = false;
@@ -52,8 +86,16 @@ export class Terminal extends Component<TerminalProps, {}> {
   private lastX: number = -1;
   private lastY: number = -1;
 
+  private gif: GIF | null = null;
+  private lastGifFrame: number | null = null;
+
   public constructor(props: TerminalProps, context: any) {
     super(props, context);
+
+    this.state = {
+      recording: RecordingState.None,
+      progress: 0,
+    };
 
     this.vdom = [
       <canvas class="terminal-canvas"
@@ -69,7 +111,7 @@ export class Terminal extends Component<TerminalProps, {}> {
     this.canvasElem = this.base!.querySelector(".terminal-canvas") as HTMLCanvasElement;
     this.canvasContext = this.canvasElem.getContext("2d") as CanvasRenderingContext2D;
     this.inputElem = this.base!.querySelector(".terminal-input") as HTMLInputElement;
-    this.barElem = this.base!.querySelector(".terminal-bar") as HTMLDivElement;
+    this.wrapperElem = this.base!.querySelector(".terminal-wrapper") as HTMLDivElement;
 
     // Subscribe to some events to allow us to shedule a redraw
     window.addEventListener("resize", this.onResized);
@@ -100,27 +142,36 @@ export class Terminal extends Component<TerminalProps, {}> {
     this.drawQueued = false;
   }
 
-  public render({ id, label, on }: TerminalProps) {
+  public render({ id, label, on }: TerminalProps, { recording, progress }: TerminalState) {
+    const recordingDisabled = recording === RecordingState.Loading || recording === RecordingState.Rendering;
     return <div class="terminal-view">
-      {...this.vdom}
-      <div class="terminal-bar">
-        <button type="none" class="action-button terminal-button"
-          title={on ? "Turn this computer off" : "Turn this computer on"}
-          onClick={on ? this.onPowerOff : this.onPowerOn}>
-          {on ? <On /> : <Off />}
-        </button>
-        <span class="terminal-info">{labelElement(id, label)}</span>
+      <div class="terminal-wrapper">
+        {...this.vdom}
+        <div class="terminal-bar">
+          <button type="none" class="action-button terminal-button"
+            title={on ? "Turn this computer off" : "Turn this computer on"}
+            onClick={on ? this.onPowerOff : this.onPowerOn}>
+            {on ? <On /> : <Off />}
+          </button>
+          <span class="terminal-info">{labelElement(id, label)}</span>
 
-        <span class="terminal-buttons-right">
-          <button type="none" class="action-button terminal-button"
-            title="Take a screenshot of the terminal." onClick={this.onScreenshot}>
-            <Camera />
-          </button>
-          <button type="none" class="action-button terminal-button"
-            title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
-            <NoEntry />
-          </button>
-        </span>
+          <span class="terminal-buttons-right">
+            <button type="none" class="action-button terminal-button"
+              title="Take a screenshot of the terminal." onClick={this.onScreenshot}>
+              <Camera />
+            </button>
+            <button type="none" class={`action-button terminal-button ${recordingDisabled ? "disabled" : ""}`}
+              title="Take a screenshot of the terminal." onClick={this.onRecord}>
+              {recording === RecordingState.Recording ? <VideocamRecording /> : <Videocam />}
+            </button>
+            <button type="none" class="action-button terminal-button"
+              title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
+              <NoEntry />
+            </button>
+          </span>
+        </div>
+        <div class="terminal-progress" style={`width: ${recording === RecordingState.Rendering ? progress * 100 : 0}%`}>
+        </div>
       </div>
     </div>;
   }
@@ -137,6 +188,9 @@ export class Terminal extends Component<TerminalProps, {}> {
       window.requestAnimationFrame(time => {
         this.drawQueued = false;
         if (!this.mounted) return;
+
+        // We push the previous frame before drawing the next one.
+        this.addGifFrame();
 
         this.draw(time);
 
@@ -216,10 +270,7 @@ export class Terminal extends Component<TerminalProps, {}> {
 
       this.canvasElem.style.height = `${canvasHeight}px`;
       this.canvasElem.style.width = `${canvasWidth}px`;
-
-      if (this.barElem) {
-        this.barElem.style.width = `${canvasWidth}px`;
-      }
+      if (this.wrapperElem) this.wrapperElem.style.width = `${canvasWidth}px`;
     }
 
     // Prevent blur when up/down-scaling
@@ -249,7 +300,7 @@ export class Terminal extends Component<TerminalProps, {}> {
 
     // Limit to allowed characters (actually slightly more generous but
     // there you go).
-    content = content.replace(/[^\x20-\xFF]/gi, ""); // .substr(0, 256));
+    content = content.replace(/[^\x20-\xFF]/gi, "");
     // Strip to the first newline
     content = content.replace(/[\r\n].*/, "");
     // Limit to 512 characters
@@ -259,6 +310,24 @@ export class Terminal extends Component<TerminalProps, {}> {
     if (!content) return;
 
     this.props.computer.queueEvent("paste", [content]);
+  }
+
+  private addGifFrame(force?: boolean) {
+    if (!this.gif || !this.canvasContext) return;
+
+    if (!this.lastGifFrame) {
+      console.error("Pushing a frame, but no previous frame!!");
+      return;
+    }
+
+    // We limit ourselves to 20fps, just so we're not producing an insane number
+    // of frames.
+    const now = Date.now();
+    if (!force && now - this.lastGifFrame < 50) return;
+
+    console.log(`Adding frame for ${now - this.lastGifFrame} seconds`);
+    this.gif.addFrame(this.canvasContext, { copy: true, delay: now - this.lastGifFrame });
+    this.lastGifFrame = now;
   }
 
   private onPaste = (event: ClipboardEvent) => {
@@ -388,28 +457,61 @@ export class Terminal extends Component<TerminalProps, {}> {
     this.onEventDefault(event);
     if (!this.canvasElem) return;
 
-    // Somewhat inspired by https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
-    // Goodness knows how well this works on non-modern browsers
-    this.canvasElem.toBlob(blob => {
-      const element = document.createElement("a") as HTMLAnchorElement;
-      const url = URL.createObjectURL(blob);
+    this.canvasElem.toBlob(blob => saveBlob("computer", "png", blob), "image/png", 1);
+  }
 
-      const now = new Date();
-      element.download = `computer-${now.getFullYear()}-${pad(now.getMonth() + 1, 2)}-${pad(now.getDate(), 2)}_` +
-        `${pad(now.getHours(), 2)}${pad(now.getMinutes(), 2)}.png`;
-      element.rel = "noopener";
-      element.href = url;
+  private onRecord = (event: Event) => {
+    this.onEventDefault(event);
 
-      setTimeout(() => URL.revokeObjectURL(url), 60e3);
-      setTimeout(() => {
-        try {
-          element.dispatchEvent(new MouseEvent("click"));
-        } catch (e) {
-          const mouseEvent = document.createEvent("MouseEvents");
-          mouseEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
-          element.dispatchEvent(mouseEvent);
+    if (!this.canvasElem) return;
+
+    switch (this.state.recording) {
+      // Skip the cases when we've got no data
+      case RecordingState.Loading:
+      case RecordingState.Rendering:
+        break;
+
+      // If we're not recording, start recording.
+      case RecordingState.None:
+        this.setState({ recording: RecordingState.Loading });
+        createGif({
+          width: this.canvasElem.width,
+          height: this.canvasElem.height,
+          quality: 10,
+        }).then(gif => {
+          this.lastGifFrame = Date.now();
+          this.gif = gif;
+          this.setState({ recording: RecordingState.Recording });
+        }).catch(e => {
+          console.error("Cannot load GIF library", e);
+          this.setState({ recording: RecordingState.None });
+        });
+        break;
+
+      case RecordingState.Recording:
+        if (!this.gif) {
+          this.setState({ recording: RecordingState.None });
+          return;
         }
-      }, 0);
-    }, "image/png", 1);
+
+        this.setState({ recording: RecordingState.Rendering });
+
+        this.addGifFrame(true);
+
+        this.gif.on("finished", blob => {
+          this.setState({ recording: RecordingState.None });
+          saveBlob("computer", "gif", blob);
+        });
+        this.gif.on("progress", progress => this.setState({ progress }));
+        this.gif.on("abort", () => {
+          this.setState({ recording: RecordingState.None });
+          console.error("Rendering GIF failed");
+        });
+
+        this.gif.render();
+
+        this.gif = null;
+        this.lastGifFrame = null;
+    }
   }
 }
