@@ -1,6 +1,7 @@
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.teavm.tooling.RuntimeCopyOperation
 import org.teavm.tooling.TeaVMTargetType
 import org.teavm.tooling.TeaVMTool
@@ -8,11 +9,7 @@ import org.teavm.tooling.TeaVMToolLog
 import org.teavm.tooling.sources.DirectorySourceFileProvider
 import org.teavm.tooling.sources.JarSourceFileProvider
 import org.teavm.vm.TeaVMOptimizationLevel
-
-import java.io.Reader
-import java.io.FilterReader
 import java.net.URLClassLoader
-import javax.sound.midi.Patch
 
 buildscript {
     repositories {
@@ -24,7 +21,7 @@ buildscript {
         classpath("org.teavm:teavm-core:${project.properties["teavm_version"]}")
         classpath("org.teavm:teavm-tooling:${project.properties["teavm_version"]}")
         classpath("io.github.java-diff-utils:java-diff-utils:4.0")
-        classpath("com.google.guava:guava:22.0")
+        classpath("org.ajoberstar.grgit:grgit-gradle:3.0.0")
     }
 }
 
@@ -176,6 +173,16 @@ tasks {
 
         dependsOn(rollup)
 
+        inputs.property("hash", {
+            try {
+                FileRepositoryBuilder().setWorkTree(File(".")).build()
+                    .use { it.resolve("HEAD").name() }
+            } catch (ignored: Exception) {
+                ignored.printStackTrace()
+                "unknown"
+            }
+        })
+
         from("$buildDir/rollup") {
             include("*.js")
             // So require.js thinks that files ending in '.js' must be absolute and so leaves off the baseUrl. Rollup
@@ -186,10 +193,12 @@ tasks {
         }
 
         from("$buildDir/typescript/loader.js") {
+            filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
             into("assets")
         }
 
         from("src/web/public") {
+            filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
             exclude("assets/font/config.json")
         }
 

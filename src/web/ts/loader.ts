@@ -1,6 +1,5 @@
 requirejs.config({
-  // baseUrl: "assets/",
-  // urlArgs: (_, url) => url.startsWith("https://cdnjs.cloudflare.com") ? url : url + "?v={version}",
+  urlArgs: (_, url) => url.startsWith("https://cdnjs.cloudflare.com") ? url : url + "?v={{version}}",
   paths: {
     vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs",
   },
