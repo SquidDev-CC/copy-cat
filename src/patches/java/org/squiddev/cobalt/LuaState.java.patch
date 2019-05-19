@@ -1,24 +1,14 @@
 --- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaState.java
 +++ src\main\java\org\squiddev\cobalt\LuaState.java
-@@ -28,16 +28,12 @@
- import org.squiddev.cobalt.compiler.LoadState;
- import org.squiddev.cobalt.compiler.LuaC;
+@@ -30,6 +30,7 @@
  import org.squiddev.cobalt.debug.DebugHandler;
--import org.squiddev.cobalt.lib.platform.FileResourceManipulator;
+ import org.squiddev.cobalt.lib.platform.FileResourceManipulator;
  import org.squiddev.cobalt.lib.platform.ResourceManipulator;
 +import org.squiddev.cobalt.lib.platform.VoidResourceManipulator;
  
  import java.io.InputStream;
  import java.io.PrintStream;
- import java.util.Random;
--import java.util.concurrent.Executor;
--import java.util.concurrent.Executors;
--import java.util.concurrent.atomic.AtomicInteger;
--import java.util.function.Function;
- 
- /**
-  * Global lua state
-@@ -119,11 +115,6 @@
+@@ -124,14 +125,7 @@
  	private LuaThread mainThread;
  
  	/**
@@ -28,17 +18,20 @@
 -
 -	/**
  	 * If this state has been abandoned, and threads should be cleaned up.
- 	 *
- 	 * @see LuaThread#orphanCheckInterval
-@@ -147,7 +138,6 @@
- 		this.compiler = builder.compiler;
+-	 *
+-	 * @see LuaThread#orphanCheckInterval
+ 	 */
+ 	boolean abandoned;
+ 
+@@ -153,7 +147,6 @@
  		this.random = builder.random;
  		this.debug = builder.debug;
+ 		this.timezone = builder.timezone;
 -		this.threader = new YieldThreader(builder.coroutineExecutor);
  	}
  
  	/**
-@@ -204,10 +194,6 @@
+@@ -210,10 +203,6 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
@@ -49,7 +42,7 @@
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
  		private LuaTable stringMetatable;
-@@ -216,11 +202,10 @@
+@@ -222,12 +211,11 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
@@ -58,14 +51,16 @@
  		private LoadState.LuaCompiler compiler = LuaC.INSTANCE;
  		private Random random = new Random();
  		private DebugHandler debug = DebugHandler.INSTANCE;
+ 		private TimeZone timezone = TimeZone.getDefault();
 -		private Executor coroutineExecutor = defaultCoroutineExecutor;
  
  		/**
  		 * Build a Lua state from this builder
-@@ -372,17 +357,5 @@
- 			this.debug = debug;
+@@ -391,18 +379,5 @@
+ 			this.timezone = zone;
  			return this;
  		}
+-
 -
 -		/**
 -		 * Set the coroutine executor for this state.
