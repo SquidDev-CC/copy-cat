@@ -1,0 +1,19 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
++++ src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
+@@ -7,6 +7,7 @@
+ package dan200.computercraft.core.apis.http;
+ 
+ import java.util.Collections;
++import java.util.HashSet;
+ import java.util.Set;
+ import java.util.concurrent.ConcurrentHashMap;
+ import java.util.function.IntSupplier;
+@@ -23,7 +24,7 @@
+ 
+     boolean active = false;
+ 
+-    final Set<T> resources = Collections.newSetFromMap( new ConcurrentHashMap<>() );
++    final Set<T> resources = new HashSet<>();
+ 
+     public ResourceGroup( IntSupplier limit )
+     {

@@ -1,0 +1,130 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\HTTPAPI.java
++++ src\main\java\dan200\computercraft\core\apis\HTTPAPI.java
+@@ -10,27 +10,27 @@
+ import dan200.computercraft.api.lua.ILuaAPI;
+ import dan200.computercraft.api.lua.ILuaContext;
+ import dan200.computercraft.api.lua.LuaException;
+-import dan200.computercraft.core.apis.http.*;
++import dan200.computercraft.core.apis.http.HTTPRequestException;
++import dan200.computercraft.core.apis.http.Resource;
++import dan200.computercraft.core.apis.http.ResourceGroup;
++import dan200.computercraft.core.apis.http.ResourceQueue;
+ import dan200.computercraft.core.apis.http.request.HttpRequest;
+ import dan200.computercraft.core.apis.http.websocket.Websocket;
+-import io.netty.handler.codec.http.DefaultHttpHeaders;
+-import io.netty.handler.codec.http.HttpHeaders;
+-import io.netty.handler.codec.http.HttpMethod;
+ 
+ import javax.annotation.Nonnull;
+ import java.net.URI;
+-import java.util.Collections;
+-import java.util.Locale;
+-import java.util.Map;
++import java.util.*;
+ 
+ import static dan200.computercraft.core.apis.ArgumentHelper.*;
+ import static dan200.computercraft.core.apis.TableHelper.*;
+ 
+ public class HTTPAPI implements ILuaAPI
+ {
++    private static final String[] VERBS = new String[]{"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"};
++
+     private final IAPIEnvironment m_apiEnvironment;
+ 
+-    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>();
++    // private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>();
+     private final ResourceGroup<HttpRequest> requests = new ResourceQueue<>( () -> ComputerCraft.httpMaxRequests );
+     private final ResourceGroup<Websocket> websockets = new ResourceGroup<>( () -> ComputerCraft.httpMaxWebsockets );
+ 
+@@ -50,7 +50,7 @@
+     @Override
+     public void startup()
+     {
+-        checkUrls.startup();
++        // checkUrls.startup();
+         requests.startup();
+         websockets.startup();
+     }
+@@ -58,7 +58,7 @@
+     @Override
+     public void shutdown()
+     {
+-        checkUrls.shutdown();
++        // checkUrls.shutdown();
+         requests.shutdown();
+         websockets.shutdown();
+     }
+@@ -115,18 +115,18 @@
+                     redirect = true;
+                 }
+ 
+-                HttpHeaders headers = getHeaders( headerTable );
++                Map<String, String> headers = getHeaders( headerTable );
+ 
+ 
+-                HttpMethod httpMethod;
++                String httpMethod;
+                 if( requestMethod == null )
+                 {
+-                    httpMethod = postString == null ? HttpMethod.GET : HttpMethod.POST;
++                    httpMethod = postString == null ? "GET" : "POST";
+                 }
+                 else
+                 {
+-                    httpMethod = HttpMethod.valueOf( requestMethod.toUpperCase( Locale.ROOT ) );
+-                    if( httpMethod == null || requestMethod.equalsIgnoreCase( "CONNECT" ) )
++                    httpMethod = requestMethod.toUpperCase();
++                    if( Arrays.binarySearch(VERBS, httpMethod) == -1 )
+                     {
+                         throw new LuaException( "Unsupported HTTP method" );
+                     }
+@@ -138,7 +138,7 @@
+ 
+                     HttpRequest request = new HttpRequest( requests, m_apiEnvironment, address, postString, headers, binary, redirect );
+ 
+-                    long requestBody = request.body().readableBytes() + HttpRequest.getHeaderSize( headers );
++                    long requestBody = (request.body() == null ? 0 : request.body().length()) + HttpRequest.getHeaderSize( headers );
+                     if( ComputerCraft.httpMaxUpload != 0 && requestBody > ComputerCraft.httpMaxUpload )
+                     {
+                         throw new HTTPRequestException( "Request body is too large" );
+@@ -161,8 +161,8 @@
+                 // Check URL
+                 try
+                 {
+-                    URI uri = HttpRequest.checkUri( address );
+-                    new CheckUrl( checkUrls, m_apiEnvironment, address, uri ).queue( CheckUrl::run );
++                    HttpRequest.checkUri( address );
++                    m_apiEnvironment.queueEvent("http_check", new Object[] { address, true });
+ 
+                     return new Object[] { true };
+                 }
+@@ -181,7 +181,7 @@
+                     throw new LuaException( "Websocket connections are disabled" );
+                 }
+ 
+-                HttpHeaders headers = getHeaders( headerTbl );
++                Map<String, String> headers = getHeaders( headerTbl );
+ 
+                 try
+                 {
+@@ -204,9 +204,9 @@
+     }
+ 
+     @Nonnull
+-    private static HttpHeaders getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
++    private static Map<String, String> getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
+     {
+-        HttpHeaders headers = new DefaultHttpHeaders();
++        Map<String, String> headers = new HashMap<>();
+         for( Map.Entry<?, ?> entry : headerTable.entrySet() )
+         {
+             Object value = entry.getValue();
+@@ -214,7 +214,7 @@
+             {
+                 try
+                 {
+-                    headers.add( (String) entry.getKey(), value );
++                    headers.put( ((String) entry.getKey()).toLowerCase(), (String)value );
+                 }
+                 catch( IllegalArgumentException e )
+                 {

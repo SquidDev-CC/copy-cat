@@ -41,7 +41,6 @@ dependencies {
 
     implementation("com.google.guava:guava:22.0")
     implementation("org.apache.commons:commons-lang3:3.6")
-    implementation("io.netty:netty-all:4.1.9.Final")
     implementation("it.unimi.dsi:fastutil:8.2.2")
 
     implementation("org.teavm:teavm-jso:${project.properties["teavm_version"]}")
@@ -278,13 +277,19 @@ tasks {
                     exclude("java/dan200/computercraft/api/peripheral/IPeripheralTile.java")
                     exclude("java/dan200/computercraft/api/peripheral/IPeripheralProvider.java")
 
-                    // Core is pretty simple. We just exclude some FS stuff, as it's a bit of a faff to deal with.
+                    // Core is pretty simple.
                     include("java/dan200/computercraft/core/**")
+                    // We just exclude some FS stuff, as it's a bit of a faff to deal with.
                     exclude("java/dan200/computercraft/core/filesystem/ComboMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/EmptyMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/FileMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/SubMount.java")
+                    // Also exclude all the Netty-specific code
+                    exclude("java/dan200/computercraft/core/apis/http/CheckUrl.java")
+                    exclude("java/dan200/computercraft/core/apis/http/NetworkUtils.java")
+                    exclude("java/dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
+                    exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
 
                     include("java/dan200/computercraft/shared/util/Colour.java")
                     include("java/dan200/computercraft/shared/util/IoUtil.java")

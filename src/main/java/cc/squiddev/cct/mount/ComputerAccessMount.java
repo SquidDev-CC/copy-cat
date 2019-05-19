@@ -148,7 +148,7 @@ public class ComputerAccessMount implements IWritableMount {
 
             int length = buffer.remaining();
             preWrite(length);
-            buffer.put(contents, (int) position, length);
+            buffer.get(contents, (int) position, length);
             size = (int) (position += length);
             return length;
         }
