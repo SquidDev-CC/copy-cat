@@ -198,7 +198,12 @@ tasks {
         }
 
         from("src/web/public") {
+            include("*.html")
             filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
+        }
+
+        from("src/web/public") {
+            exclude("*.html")
             exclude("assets/font/config.json")
         }
 

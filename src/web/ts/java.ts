@@ -1,20 +1,19 @@
-import { ICallbacks, IComputerAccess } from "./classes";
-export { ICallbacks, IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "./classes";
+import { ICallbacks, IComputerAccess, IConfigGroup } from "./classes";
+export { ICallbacks, IComputerAccess, IFileSystemEntry, QueueEventHandler, Result, IConfigGroup } from "./classes";
 
 import "setimmediate";
 
-export class Callbacks implements ICallbacks {
-  private computer: IComputerAccess;
+export type ConfigFactory = (name: string, description: string | null) => IConfigGroup;
 
-  constructor(computer: IComputerAccess) {
+export class Callbacks implements ICallbacks {
+  private readonly computer: IComputerAccess;
+  public readonly config: ConfigFactory;
+
+  constructor(computer: IComputerAccess, config: ConfigFactory) {
     this.computer = computer;
+    this.config = config;
   }
 
-  /**
-   * Get the current callback instance
-   *
-   * @return The callback instance
-   */
   public getComputer(): IComputerAccess {
     return this.computer;
   }
@@ -29,8 +28,8 @@ export class Callbacks implements ICallbacks {
   }
 }
 
-export const start = (computer: IComputerAccess) => {
+export const start = (computer: IComputerAccess, config: ConfigFactory) => {
   import("./classes")
-    .then(x => x(new Callbacks(computer)))
+    .then(x => x(new Callbacks(computer, config)))
     .catch(x => console.log(x)); // TODO: error handling
 };

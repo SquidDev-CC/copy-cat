@@ -1,12 +1,14 @@
 import { Component, h, render } from "preact";
+import { IConfigGroup } from "./classes";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
-import { Settings } from "./settings";
+import { ConfigGroup, Settings } from "./settings";
 import * as storage from "./storage";
 
 type MainState = {
   settings: Settings,
+  computerConfigGroups: ConfigGroup[],
 
   currentVDom: (state: MainState) => JSX.Element,
   dialogue?: (state: MainState) => JSX.Element,
@@ -26,6 +28,8 @@ class Main extends Component<{}, MainState> {
 
       darkMode: false,
       terminalBorder: false,
+
+      computerSettings: [],
     };
 
     // Sync settings from local storage
@@ -45,10 +49,11 @@ class Main extends Component<{}, MainState> {
     this.state = {
       settings,
       currentVDom: this.computerVDom,
+      computerConfigGroups: [],
     };
   }
 
-  public shouldComponentUpdate({}: {}, newState: MainState) {
+  public shouldComponentUpdate({ }: {}, newState: MainState) {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
@@ -58,7 +63,7 @@ class Main extends Component<{}, MainState> {
     storage.set("settings", JSON.stringify(this.state.settings));
   }
 
-  public render({}: {}, state: MainState) {
+  public render({ }: {}, state: MainState) {
     return <div class="container">
       {state.currentVDom(state)}
       <div class="info-buttons">
@@ -67,7 +72,7 @@ class Main extends Component<{}, MainState> {
           <Cog />
         </button>
         <button class="action-button" title="Find out more about the emulator"
-          onClick={() => this.setState({ dialogue: () => <About />})}>
+          onClick={() => this.setState({ dialogue: () => <About /> })}>
           <Info />
         </button>
       </div>
@@ -82,7 +87,10 @@ class Main extends Component<{}, MainState> {
 
   private openSettings = () => {
     const update = (s: Settings) => this.setState({ settings: s });
-    this.setState({ dialogue: (s: MainState) => <Settings settings={s.settings} update={update} /> });
+    this.setState({
+      dialogue: ({ settings, computerConfigGroups }: MainState) =>
+        <Settings settings={settings} update={update} computerConfigGroups={computerConfigGroups} />,
+    });
   }
 
   private closeDialogueClick = (e: MouseEvent) => {
@@ -90,7 +98,13 @@ class Main extends Component<{}, MainState> {
   }
 
   private computerVDom = ({ settings, dialogue }: MainState) => {
-    return <Computer settings={settings} focused={dialogue === undefined} />;
+    return <Computer settings={settings} focused={dialogue === undefined} computerSettings={this.configFactory} />;
+  }
+
+  private configFactory = (name: string, description: string | null): IConfigGroup => {
+    const group = new ConfigGroup(name, description);
+    this.setState({ computerConfigGroups: [...this.state.computerConfigGroups, group] });
+    return group;
   }
 }
 

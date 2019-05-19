@@ -161,6 +161,43 @@ declare namespace Start {
     onReboot(handler: () => void): void;
   }
 
+  export interface IConfigGroup {
+    /**
+     * Add a string property to this config group
+     *
+     * @param id Unique ID for this property
+     * @param name        The display name of this group
+     * @param description A short description of this group
+     * @param def         The default value
+     * @param changed     Called when it is changed
+     */
+    addString(id: string, name: string, def: string, description: string, changed: (value: string) => void): void;
+
+    /**
+     * Add a boolean property to this config group
+     *
+     * @param id Unique ID for this property
+     * @param name        The display name of this group
+     * @param description A short description of this group
+     * @param def         The default value
+     * @param changed     Called when it is changed
+     */
+    addBoolean(id: string, name: string, def: boolean, description: string, changed: (value: boolean) => void): void;
+
+    /**
+     * Add an integer property to this config group
+     *
+     * @param id Unique ID for this property
+     * @param name        The display name of this group
+     * @param description A short description of this group
+     * @param min         The minimum value
+     * @param max         The maximum value
+     * @param def         The default value
+     * @param changed     Called when it is changed
+     */
+    addInt(id: string, name: string, def: number, min: number, max: number, description: string, changed: (value: number) => void): void;
+  }
+
   export interface ICallbacks {
     /**
      * Get the current callback instance
@@ -168,6 +205,15 @@ declare namespace Start {
      * @return The callback instance
      */
     getComputer(): IComputerAccess;
+
+        /**
+     * Get or create a config group
+     *
+     * @param name        The display name of this group
+     * @param description A short description of this group
+     * @return The constructed config group
+     */
+    config(name: string, description: string | null): IConfigGroup;
 
     setInterval(callback: () => void, delay: number): void;
 

@@ -1,5 +1,5 @@
 import { Component, h } from "preact";
-import { start } from "../java";
+import { ConfigFactory, start } from "../java";
 import { Settings } from "../settings";
 import { Terminal } from "../terminal/component";
 import { TerminalData } from "../terminal/data";
@@ -11,6 +11,7 @@ import { FileTree } from "./files";
 export type ComputerProps = {
   focused: boolean,
   settings: Settings,
+  computerSettings: ConfigFactory,
 };
 
 type EditedFile = {
@@ -50,7 +51,7 @@ export class Computer extends Component<ComputerProps, ComputerState> {
   }
 
   public componentDidMount() {
-    start(this.state.computer);
+    start(this.state.computer, this.props.computerSettings);
   }
 
   public componentWillUnmount() {
