@@ -201,7 +201,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
   }
 
   private draw(time: number) {
-    if (!this.canvasElem || !this.canvasContext) return;
+    if (!this.canvasElem || !this.canvasContext || !this.wrapperElem) return;
 
     const { terminal, font: fontPath } = this.props;
     const sizeX = terminal.sizeX || 51;
@@ -228,7 +228,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
     this.changed = false;
 
     // Calculate terminal scaling to fit the screen
-    const actualWidth = this.canvasElem.parentElement!.clientWidth - render.terminalMargin;
+    const actualWidth = this.wrapperElem.parentElement!.clientWidth - render.terminalMargin;
     const width = sizeX * render.cellWidth;
     const height = sizeY * render.cellHeight;
 
@@ -269,8 +269,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
       this.canvasElem.width = canvasWidth;
 
       this.canvasElem.style.height = `${canvasHeight}px`;
-      this.canvasElem.style.width = `${canvasWidth}px`;
-      if (this.wrapperElem) this.wrapperElem.style.width = `${canvasWidth}px`;
+      this.wrapperElem.style.width = this.canvasElem.style.width = `${canvasWidth}px`;
     }
 
     // Prevent blur when up/down-scaling
