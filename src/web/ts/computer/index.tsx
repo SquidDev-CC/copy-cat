@@ -26,8 +26,8 @@ type ComputerState = {
 
   activeFile: EditedFile | null,
 
-  id?: number,
-  label?: string,
+  id: number,
+  label: string | null,
   on: boolean,
 };
 
@@ -37,16 +37,15 @@ export class Computer extends Component<ComputerProps, ComputerState> {
 
     const terminal = new TerminalData();
     const terminalChanged = new Semaphore();
-    this.state = {
+    const computer = new ComputerAccess(
       terminal, terminalChanged,
-      computer: new ComputerAccess(
-        terminal, terminalChanged,
-        (label, on) => this.setState({ label: label ? label : undefined, on }),
-      ),
-
+      (label, on) => this.setState({ label, on }),
+    );
+    this.state = {
+      terminal, terminalChanged, computer,
       activeFile: null,
 
-      id: 0, on: false,
+      id: 0, on: false, label: computer.getLabel(),
     };
   }
 
@@ -82,9 +81,9 @@ export class Computer extends Component<ComputerProps, ComputerState> {
         </div>
         {activeFile == null
           ? <Terminal terminal={terminal} changed={terminalChanged} focused={focused}
-              computer={computer} font={settings.terminalFont} id={id} label={label} on={on}/>
+            computer={computer} font={settings.terminalFont} id={id} label={label} on={on} />
           : <Editor model={activeFile.model} settings={settings} focused={focused}
-                doSave={contents => activeFile.file.setContents(contents)} />}
+            doSave={contents => activeFile.file.setContents(contents)} />}
       </div>
     </div>;
   }

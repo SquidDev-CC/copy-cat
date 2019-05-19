@@ -15,8 +15,8 @@ export type TerminalProps = {
   terminal: TerminalData,
   font: string,
 
-  id?: number,
-  label?: string,
+  id: number | null,
+  label: string | null,
   on: boolean,
 };
 
@@ -36,10 +36,10 @@ const pad = (val: number, len: number) => {
   return str.length >= len ? str : "0".repeat(len - str.length) + str;
 };
 
-const labelElement = (id?: number, label?: string) => {
-  if (id === undefined && label === undefined) return "Unlabeled computer";
-  if (id === undefined) return `${label}`;
-  if (label === undefined) return `Computer #${id}`;
+const labelElement = (id: number | null, label: string | null) => {
+  if (id === null && label === null) return "Unlabeled computer";
+  if (id === null) return `${label}`;
+  if (label === null) return `Computer #${id}`;
   return `${label} (Computer #${id})`;
 };
 
@@ -161,7 +161,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
               <Camera />
             </button>
             <button type="none" class={`action-button terminal-button ${recordingDisabled ? "disabled" : ""}`}
-              title="Take a screenshot of the terminal." onClick={this.onRecord}>
+              title="Record the terminal to a GIF." onClick={this.onRecord}>
               {recording === RecordingState.Recording ? <VideocamRecording /> : <Videocam />}
             </button>
             <button type="none" class="action-button terminal-button"

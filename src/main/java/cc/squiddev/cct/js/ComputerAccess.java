@@ -14,6 +14,14 @@ import java.io.IOException;
  */
 public interface ComputerAccess extends JSObject {
     /**
+     * Get the computer's label.
+     *
+     * @return The current label, or {@code null} if not set.
+     */
+    @Nullable
+    String getLabel();
+
+    /**
      * Set this computer's current state
      *
      * @param label This computer's label

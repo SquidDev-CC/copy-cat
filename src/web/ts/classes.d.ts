@@ -50,6 +50,13 @@ declare namespace Start {
    */
   export interface IComputerAccess {
     /**
+     * Get the computer's label.
+     *
+     * @return The current label, or {@code null} if not set.
+     */
+    getLabel(): string | null;
+
+    /**
      * Set this computer's current state
      *
      * @param label This computer's label

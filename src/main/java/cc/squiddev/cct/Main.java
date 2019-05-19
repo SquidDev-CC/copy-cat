@@ -29,6 +29,7 @@ public class Main implements IComputerEnvironment {
         Computer computer = new Computer(this, terminal, 0);
 
         ComputerAccess computerAccess = Callbacks.computer();
+        computer.setLabel(computerAccess.getLabel());
         computerAccess.onEvent((e, args) -> computer.queueEvent(e, JsonParse.parseValues(args)));
         computerAccess.onTurnOn(computer::turnOn);
         computerAccess.onReboot(computer::reboot);

@@ -90,6 +90,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
   private turnOnHandler?: () => void;
   private shutdownHandler?: () => void;
   private rebootHander?: () => void;
+  private label: string | null;
 
   private terminal: TerminalData;
   private semaphore: Semaphore;
@@ -104,6 +105,8 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
     this.terminal = terminal;
     this.semaphore = semaphore;
     this.stateChanged = stateChange;
+
+    this.label = storage.get(`computer[0].label`);
 
     const queue = [""];
     while (true) {
@@ -132,8 +135,21 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
     }
   }
 
+  public getLabel(): string | null {
+    return this.label;
+  }
+
   public setState(label: string | null, on: boolean): void {
-    this.stateChanged(label , on);
+    if (this.label !== label) {
+      this.label = label;
+      if (label) {
+        storage.set(`computer[0].label`, label);
+      } else {
+        storage.remove(`computer[0].label`);
+      }
+    }
+
+    this.stateChanged(label, on);
   }
 
   public updateTerminal(
