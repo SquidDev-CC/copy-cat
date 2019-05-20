@@ -14,11 +14,16 @@ computer running right in your browser rather than a server!
 which are impossible to emulate due to the restricted environment of a browser.
 
 For instance, the `http` API has been entirely recreated, and some functionality
-(such as setting specific headers or requesting some sites) is not impossible.
-As with any emulator, there will be subtle differences in how input events (key
- presses, mouse clicks, etc...) are handled, so do not rely on our behaviour.
+(such as setting specific headers or requesting some sites) is not possible. As
+with any emulator, there will be subtle differences in how input events (key
+presses, mouse clicks, etc...) are handled, so do not rely on our behaviour.
 
 And yes, this disclaimer was longer than the actual description.
+
+## Screenshots
+![The emulator in action](img/startup-url.png "The emulator in action")
+
+![Editing a file](img/editor.png "Editing a file")
 
 ## Build it yourself
 Due to the nature of this project, Copy Cat has a rather strange build setup. We
