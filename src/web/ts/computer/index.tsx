@@ -68,6 +68,38 @@ export class Computer extends Component<ComputerProps, ComputerState> {
       terminal, terminalChanged,
       (label, on) => this.setState({ label, on }),
     );
+
+    // Create a startup file if specified.
+    for (const field of window.location.search.substring(1).split("&")) {
+      const [key, value] = field.split("=");
+      if (key === "startup") {
+        const entry = computer.createFile("startup.lua");
+        if (!entry.value) continue;
+
+        let contents: string;
+        try {
+          contents = atob(value);
+        } catch (e) {
+          console.error(e);
+          break;
+        }
+
+        contents = contents
+          .replace(/(\\|\n|\")/g, "\\$1")
+          .replace("\r", "\\r").replace("\0", "\\0");
+
+        // We create a startup script which deletes itself, and then runs the
+        // original program. This allows it to be invisible, even in the event
+        // of syntax errors.
+        entry.value.setContents(`
+fs.delete("startup.lua")
+local fn, err = load("${contents}", "@startup.lua", nil, _ENV)
+if not fn then error(err, 0) end
+fn()`);
+        break;
+      }
+    }
+
     this.state = {
       terminal, terminalChanged, computer,
       activeFile: null,
