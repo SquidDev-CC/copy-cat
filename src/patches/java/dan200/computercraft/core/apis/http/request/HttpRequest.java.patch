@@ -1,10 +1,11 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
 +++ src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
-@@ -6,38 +6,25 @@
+@@ -6,38 +6,26 @@
  
  package dan200.computercraft.core.apis.http.request;
  
-+import cc.squiddev.cct.http.Int8ArrayByteChannel;
++import cc.squiddev.cct.Main;
++import cc.squiddev.cct.mount.Int8ArrayByteChannel;
 +import cc.squiddev.cct.stub.SeekableByteChannel;
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.api.lua.ILuaObject;
@@ -48,7 +49,7 @@
  
  /**
   * Represents one or more
-@@ -49,43 +36,34 @@
+@@ -49,43 +37,34 @@
  
      private static final int MAX_REDIRECTS = 16;
  
@@ -103,7 +104,7 @@
      }
  
      public IAPIEnvironment environment()
-@@ -115,91 +93,72 @@
+@@ -115,91 +94,73 @@
          if( url.getScheme() == null ) throw new HTTPRequestException( "Must specify http or https" );
          if( url.getHost() == null ) throw new HTTPRequestException( "URL malformed" );
  
@@ -194,7 +195,8 @@
 -                        {
 -                            p.addLast( sslContext.newHandler( ch.alloc(), uri.getHost(), socketAddress.getPort() ) );
 -                        }
-+            request.open(method, "https://cors-anywhere.herokuapp.com/" + uri.toASCIIString());
++            String address = uri.toASCIIString();
++            request.open(method, Main.corsProxy.isEmpty() ? address : Main.corsProxy.replace("{}", address));
 +            for (Map.Entry<String, String> header : headers.entrySet()) {
 +                request.setRequestHeader(header.getKey(), header.getValue());
 +            }
@@ -236,7 +238,7 @@
      }
  
      void failure( String message )
-@@ -214,14 +173,6 @@
+@@ -214,14 +175,6 @@
          {
              message = cause.getMessage();
          }
@@ -251,7 +253,7 @@
          else
          {
              message = "Could not connect";
-@@ -244,16 +195,12 @@
+@@ -244,16 +197,12 @@
      protected void dispose()
      {
          super.dispose();
@@ -270,7 +272,7 @@
          {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -261,12 +208,12 @@
+@@ -261,12 +210,12 @@
          return size;
      }
  

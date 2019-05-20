@@ -18,6 +18,8 @@ import dan200.computercraft.shared.util.Palette;
 import java.io.InputStream;
 
 public class Main implements IComputerEnvironment {
+    public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
+
     public static void main(String[] args) {
         setupConfig();
         new Main().run();
@@ -182,6 +184,12 @@ public class Main implements IComputerEnvironment {
         http.addInt("http.max_websocket_message", "Maximum websocket message size", ComputerCraft.httpMaxWebsocketMessage, 0, Websocket.MAX_MESSAGE_SIZE,
             "The maximum size (in bytes) that a computer can send or receive in one websocket packet.",
             x -> ComputerCraft.httpMaxWebsocketMessage = x
+        );
+
+        http.addString("http.proxy", "Proxy", corsProxy,
+            "The proxy to use in order to bypass Cross-Origin protection (aka CORS). This allows you to make requests to " +
+                "any site, but does involve sending all headers to another site first. Set to empty or \"{}\" to disable.",
+            x -> corsProxy = x
         );
     }
 }
