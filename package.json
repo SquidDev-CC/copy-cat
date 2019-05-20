@@ -26,6 +26,7 @@
     "@types/requirejs": "^2.1.31",
     "rollup": "^1.12.3",
     "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^5.0.0",
     "tslint": "^5.13.1",

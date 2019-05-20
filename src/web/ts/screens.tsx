@@ -42,8 +42,8 @@ export const About = () => <div class="dialogue-box">
 
   <p>
     Of course, this emulator is sure to have lots of bugs and missing features. If you've found a problem, why not put
-    it on <a href="https://github.com/SquidDev-CC/copy-cat/issues" title="The Copy Cat GitHub issue tracker">the GitHub
-    repo</a>?
+    it on <strong><a href="https://github.com/SquidDev-CC/copy-cat/issues" title="The Copy Cat GitHub issue tracker">the
+    GitHub repo</a></strong>?
   </p>
 
   <h3>Credits</h3>
@@ -67,20 +67,12 @@ export const About = () => <div class="dialogue-box">
       : ComputerCraft Public License
     </li>
     <li>
-      <a href="https://github.com/developit/preact" target="_blank">Preact</a>
-      : MIT, Copyright (c) 2015-present Jason Miller
+      <a href="https://github.com/FortAwesome/Font-Awesome/" target="_blank">Font Awesome</a>
+      : CC BY 4.0
     </li>
     <li>
-      <a href="https://github.com/YuzuJS/setImmediate" target="_blank">setImmediate</a>
-      : MIT, Copyright (c) 2012 Barnesandnoble.com, llc, Donavon West, and Domenic Denicola
-    </li>
-    <li>
-      <a href="https://github.com/requirejs/requirejs" target="_blank">require.js</a>
-      : MIT, Copyright jQuery Foundation and other contributors, https://jquery.org
-    </li>
-    <li>
-      <a href="https://github.com/Microsoft/monaco-editor/" target="_blank">Monaco Editor</a>
-      : MIT, Copyright (c) 2019 Microsoft Corporation
+      Numerous Javascript libraries. A full list can be found <a href="assets/dependencies.txt" target="_blank">in the
+      dependnecies list</a> or at the top of any Javascript file.
     </li>
   </ul>
 

@@ -183,10 +183,7 @@ tasks {
 
         from("$buildDir/rollup") {
             include("*.js")
-            // So require.js thinks that files ending in '.js' must be absolute and so leaves off the baseUrl. Rollup
-            // will include the ".js" on non-external modules, and so we need to "fix" that.
-            // Yes, this is horrible and there's probably better ways to fix it.
-            filter { it.replace(".js\'],", "\'],") }
+            include("dependencies.txt")
             into("assets")
         }
 
