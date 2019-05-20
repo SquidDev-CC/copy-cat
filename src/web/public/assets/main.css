@@ -149,6 +149,8 @@ pre {
 }
 
 .file-list {
+  position: relative;
+
   flex-basis: 200px;
   max-width: 200px;
   background-color: #eee;
@@ -206,6 +208,27 @@ pre {
   display: inline-block;
   width: 1em;
   padding: 0 5px;
+}
+
+.file-drop-marker {
+  display: none;
+}
+
+.file-list.dragging .file-drop-marker {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.file-drop-marker > span {
+  color: white;
+  font-size: 2em;
+  padding: 10px;
+  text-align: center;
+  line-height: 1em;
 }
 
 .editor-placeholder {
