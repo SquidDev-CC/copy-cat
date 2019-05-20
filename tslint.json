@@ -12,7 +12,7 @@
       "max-classes-per-file": false,
       "member-ordering": false,
       "no-bitwise": false,
-      "no-console": false,
+      "no-console": [true, "log"],
       "no-implicit-dependencies": [true],
       "no-magic-numbers": false,
       "no-namespace": false,

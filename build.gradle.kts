@@ -208,7 +208,6 @@ tasks {
         }
 
         from("node_modules/gif.js/dist") {
-            include("gif.js")
             include("gif.worker.js")
             into("assets")
         }

@@ -31,5 +31,5 @@ export class Callbacks implements ICallbacks {
 export const start = (computer: IComputerAccess, config: ConfigFactory) => {
   import("./classes")
     .then(x => x(new Callbacks(computer, config)))
-    .catch(x => console.log(x)); // TODO: error handling
+    .catch(x => console.error("Cannot load classes", x));
 };

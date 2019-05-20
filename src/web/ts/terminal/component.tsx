@@ -1,12 +1,15 @@
 import { Component, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
 import { Camera, NoEntry, Off, On, Videocam, VideocamRecording } from "../font";
-import { GIF, create as createGif } from "../record";
+import { GIF } from "../gif";
+import logger from "../log";
 import { TerminalData } from "./data";
 import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
 
-enum RecordingState { None, Loading, Recording, Rendering }
+enum RecordingState { None, Recording, Rendering }
+
+const log = logger("Terminal");
 
 export type TerminalProps = {
   changed: Semaphore,
@@ -143,7 +146,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
   }
 
   public render({ id, label, on }: TerminalProps, { recording, progress }: TerminalState) {
-    const recordingDisabled = recording === RecordingState.Loading || recording === RecordingState.Rendering;
+    const recordingDisabled = recording === RecordingState.Rendering;
     return <div class="terminal-view">
       <div class="terminal-wrapper">
         {...this.vdom}
@@ -324,8 +327,8 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
     const now = Date.now();
     if (!force && now - this.lastGifFrame < 50) return;
 
-    console.log(`Adding frame for ${now - this.lastGifFrame} seconds`);
-    this.gif.addFrame(this.canvasContext, { copy: true, delay: now - this.lastGifFrame });
+    log(`Adding frame for ${now - this.lastGifFrame} seconds`);
+    this.gif.addFrame(this.canvasContext, { delay: now - this.lastGifFrame });
     this.lastGifFrame = now;
   }
 
@@ -466,25 +469,18 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
 
     switch (this.state.recording) {
       // Skip the cases when we've got no data
-      case RecordingState.Loading:
       case RecordingState.Rendering:
         break;
 
       // If we're not recording, start recording.
       case RecordingState.None:
-        this.setState({ recording: RecordingState.Loading });
-        createGif({
+        this.gif = new GIF({
           width: this.canvasElem.width,
           height: this.canvasElem.height,
           quality: 10,
-        }).then(gif => {
-          this.lastGifFrame = Date.now();
-          this.gif = gif;
-          this.setState({ recording: RecordingState.Recording });
-        }).catch(e => {
-          console.error("Cannot load GIF library", e);
-          this.setState({ recording: RecordingState.None });
         });
+        this.lastGifFrame = Date.now();
+        this.setState({ recording: RecordingState.Recording });
         break;
 
       case RecordingState.Recording:
@@ -497,15 +493,15 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
 
         this.addGifFrame(true);
 
-        this.gif.on("finished", blob => {
+        this.gif.onFinished = blob => {
           this.setState({ recording: RecordingState.None });
           saveBlob("computer", "gif", blob);
-        });
-        this.gif.on("progress", progress => this.setState({ progress }));
-        this.gif.on("abort", () => {
+        };
+        this.gif.onProgress = progress => this.setState({ progress });
+        this.gif.onAbort = () => {
           this.setState({ recording: RecordingState.None });
           console.error("Rendering GIF failed");
-        });
+        };
 
         this.gif.render();
 
