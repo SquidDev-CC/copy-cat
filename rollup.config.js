@@ -1,11 +1,9 @@
 import resolve from "rollup-plugin-node-resolve";
+import commonJs from "rollup-plugin-commonjs";
+import builtins from "rollup-plugin-node-builtins";
 
 export default {
-  input: {
-    main: "build/typescript/main.js",
-    classes: "build/teaVM/classes.js",
-    editor: "build/typescript/editor/index.js",
-  },
+  input: "build/javascript/main.js",
   output: {
     dir: "build/rollup/",
     format: "amd",
@@ -17,5 +15,9 @@ export default {
   context: "window",
   external: [ "monaco-editor" ],
 
-  plugins: [ resolve() ],
+  plugins: [
+    builtins(),
+    resolve({ browser: true, }),
+    commonJs(),
+  ],
 };

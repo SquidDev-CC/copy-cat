@@ -27,7 +27,7 @@
  * in the entirity of EventEmitter.
  */
 
-import logger from "./log";
+import logger from "../log";
 const log = logger("GIF encoding");
 
 export type Options = {

@@ -8,3 +8,4 @@ export const Info = () => <span class="icon icon-info" />;
 export const Camera = () => <span class="icon icon-camera" />;
 export const Videocam = () => <span class="icon icon-videocam" />;
 export const VideocamRecording = () => <span class="icon icon-videocam-on" />;
+export const Download = () => <span class="icon icon-download" />;

@@ -7,7 +7,7 @@
     "jsx": "react",
     "jsxFactory": "h",
     "newLine": "LF",
-    "outDir": "build/typescript",
+    "outDir": "build/javascript",
     "baseUrl": ".",
     "types": [ "requirejs" ],
 
@@ -15,7 +15,11 @@
     "strict": true,
     "noUnusedParameters": true,
 
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+
+    "paths": {
+      "jszip": [ "src/web/typings/jszip.d.ts" ]
+    }
   },
   "include": [ "src/web/ts/**/*.ts", "src/web/ts/**/*.tsx" ]
 }

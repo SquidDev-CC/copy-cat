@@ -58,7 +58,7 @@ tasks {
         inputs.files(project.configurations.getByName("runtime").allArtifacts.files).withPropertyName("jars")
 
         val dir = File(buildDir, "teaVM")
-        outputs.file(File(dir, "classes.raw.js")).withPropertyName("output")
+        outputs.file(File(dir, "classes.js")).withPropertyName("output")
 
         doLast {
             val log = object : TeaVMToolLog {
@@ -86,7 +86,7 @@ tasks {
                 val tool = TeaVMTool()
                 tool.classLoader = classloader
                 tool.targetDirectory = dir
-                tool.targetFileName = "classes.raw.js"
+                tool.targetFileName = "classes.js"
                 tool.mainClass = application.mainClassName
                 tool.runtime = RuntimeCopyOperation.MERGED
                 tool.isMinifying = true
@@ -113,13 +113,12 @@ tasks {
         description = "Converts the TeaVM file into a AMD module"
 
         dependsOn(compileTeaVM)
-        val dir = File(buildDir, "teaVM")
-        inputs.file(File(dir, "classes.raw.js")).withPropertyName("input")
-        outputs.file(File(dir, "classes.js")).withPropertyName("output")
+        inputs.file(File("$buildDir/teaVM/classes.js")).withPropertyName("input")
+        outputs.file(File("$buildDir/javascript/classes.js")).withPropertyName("output")
 
         doLast {
-            File(dir, "classes.js").bufferedWriter().use { writer ->
-                File(dir, "classes.raw.js").reader().use { it.copyTo(writer) }
+            File("$buildDir/javascript/classes.js").bufferedWriter().use { writer ->
+                File("$buildDir/teaVM/classes.js").reader().use { it.copyTo(writer) }
                 writer.write("export default callbacks => {\n");
                 writer.write("  window.callbacks = callbacks;\n")
                 writer.write("  main();\n");
@@ -147,7 +146,7 @@ tasks {
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("tsconfig.json").withPropertyName("TypeScript config")
 
-        outputs.dir("$buildDir/typescript").withPropertyName("output")
+        outputs.dir("$buildDir/javascript").withPropertyName("output")
 
         commandLine(mkCommand("npm run --silent tsc"))
     }
@@ -157,8 +156,7 @@ tasks {
         description = "Combines multiple Javascript files into one"
 
         dependsOn(bundleTeaVM, compileTypescript)
-        inputs.file("$buildDir/teaVM/classes.js").withPropertyName("teaVM")
-        inputs.files(fileTree("$buildDir/typescript")).withPropertyName("typescript")
+        inputs.files(fileTree("$buildDir/javascript")).withPropertyName("sources")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
@@ -192,7 +190,7 @@ tasks {
             into("assets")
         }
 
-        from("$buildDir/typescript/loader.js") {
+        from("$buildDir/javascript/loader.js") {
             filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
             into("assets")
         }

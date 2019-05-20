@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "icons",
   "css_prefix_text": "icon-",
   "css_use_suffix": false,
   "hinting": true,
@@ -72,6 +72,12 @@
       "uid": "0f99ab40ab0b4d64a74f2d0deeb03e42",
       "css": "videocam",
       "code": 59400,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "9a76bc135eac17d2c8b8ad4a5774fc87",
+      "css": "download",
+      "code": 59401,
       "src": "fontawesome"
     }
   ]

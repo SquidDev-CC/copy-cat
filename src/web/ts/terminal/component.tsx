@@ -1,7 +1,8 @@
 import { Component, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
+import { GIF } from "../files/gif";
+import saveBlob from "../files/save";
 import { Camera, NoEntry, Off, On, Videocam, VideocamRecording } from "../font";
-import { GIF } from "../gif";
 import logger from "../log";
 import { TerminalData } from "./data";
 import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
@@ -34,42 +35,11 @@ const clamp = (value: number, min: number, max: number) => {
   return value;
 };
 
-const pad = (val: number, len: number) => {
-  const str = val.toString();
-  return str.length >= len ? str : "0".repeat(len - str.length) + str;
-};
-
 const labelElement = (id: number | null, label: string | null) => {
   if (id === null && label === null) return "Unlabeled computer";
   if (id === null) return `${label}`;
   if (label === null) return `Computer #${id}`;
   return `${label} (Computer #${id})`;
-};
-
-const saveBlob = (prefix: string, extension: string, blob: Blob | null) => {
-  if (!blob) return;
-
-  // Somewhat inspired by https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
-  // Goodness knows how well this works on non-modern browsers.
-  const element = document.createElement("a") as HTMLAnchorElement;
-  const url = URL.createObjectURL(blob);
-
-  const now = new Date();
-  element.download = `${prefix}-${now.getFullYear()}-${pad(now.getMonth() + 1, 2)}-${pad(now.getDate(), 2)}_` +
-    `${pad(now.getHours(), 2)}-${pad(now.getMinutes(), 2)}.${extension}`;
-  element.rel = "noopener";
-  element.href = url;
-
-  setTimeout(() => URL.revokeObjectURL(url), 60e3);
-  setTimeout(() => {
-    try {
-      element.dispatchEvent(new MouseEvent("click"));
-    } catch (e) {
-      const mouseEvent = document.createEvent("MouseEvents");
-      mouseEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
-      element.dispatchEvent(mouseEvent);
-    }
-  }, 0);
 };
 
 export class Terminal extends Component<TerminalProps, TerminalState> {
@@ -151,7 +121,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
       <div class="terminal-wrapper">
         {...this.vdom}
         <div class="terminal-bar">
-          <button type="none" class="action-button terminal-button"
+          <button class="action-button terminal-button" type="button"
             title={on ? "Turn this computer off" : "Turn this computer on"}
             onClick={on ? this.onPowerOff : this.onPowerOn}>
             {on ? <On /> : <Off />}
@@ -159,15 +129,15 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
           <span class="terminal-info">{labelElement(id, label)}</span>
 
           <span class="terminal-buttons-right">
-            <button type="none" class="action-button terminal-button"
+            <button class="action-button terminal-button" type="button"
               title="Take a screenshot of the terminal." onClick={this.onScreenshot}>
               <Camera />
             </button>
-            <button type="none" class={`action-button terminal-button ${recordingDisabled ? "disabled" : ""}`}
+            <button class={`action-button terminal-button ${recordingDisabled ? "disabled" : ""}`} type="button"
               title="Record the terminal to a GIF." onClick={this.onRecord}>
               {recording === RecordingState.Recording ? <VideocamRecording /> : <Videocam />}
             </button>
-            <button type="none" class="action-button terminal-button"
+            <button class="action-button terminal-button" type="button"
               title="Send a `terminate' event to the computer." onClick={this.onTerminate}>
               <NoEntry />
             </button>

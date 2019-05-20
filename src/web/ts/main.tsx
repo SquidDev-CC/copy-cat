@@ -67,11 +67,11 @@ class Main extends Component<{}, MainState> {
     return <div class="container">
       {state.currentVDom(state)}
       <div class="info-buttons">
-        <button class="action-button" title="Configure how the emulator behaves"
+        <button class="action-button" title="Configure how the emulator behaves" type="button"
           onClick={this.openSettings}>
           <Cog />
         </button>
-        <button class="action-button" title="Find out more about the emulator"
+        <button class="action-button" title="Find out more about the emulator" type="button"
           onClick={() => this.setState({ dialogue: () => <About /> })}>
           <Info />
         </button>
