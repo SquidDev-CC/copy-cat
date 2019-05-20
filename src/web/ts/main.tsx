@@ -3,12 +3,12 @@ import { IConfigGroup } from "./classes";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
-import { ConfigGroup, Settings } from "./settings";
-import * as storage from "./storage";
+import { ConfigGroup, SettingStore, Settings } from "./settings";
 
 type MainState = {
   settings: Settings,
-  computerConfigGroups: ConfigGroup[],
+  settingStorage: SettingStore,
+  configGroups: ConfigGroup[],
 
   currentVDom: (state: MainState) => JSX.Element,
   dialogue?: (state: MainState) => JSX.Element,
@@ -20,47 +20,50 @@ class Main extends Component<{}, MainState> {
   }
 
   public componentWillMount() {
-    const settings: Settings = {
-      showInvisible: true,
-      trimWhitespace: true,
+    const settingStorage = new SettingStore();
 
-      terminalFont: "assets/term_font.png",
-
-      darkMode: false,
-      terminalBorder: false,
-
-      computerSettings: [],
-    };
-
-    // Sync settings from local storage
-    const settingJson = storage.get("settings");
-    if (settingJson !== null) {
-      try {
-        const settingStorage = JSON.parse(settingJson);
-        for (const key of Object.keys(settings)) {
-          const value = settingStorage[key];
-          if (value !== undefined) (settings as any)[key] = value;
-        }
-      } catch (e) {
-        console.error("Cannot read settings", e);
-      }
-    }
+    const configEditor = new ConfigGroup("Editor", "Configure the built-in eidtor", settingStorage);
+    const configTerminal = new ConfigGroup("Editor", "Configure the terminal display", settingStorage);
+    const configGroups = [configEditor, configTerminal];
 
     this.state = {
-      settings,
+      settingStorage, configGroups,
+      settings: {
+        showInvisible: true, trimWhitespace: true, darkMode: false,
+        terminalFont: "assets/term_font.png",
+      },
       currentVDom: this.computerVDom,
-      computerConfigGroups: [],
     };
+
+    // Declare our settings
+    configEditor.addBoolean("editor.invisible", "Show invisible", this.state.settings.showInvisible,
+      "Show invisible characters, such as spaces and tabs.",
+      x => this.setState({ settings: { ...this.state.settings, showInvisible: x } }),
+    );
+
+    configEditor.addBoolean("editor.trim_whitespace", "Trim whitespace", this.state.settings.trimWhitespace,
+      "Trim whitespace from files when saving.",
+      x => this.setState({ settings: { ...this.state.settings, trimWhitespace: x } }),
+    );
+
+    configEditor.addBoolean("editor.dark", "Dark mode", this.state.settings.darkMode,
+      "Only the editor currently, sorry.",
+      x => this.setState({ settings: { ...this.state.settings, darkMode: x } }),
+    );
+
+    configTerminal.addOption("terminal.font", "Font", this.state.settings.terminalFont,
+      [
+        { key: "assets/term_font.png", value: "Standard font" },
+        { key: "assets/term_font_hd.png", value: "High-definition font" },
+      ], "Which font the we should use within the terminal",
+      x => this.setState({ settings: { ...this.state.settings, terminalFont: x } }),
+    );
   }
 
   public shouldComponentUpdate({ }: {}, newState: MainState) {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
-  }
-
-  public componentDidUpdate() {
-    storage.set("settings", JSON.stringify(this.state.settings));
   }
 
   public render({ }: {}, state: MainState) {
@@ -86,10 +89,9 @@ class Main extends Component<{}, MainState> {
   }
 
   private openSettings = () => {
-    const update = (s: Settings) => this.setState({ settings: s });
     this.setState({
-      dialogue: ({ settings, computerConfigGroups }: MainState) =>
-        <Settings settings={settings} update={update} computerConfigGroups={computerConfigGroups} />,
+      dialogue: ({ settingStorage, configGroups }: MainState) =>
+        <Settings store={settingStorage} configGroups={configGroups} />,
     });
   }
 
@@ -102,8 +104,8 @@ class Main extends Component<{}, MainState> {
   }
 
   private configFactory = (name: string, description: string | null): IConfigGroup => {
-    const group = new ConfigGroup(name, description);
-    this.setState({ computerConfigGroups: [...this.state.computerConfigGroups, group] });
+    const group = new ConfigGroup(name, description, this.state.settingStorage);
+    this.setState({ configGroups: [...this.state.configGroups, group] });
     return group;
   }
 }

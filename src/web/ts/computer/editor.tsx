@@ -14,13 +14,17 @@ export type Model = {
 export type LazyModel = Model | {
   resolved: false,
   contents: string,
-  mode?: string,
+  name: string,
   promise: Promise<Model>,
 };
 
-const modelFactory = (m: typeof mTypes, out: {}, contents: string, mode?: string): Model => {
-  // We could specify the path, but then that has to be unique and it introduces all sorts of issues.
-  const text = m.editor.createModel(contents, mode);
+let unique = 0;
+
+const modelFactory = (m: typeof mTypes, out: {}, contents: string, name: string): Model => {
+  unique++; // We keep a unique id to ensure the Uri is not repeated.
+  const mode = name.endsWith(".lua") ? "luax" : undefined;
+  const text = m.editor.createModel(contents, mode, m.Uri.file(`f${unique.toString(16)}/${name}`));
+
   text.updateOptions({ trimAutoWhitespace: true });
   text.detectIndentation(true, 2);
 
@@ -34,7 +38,7 @@ const modelFactory = (m: typeof mTypes, out: {}, contents: string, mode?: string
 const forceModel = (model: LazyModel): Model => {
   if (model.resolved) return model;
 
-  const resolved = modelFactory(monaco!, model, model.contents, model.mode);
+  const resolved = modelFactory(monaco!, model, model.contents, model.name);
 
   const old: { contents?: string, mode?: string } = model;
   delete old.contents;
@@ -43,11 +47,11 @@ const forceModel = (model: LazyModel): Model => {
   return resolved;
 };
 
-export const createModel = (contents: string, mode?: string): LazyModel => {
-  if (monaco) return modelFactory(monaco, {}, contents, mode);
+export const createModel = (contents: string, name: string): LazyModel => {
+  if (monaco) return modelFactory(monaco, {}, contents, name);
 
   const model: LazyModel = {
-    resolved: false, contents, mode,
+    resolved: false, contents, name,
     promise: import("../editor").then(m => {
       monaco = m;
       return forceModel(model);

@@ -197,7 +197,7 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     this.setState({
       activeFile: {
         file, path,
-        model: createModel(file.getContents(), path.endsWith(".lua") ? "luax" : undefined),
+        model: createModel(file.getContents(), path),
       },
     }, () => {
       if (oldActive && oldActive.model.resolved) oldActive.model.text.dispose();
