@@ -221,6 +221,9 @@ pre {
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  /* Required for Chrome, as it fires dropleave events when entering children */
+  pointer-events: none;
 }
 
 .file-drop-marker > span {
