@@ -26,7 +26,10 @@ export default {
         banner:
 `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
 <% _.forEach(_.sortBy(dependencies, ["name"]), ({ name, author, license }) => { %>
-  - <%= name %>: Copyright <%= author ? author.name : "" %> (<%= license %>)<% }) %>`,
+  - <%= name %>: Copyright <%= author ? author.name : "" %> (<%= license %>)<% }) %>
+
+@license
+  `,
         thirdParty: { output: "build/rollup/dependencies.txt" },
       });
 

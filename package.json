@@ -12,7 +12,9 @@
     "tsc": "tsc --project .",
     "tslint": "tslint --project .",
     "rollup": "rollup -c",
-    "host": "cd build/web && python -mhttp.server 8080"
+    "host": "cd build/web && python -mhttp.server 8080",
+    "terser": "terser --compress --mangle --comments",
+    "uglifycss": "uglifycss --max-line-len 120"
   },
   "dependencies": {
     "gif.js": "^0.2.0",
@@ -29,9 +31,9 @@
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^5.0.0",
+    "terser": "^4.0.0",
     "tslint": "^5.13.1",
     "typescript": "^3.3.3333",
-    "uglify-es": "github:mishoo/UglifyJS2#harmony",
     "uglifycss": "0.0.29"
   }
 }

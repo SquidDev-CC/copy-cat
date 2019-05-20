@@ -210,6 +210,57 @@ tasks {
         into("$buildDir/web")
     }
 
+    val minify by registering {
+        group = "build"
+        description = "Minifies the JS and CSS files"
+
+        val js = fileTree("$buildDir/web") { include("**/*.js") }
+        val css = fileTree("$buildDir/web") { include("**/*.css") }
+        val dest = file("$buildDir/minified")
+
+        inputs.files(js).withPropertyName("js")
+        inputs.files(css).withPropertyName("css")
+        inputs.file("package.json").withPropertyName("package.json")
+        outputs.files(fileTree(dest))
+        dependsOn(website)
+
+        doLast {
+            // Clean the directory a little bit.
+            fileTree(dest).forEach { it.delete() }
+
+            js.forEach { original ->
+                val relative = original.relativeTo(js.dir)
+                val renamed = dest.resolve(relative)
+                renamed.parentFile.mkdirs()
+
+                exec {
+                    commandLine(mkCommand("npm run terser --silent -- --output \"$renamed\" \"$original\""))
+                }
+            }
+
+            css.forEach { original ->
+                val relative = original.relativeTo(js.dir)
+                val renamed = dest.resolve(relative)
+                renamed.parentFile.mkdirs()
+
+                exec {
+                    commandLine(mkCommand("npm run uglifycss --silent -- --output \"$renamed\" \"$original\""))
+                }
+            }
+        }
+    }
+
+    val websiteMinified by registering(Sync::class) {
+        group = "build"
+        description = "Produces a minified website"
+
+        dependsOn(website, minify)
+
+        from("$buildDir/web") { exclude("**/*.css", "**/*.js") }
+        from("$buildDir/minified") { include("**/*.css", "**/*.js") }
+        into("$buildDir/webMin")
+    }
+
     val cleanPatches by registering(Delete::class) {
         delete("src/patches")
         description = "Cleans the patch directory"
@@ -340,5 +391,9 @@ tasks {
 
     assemble {
         dependsOn(website)
+    }
+
+    assembleDist {
+        dependsOn(websiteMinified)
     }
 }
