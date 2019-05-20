@@ -131,7 +131,7 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     </div>;
   }
 
-  private addOneFile(name: string, contents: string) {
+  private addOneFile(name: string, contents: ArrayBuffer) {
     const index = name.lastIndexOf(".");
     const prefix = index > 0 ? name.substring(0, index) : name;
     const suffix = index > 0 ? name.substring(index) : "";
@@ -178,15 +178,15 @@ export class Computer extends Component<ComputerProps, ComputerState> {
               if (fullName.endsWith("/")) fullName = fullName.substring(0, fullName.length - 1);
               computer.createDirectory(fullName);
             } else {
-              this.addOneFile(fullName, await entry.async("text"));
+              this.addOneFile(fullName, await entry.async("arraybuffer"));
             }
           }
         })
         .catch(e => console.error(e));
     } else {
       const reader = new FileReader();
-      reader.onload = () => this.addOneFile(file.name, reader.result as string);
-      reader.readAsText(file);
+      reader.onload = () => this.addOneFile(file.name, reader.result as ArrayBuffer);
+      reader.readAsArrayBuffer(file);
     }
   }
 
@@ -194,10 +194,11 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     if (file.isDirectory()) return;
 
     const oldActive = this.state.activeFile;
+
     this.setState({
       activeFile: {
         file, path,
-        model: createModel(file.getContents(), path),
+        model: createModel(file.getStringContents(), path),
       },
     }, () => {
       if (oldActive && oldActive.model.resolved) oldActive.model.text.dispose();

@@ -1,3 +1,4 @@
+import { decode, encode } from "../files/encode";
 import { IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "../java";
 import * as storage from "../storage";
 import { TerminalData } from "../terminal/data";
@@ -13,21 +14,25 @@ export const splitName = (file: string) => {
 
 export const joinName = (parent: string, child: string) => parent === "" ? child : `${parent}/${child}`;
 
+const empty = new Int8Array(0);
+const decoder = new TextDecoder("UTF-8", { fatal: false });
+const encoder = new TextEncoder();
+
 export class FileSystemEntry implements IFileSystemEntry {
   private readonly path: string;
   private children: string[] | null;
-  private contents: string | null;
+  private contents: Int8Array | null;
   private exists: boolean = true;
   private semaphore?: Semaphore;
 
-  constructor(path: string, children: string[] | null, contents: string | null) {
+  constructor(path: string, children: string[] | null, contents: Int8Array | null) {
     this.path = path;
     this.children = children;
     this.contents = contents;
   }
 
   public static create(path: string, directory: boolean) {
-    const instance = new FileSystemEntry(path, directory ? [] : null, directory ? null : "");
+    const instance = new FileSystemEntry(path, directory ? [] : null, directory ? null : empty);
     instance.save();
     return instance;
   }
@@ -37,35 +42,46 @@ export class FileSystemEntry implements IFileSystemEntry {
   }
 
   public getChildren(): string[] {
-    if (this.children == null) throw Error("Not a directory");
+    if (this.children === null) throw Error("Not a directory");
     return this.children;
   }
 
   public setChildren(children: string[]): void {
-    if (this.children == null) throw Error("Not a directory");
+    if (this.children === null) throw Error("Not a directory");
     this.children = children;
     if (this.semaphore) this.semaphore.signal();
     this.save();
   }
 
-  public getContents(): string {
-    if (this.contents != null) return this.contents;
-    if (this.children != null) throw Error("Not a file");
+  public getContents(): Int8Array {
+    if (this.contents !== null) return this.contents;
+    if (this.children !== null) throw Error("Not a file");
 
-    return this.contents = atob(storage.get(`computer[0].files[${this.path}].b64`) || "");
+    const contents = storage.get(`computer[0].files[${this.path}].b64`);
+    return this.contents = contents ? new Int8Array(decode(contents)) : empty;
   }
 
-  public setContents(contents: string): Result<true> {
-    if (this.contents == null) throw Error("Not a file");
+  public getStringContents(): string {
+    return decoder.decode(this.getContents());
+  }
+
+  public setContents(contents: ArrayBuffer | string): Result<true> {
+    if (this.children !== null) throw Error("Not a file");
     if (!this.exists) return { error: "File has been deleted", value: null };
-    this.contents = contents;
+
+    if (typeof contents === "string") {
+      const encoded = encoder.encode(contents);
+      this.contents = new Int8Array(encoded);
+    } else {
+      this.contents = contents instanceof Int8Array ? contents : new Int8Array(contents);
+    }
     this.save();
     return { value: true };
   }
 
   public delete(): void {
     this.exists = false;
-    storage.remove(this.children == null
+    storage.remove(this.children === null
       ? `computer[0].files[${this.path}].b64`
       : `computer[0].files[${this.path}].children`);
   }
@@ -76,7 +92,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     }
 
     if (this.contents !== null) {
-      storage.set(`computer[0].files[${this.path}].b64`, btoa(this.contents));
+      storage.set(`computer[0].files[${this.path}].b64`, encode(this.contents));
     }
   }
 

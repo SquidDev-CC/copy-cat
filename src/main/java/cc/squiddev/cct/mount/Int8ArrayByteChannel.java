@@ -1,4 +1,4 @@
-package cc.squiddev.cct.http;
+package cc.squiddev.cct.mount;
 
 import cc.squiddev.cct.stub.SeekableByteChannel;
 import org.teavm.jso.typedarrays.Int8Array;

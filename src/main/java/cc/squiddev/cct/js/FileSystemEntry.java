@@ -30,7 +30,7 @@ public interface FileSystemEntry extends JSObject {
      * @throws RuntimeException If this is not a file
      */
     @Nonnull
-    String getContents();
+    Int8Array getContents();
 
     /**
      * Set the contents of this filesystem entry
@@ -40,5 +40,5 @@ public interface FileSystemEntry extends JSObject {
      * @throws RuntimeException If this is not a file
      */
     @Nonnull
-    ComputerAccess.Result<JSBoolean> setContents(@Nonnull String contents);
+    ComputerAccess.Result<JSBoolean> setContents(@Nonnull Int8Array contents);
 }

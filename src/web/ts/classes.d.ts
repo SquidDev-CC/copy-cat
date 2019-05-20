@@ -32,7 +32,7 @@ export interface IFileSystemEntry {
    * @return This file's contents
    * @throws If this is not a file
    */
-  getContents(): string;
+  getContents(): Int8Array;
 
   /**
    * Set the contents of this filesystem entry
@@ -41,7 +41,7 @@ export interface IFileSystemEntry {
    * @return Whether this file's contents was set or not
    * @throws If this is not a file
    */
-  setContents(contents: string): Result<true>;
+  setContents(contents: Int8Array): Result<true>;
 }
 
 /**
