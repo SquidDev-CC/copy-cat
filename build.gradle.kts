@@ -414,3 +414,9 @@ tasks {
         dependsOn(websiteMinified)
     }
 }
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile::class) {
+        options.compilerArgs.addAll(listOf("-Xlint", "-Xlint:-processing"))
+    }
+}

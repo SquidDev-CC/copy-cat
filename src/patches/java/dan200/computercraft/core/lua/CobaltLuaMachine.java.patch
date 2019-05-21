@@ -53,7 +53,15 @@
              .build();
  
          m_globals = new LuaTable();
-@@ -295,7 +292,7 @@
+@@ -261,6 +258,7 @@
+                 } );
+             }
+         }
++        object.overwriteLuaTable( table );
+         return table;
+     }
+ 
+@@ -295,7 +293,7 @@
              // Start remembering stuff
              if( values == null )
              {
@@ -62,7 +70,7 @@
              }
              else if( values.containsKey( object ) )
              {
-@@ -362,7 +359,7 @@
+@@ -362,7 +360,7 @@
                  // Start remembering stuff
                  if( objects == null )
                  {
@@ -71,7 +79,7 @@
                  }
                  else if( objects.containsKey( value ) )
                  {
-@@ -479,7 +476,6 @@
+@@ -479,7 +477,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -79,7 +87,7 @@
              handleSoftAbort();
          }
  
-@@ -505,24 +501,26 @@
+@@ -505,24 +502,26 @@
      {
          @Nonnull
          @Override
@@ -109,7 +117,7 @@
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -562,9 +560,12 @@
+@@ -562,9 +561,12 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }
