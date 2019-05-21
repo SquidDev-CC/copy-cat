@@ -10,6 +10,7 @@ import org.teavm.tooling.sources.DirectorySourceFileProvider
 import org.teavm.tooling.sources.JarSourceFileProvider
 import org.teavm.vm.TeaVMOptimizationLevel
 import java.net.URLClassLoader
+import java.util.regex.Pattern
 
 buildscript {
     repositories {
@@ -103,7 +104,7 @@ tasks {
 
                 tool.generate()
 
-                if (!tool.problemProvider.severeProblems.isEmpty()) throw IllegalStateException("Build failed")
+                if (tool.problemProvider.severeProblems.isNotEmpty()) throw IllegalStateException("Build failed")
             }
         }
     }
@@ -118,8 +119,24 @@ tasks {
 
         doLast {
             File("$buildDir/javascript/classes.js").bufferedWriter().use { writer ->
-                File("$buildDir/teaVM/classes.js").reader().use { it.copyTo(writer) }
-                writer.write("export default callbacks => {\n");
+                // No clue why this cast is needed.
+                val contents = File("$buildDir/teaVM/classes.js").readText() as java.lang.String
+
+                // TeaVM assumes we execute in the top level, but we don't! As a result, attempting to use
+                // $rt_global as a proxy for all our functions causes issues. Thus we remove the getter for it,
+                // transforming `otp_Platform_getConsole().foo` into `foo`
+                val matcher = Pattern
+                    .compile("""function (\w+)\(\) ?\{\s*return \${"$"}rt_global;\s*\}""")
+                    .matcher(contents)
+                if (!matcher.find()) {
+                    throw IllegalStateException("Cannot find global returner")
+                }
+
+                println("Removing global returner '${matcher.group(1)}'.")
+                writer.write(contents.replaceAll("""\b${matcher.group(1)}\(\)\.""", ""));
+
+                // Also export a simple function which sets the callbacks and then boots the VM
+                writer.write("export default callbacks => {\n")
                 writer.write("  window.callbacks = callbacks;\n")
                 writer.write("  main();\n");
                 writer.write("};\n");

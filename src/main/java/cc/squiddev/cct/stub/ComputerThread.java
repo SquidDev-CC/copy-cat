@@ -16,7 +16,7 @@ public class ComputerThread {
         if (executor.onComputerQueue) throw new IllegalStateException("Cannot queue already queued executor");
         lastExecutor = executor;
         executor.onComputerQueue = true;
-        workOnce();
+        Callbacks.setImmediate(CALLBACK);
     }
 
     private static void workOnce() {

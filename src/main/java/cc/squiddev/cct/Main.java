@@ -6,6 +6,7 @@ import cc.squiddev.cct.js.ConfigGroup;
 import cc.squiddev.cct.js.JsonParse;
 import cc.squiddev.cct.mount.ComputerAccessMount;
 import cc.squiddev.cct.mount.ResourceMount;
+import cc.squiddev.cct.stub.Logger;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
@@ -21,6 +22,7 @@ public class Main implements IComputerEnvironment {
     public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
 
     public static void main(String[] args) {
+        ComputerCraft.log = Logger.INSTANCE;
         setupConfig();
         new Main().run();
     }
@@ -39,7 +41,11 @@ public class Main implements IComputerEnvironment {
         computerAccess.onShutdown(computer::shutdown);
 
         Callbacks.setInterval(() -> {
-            computer.tick();
+            try {
+                computer.tick();
+            } catch (RuntimeException e) {
+                Logger.INSTANCE.error("Error when ticking computer", e);
+            }
 
             if (computer.pollAndResetChanged()) {
                 computerAccess.setState(computer.getLabel(), computer.isOn());
