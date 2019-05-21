@@ -104,7 +104,7 @@
      }
  
      public IAPIEnvironment environment()
-@@ -115,91 +94,73 @@
+@@ -115,91 +94,83 @@
          if( url.getScheme() == null ) throw new HTTPRequestException( "Must specify http or https" );
          if( url.getHost() == null ) throw new HTTPRequestException( "URL malformed" );
  
@@ -164,8 +164,7 @@
 +                Map<String, String> responseHeaders = new HashMap<>();
 +                for (String header : request.getAllResponseHeaders().split("\r\n")) {
 +                    int index = header.indexOf(':');
-+                    if (index >= 0) responseHeaders.put(header.substring(0, index), header.substring(index + 1));
-+                }
++                    if (index < 0) continue;
  
 -            HttpRequestHandler handler = currentRequest = new HttpRequestHandler( this, uri, method );
 -            connectFuture = new Bootstrap()
@@ -176,6 +175,21 @@
 -                    @Override
 -                    protected void initChannel( SocketChannel ch )
 -                    {
++                    // Normalise the header (so "content-type" becomes "Content-Type")
++                    boolean upcase = true;
++                    StringBuilder headerBuilder = new StringBuilder(index);
++                    for (int i = 0; i < index; i++) {
++                        char c = header.charAt(i);
++                        headerBuilder.append(upcase ? Character.toUpperCase(c) : c);
++                        upcase = c == '-';
++                    }
++                    responseHeaders.put(headerBuilder.toString(), header.substring(index + 1).trim());
++                }
+ 
+-                        if( ComputerCraft.httpTimeout > 0 )
+-                        {
+-                            ch.config().setConnectTimeoutMillis( ComputerCraft.httpTimeout );
+-                        }
 +                ILuaObject stream = new HttpResponseHandle(reader, request.getStatus(), request.getStatusText(), responseHeaders);
 +                if (request.getStatus() >= 200 && request.getStatus() < 400) {
 +                    success(stream);
@@ -184,16 +198,16 @@
 +                }
 +            });
  
--                        if( ComputerCraft.httpTimeout > 0 )
--                        {
--                            ch.config().setConnectTimeoutMillis( ComputerCraft.httpTimeout );
--                        }
-+            request.setResponseType(binary ? "arraybuffer" : "text");
- 
 -                        ChannelPipeline p = ch.pipeline();
 -                        if( sslContext != null )
 -                        {
 -                            p.addLast( sslContext.newHandler( ch.alloc(), uri.getHost(), socketAddress.getPort() ) );
+-                        }
++            request.setResponseType(binary ? "arraybuffer" : "text");
+ 
+-                        if( ComputerCraft.httpTimeout > 0 )
+-                        {
+-                            p.addLast( new ReadTimeoutHandler( ComputerCraft.httpTimeout, TimeUnit.MILLISECONDS ) );
 -                        }
 +            String address = uri.toASCIIString();
 +            request.open(method, Main.corsProxy.isEmpty() ? address : Main.corsProxy.replace("{}", address));
@@ -202,11 +216,6 @@
 +            }
 +            request.send(postBuffer);
  
--                        if( ComputerCraft.httpTimeout > 0 )
--                        {
--                            p.addLast( new ReadTimeoutHandler( ComputerCraft.httpTimeout, TimeUnit.MILLISECONDS ) );
--                        }
--
 -                        p.addLast(
 -                            new HttpClientCodec(),
 -                            new HttpContentDecompressor(),
@@ -238,7 +247,7 @@
      }
  
      void failure( String message )
-@@ -214,14 +175,6 @@
+@@ -214,14 +185,6 @@
          {
              message = cause.getMessage();
          }
@@ -253,7 +262,7 @@
          else
          {
              message = "Could not connect";
-@@ -244,16 +197,12 @@
+@@ -244,16 +207,12 @@
      protected void dispose()
      {
          super.dispose();
@@ -272,7 +281,7 @@
          {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -261,12 +210,12 @@
+@@ -261,12 +220,12 @@
          return size;
      }
  
