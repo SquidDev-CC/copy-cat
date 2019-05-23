@@ -35,7 +35,7 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
     { expanded }: FileEntryState,
   ) {
     return <li class="file-entry">
-      <div class="file-entry-head" style={`padding-left: ${depth}em`}
+      <div class={`file-entry-head ${opened === path ? "active" : ""}`} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
         <span class={`file-entry-icon icon icon-${getExtension(name, entry.isDirectory(), expanded || false)}`}></span>
         <span class="file-entry-name">{name}</span>
@@ -64,8 +64,9 @@ type FileListState = {
 type ChildNode = { name: string, dir: boolean, node: VNode<any> };
 
 export class FileTree extends Component<FileListProperties, FileListState> {
-  public shouldComponentUpdate({ entry, depth }: FileListProperties, { children }: FileListState) {
-    return entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children;
+  public shouldComponentUpdate({ entry, depth, opened }: FileListProperties, { children }: FileListState) {
+    return entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children ||
+      opened !== this.props.opened;
   }
 
   public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState) {

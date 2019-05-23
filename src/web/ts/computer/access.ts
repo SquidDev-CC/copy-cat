@@ -76,6 +76,7 @@ export class FileSystemEntry implements IFileSystemEntry {
       this.contents = contents instanceof Int8Array ? contents : new Int8Array(contents);
     }
     this.save();
+    if (this.semaphore) this.semaphore.signal();
     return { value: true };
   }
 
@@ -84,6 +85,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     storage.remove(this.children === null
       ? `computer[0].files[${this.path}].b64`
       : `computer[0].files[${this.path}].children`);
+    if (this.semaphore) this.semaphore.signal();
   }
 
   private save(): void {
@@ -98,6 +100,10 @@ export class FileSystemEntry implements IFileSystemEntry {
 
   public getSemaphore(): Semaphore {
     return this.semaphore || (this.semaphore = new Semaphore());
+  }
+
+  public doesExist(): boolean {
+    return this.exists;
   }
 }
 
@@ -252,8 +258,8 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const entry = this.filesystem.get(file);
       if (!entry) continue;
 
-      entry.delete();
       this.filesystem.delete(path);
+      entry.delete();
 
       if (!entry.isDirectory()) continue;
       for (const child of entry.getChildren()) queue.push(joinName(file, child));

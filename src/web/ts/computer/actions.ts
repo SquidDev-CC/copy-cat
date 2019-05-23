@@ -1,13 +1,12 @@
 export class Semaphore {
-  private readonly listeners: Array<() => void> = [];
+  private readonly listeners: Set<() => void> = new Set();
 
   public attach(listener: () => void) {
-    this.listeners.push(listener);
+    this.listeners.add(listener);
   }
 
   public detach(listener: () => void) {
-    const index = this.listeners.indexOf(listener);
-    if (index > -1) this.listeners.splice(index, 1);
+    this.listeners.delete(listener);
   }
 
   public signal() {

@@ -279,8 +279,10 @@ tasks {
     }
 
     val cleanPatches by registering(Delete::class) {
-        delete("src/patches")
+        group = "patch"
         description = "Cleans the patch directory"
+
+        delete("src/patches")
     }
 
     val cleanSources by registering(Delete::class) {
@@ -412,6 +414,11 @@ tasks {
 
     assembleDist {
         dependsOn(websiteMinified)
+    }
+
+    val avengers by registering {
+        description = "An alias to 'clean'. Should be run before assemble."
+        dependsOn(clean)
     }
 }
 

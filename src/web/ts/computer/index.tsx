@@ -29,6 +29,7 @@ type ComputerState = {
   computer: ComputerAccess,
 
   activeFile: EditedFile | null,
+  openFiles: Map<FileSystemEntry, { model: LazyModel, monitor: () => void }>,
 
   id: number,
   label: string | null,
@@ -102,7 +103,7 @@ fn()`);
 
     this.state = {
       terminal, terminalChanged, computer,
-      activeFile: null,
+      activeFile: null, openFiles: new Map(),
 
       id: 0, on: false, label: computer.getLabel(),
 
@@ -116,11 +117,15 @@ fn()`);
 
   public componentWillUnmount() {
     this.state.computer.shutdown();
+    for (const [file, { model, monitor }] of this.state.openFiles) {
+      if (model.resolved) model.text.dispose();
+      file.getSemaphore().detach(monitor);
+    }
   }
 
   public shouldComponentUpdate(
     { focused, settings }: Readonly<ComputerProps>,
-    { id, label, on, activeFile: activeFile, dragging }: Readonly<ComputerState>,
+    { id, label, on, activeFile, dragging }: Readonly<ComputerState>,
   ): boolean {
     return focused !== this.props.focused || settings !== this.props.settings ||
       id !== this.state.id || label !== this.state.label || on !== this.state.on ||
@@ -225,23 +230,39 @@ fn()`);
   private openFile = (path: string, file: FileSystemEntry) => {
     if (file.isDirectory()) return;
 
-    const oldActive = this.state.activeFile;
+    let entry = this.state.openFiles.get(file);
+    if (typeof entry === "undefined") {
+      const model = createModel(file.getStringContents(), path);
 
-    this.setState({
-      activeFile: {
-        file, path,
-        model: createModel(file.getStringContents(), path),
-      },
-    }, () => {
-      if (oldActive && oldActive.model.resolved) oldActive.model.text.dispose();
-    });
+      const monitor = () => {
+        if (!file.doesExist()) {
+          // If the file has been deleted, dispose the model and remove from the cache.
+          if (model.resolved) model.text.dispose();
+          file.getSemaphore().detach(monitor);
+          this.state.openFiles.delete(file);
+        }
+      };
+
+      entry = { model, monitor };
+      this.state.openFiles.set(file, entry);
+      file.getSemaphore().attach(monitor);
+    } else {
+      // Update the contents from the file. Note, this may mess up the view a little - we'll have to cope.
+      const model = entry.model;
+      const contents = file.getStringContents();
+      if (model.resolved) {
+        if (contents !== model.text.getValue()) model.text.setValue(contents);
+      } else {
+        model.contents = contents;
+      }
+    }
+
+    this.setState({ activeFile: { file, path, model: entry.model } });
   }
 
   private openComputer = () => {
     const oldActive = this.state.activeFile;
-    this.setState({ activeFile: null }, () => {
-      if (oldActive && oldActive.model.resolved) oldActive.model.text.dispose();
-    });
+    this.setState({ activeFile: null });
   }
 
   private saveZip = (e: Event) => {
