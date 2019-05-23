@@ -21,6 +21,8 @@ import java.io.InputStream;
 public class Main implements IComputerEnvironment {
     public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
 
+    private long ticks;
+
     public static void main(String[] args) {
         ComputerCraft.log = Logger.INSTANCE;
         setupConfig();
@@ -41,6 +43,8 @@ public class Main implements IComputerEnvironment {
         computerAccess.onShutdown(computer::shutdown);
 
         Callbacks.setInterval(() -> {
+            ticks++;
+
             try {
                 computer.tick();
             } catch (RuntimeException e) {
@@ -81,12 +85,12 @@ public class Main implements IComputerEnvironment {
 
     @Override
     public int getDay() {
-        return 0;
+        return (int) ((ticks + 6000) / 24000) + 1;
     }
 
     @Override
     public double getTimeOfDay() {
-        return 0;
+        return ((ticks + 6000) % 24000) / 1000.0;
     }
 
     @Override
