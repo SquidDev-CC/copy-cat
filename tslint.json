@@ -13,6 +13,7 @@
       "member-ordering": false,
       "no-bitwise": false,
       "no-console": [true, "log"],
+      "no-empty": [true, "allow-empty-functions"],
       "no-implicit-dependencies": [true],
       "no-magic-numbers": false,
       "no-namespace": false,

@@ -1,8 +1,8 @@
 import { decode, encode } from "../files/encode";
 import { IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "../java";
-import * as storage from "../storage";
 import { TerminalData } from "../terminal/data";
 import { IComputerActionable, LuaValue, Semaphore } from "./actions";
+import { IComputerPersistance } from "./persist";
 
 const colours = "0123456789abcdef";
 
@@ -19,20 +19,22 @@ const decoder = new TextDecoder("UTF-8", { fatal: false });
 const encoder = new TextEncoder();
 
 export class FileSystemEntry implements IFileSystemEntry {
+  private readonly persistance: IComputerPersistance;
   private readonly path: string;
   private children: string[] | null;
   private contents: Int8Array | null;
   private exists: boolean = true;
   private semaphore?: Semaphore;
 
-  constructor(path: string, children: string[] | null, contents: Int8Array | null) {
+  constructor(persistance: IComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null) {
+    this.persistance = persistance;
     this.path = path;
     this.children = children;
     this.contents = contents;
   }
 
-  public static create(path: string, directory: boolean) {
-    const instance = new FileSystemEntry(path, directory ? [] : null, directory ? null : empty);
+  public static create(persistance: IComputerPersistance, path: string, directory: boolean) {
+    const instance = new FileSystemEntry(persistance, path, directory ? [] : null, directory ? null : empty);
     instance.save();
     return instance;
   }
@@ -56,9 +58,7 @@ export class FileSystemEntry implements IFileSystemEntry {
   public getContents(): Int8Array {
     if (this.contents !== null) return this.contents;
     if (this.children !== null) throw Error("Not a file");
-
-    const contents = storage.get(`computer[0].files[${this.path}].b64`);
-    return this.contents = contents ? new Int8Array(decode(contents)) : empty;
+    return this.contents = this.persistance.getContents(this.path);
   }
 
   public getStringContents(): string {
@@ -82,20 +82,17 @@ export class FileSystemEntry implements IFileSystemEntry {
 
   public delete(): void {
     this.exists = false;
-    storage.remove(this.children === null
-      ? `computer[0].files[${this.path}].b64`
-      : `computer[0].files[${this.path}].children`);
+    if (this.children === null) {
+      this.persistance.removeChildren(this.path);
+    } else {
+      this.persistance.removeContents(this.path);
+    }
     if (this.semaphore) this.semaphore.signal();
   }
 
   private save(): void {
-    if (this.children !== null) {
-      storage.set(`computer[0].files[${this.path}].children`, JSON.stringify(this.children));
-    }
-
-    if (this.contents !== null) {
-      storage.set(`computer[0].files[${this.path}].b64`, encode(this.contents));
-    }
+    if (this.children !== null) this.persistance.setChildren(this.path, this.children);
+    if (this.contents !== null) this.persistance.setContents(this.path, this.contents);
   }
 
   public getSemaphore(): Semaphore {
@@ -108,51 +105,47 @@ export class FileSystemEntry implements IFileSystemEntry {
 }
 
 export class ComputerAccess implements IComputerAccess, IComputerActionable {
+  private readonly persistance: IComputerPersistance;
+
+  private readonly terminal: TerminalData;
+  private readonly semaphore: Semaphore;
+  private readonly stateChanged: (label: string | null, on: boolean) => void;
+
+  private label: string | null;
+  private readonly filesystem: Map<string, FileSystemEntry> = new Map<string, FileSystemEntry>();
+
   private queueEventHandler?: QueueEventHandler;
   private turnOnHandler?: () => void;
   private shutdownHandler?: () => void;
   private rebootHander?: () => void;
-  private label: string | null;
-
-  private terminal: TerminalData;
-  private semaphore: Semaphore;
-  private stateChanged: (label: string | null, on: boolean) => void;
-
-  private filesystem: Map<string, FileSystemEntry> = new Map<string, FileSystemEntry>();
 
   constructor(
-    terminal: TerminalData, semaphore: Semaphore,
+    persistance: IComputerPersistance, terminal: TerminalData, semaphore: Semaphore,
     stateChange: (label: string | null, on: boolean) => void,
   ) {
+    this.persistance = persistance;
+
     this.terminal = terminal;
     this.semaphore = semaphore;
     this.stateChanged = stateChange;
 
-    this.label = storage.get(`computer[0].label`);
+    this.label = persistance.getLabel();
 
     const queue = [""];
     while (true) {
       const path = queue.pop();
       if (path === undefined) break;
 
-      const children = storage.get(`computer[0].files[${path}].children`);
+      const children = persistance.getChildren(path);
       if (children !== null) {
-        let childList: string[];
-        try {
-          childList = JSON.parse(children);
-        } catch (e) {
-          console.error(`Error loading file "${path}"`);
-          continue;
-        }
-
-        this.filesystem.set(path, new FileSystemEntry(path, childList, null));
-        for (const child of childList) queue.push(joinName(path, child));
+        this.filesystem.set(path, new FileSystemEntry(persistance, path, children, null));
+        for (const child of children) queue.push(joinName(path, child));
       } else if (path === "") {
         // Create a new entry
-        this.filesystem.set("", new FileSystemEntry("", [], null));
+        this.filesystem.set("", new FileSystemEntry(persistance, "", [], null));
       } else {
         // Assume it's a file
-        this.filesystem.set(path, new FileSystemEntry(path, null, null));
+        this.filesystem.set(path, new FileSystemEntry(persistance, path, null, null));
       }
     }
   }
@@ -164,11 +157,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
   public setState(label: string | null, on: boolean): void {
     if (this.label !== label) {
       this.label = label;
-      if (label) {
-        storage.set(`computer[0].label`, label);
-      } else {
-        storage.remove(`computer[0].label`);
-      }
+      this.persistance.setLabel(label);
     }
 
     this.stateChanged(label, on);
@@ -211,7 +200,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const parent = this.createDirectory(parentName);
       if (parent.value === null) return parent;
 
-      const file = FileSystemEntry.create(path, true);
+      const file = FileSystemEntry.create(this.persistance, path, true);
       parent.value.setChildren([...parent.value.getChildren(), fileName]);
       this.filesystem.set(path, file);
       return { value: file };
@@ -229,7 +218,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const parent = this.filesystem.get(parentName);
       if (parent == null || !parent.isDirectory()) return { error: `/${path}: Access denied`, value: null };
 
-      const file = FileSystemEntry.create(path, false);
+      const file = FileSystemEntry.create(this.persistance, path, false);
       parent.setChildren([...parent.getChildren(), fileName]);
       this.filesystem.set(path, file);
       return { value: file };

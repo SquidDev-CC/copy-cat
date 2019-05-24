@@ -10,6 +10,7 @@ import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { Semaphore } from "./actions";
 import Editor, { LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
+import { StoragePersistence } from "./persist";
 
 export type ComputerProps = {
   focused: boolean,
@@ -66,6 +67,7 @@ export class Computer extends Component<ComputerProps, ComputerState> {
     const terminal = new TerminalData();
     const terminalChanged = new Semaphore();
     const computer = new ComputerAccess(
+      new StoragePersistence(0),
       terminal, terminalChanged,
       (label, on) => this.setState({ label, on }),
     );
