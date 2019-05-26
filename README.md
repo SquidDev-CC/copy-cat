@@ -31,9 +31,16 @@ take sources of [Cobalt][cobalt] and [CC: Tweaked][cct], modify them to work in
 a Javascript environment, and then compile them to JS. Thankfully, this is all
 automated by Gradle. However, it does require a bit of setup:
 
-Before getting started, you will need the JDK (Java Development Kit) and NodeJS
-installed and on the path.
+Before getting started, you will need the JDK (Java Development Kit), Maven and
+NodeJS installed and on the path.
 
+First you need to set up our modified version of TeaVM. This is a temporary
+step until these changes are PRed upstream.
+
+ - Clone our modified version of TeaVM `git clone -b cc-patches https://github.com/SquidDev/teavm.git`
+ - Switch into the `teavm` directory and run `mvn install -DskipTests`.
+
+Now we can set up copy-cat itself:
  - Clone Copy Cat with submodules: `git clone --recursive https://github.com/SquidDev-CC/copy-cat`
  - Install NodeJS packages: `npm install`
  - Apply patches: `./gradlew applyPatches`

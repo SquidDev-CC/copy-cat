@@ -13,6 +13,7 @@
     "tslint": "tslint --project .",
     "rollup": "rollup -c",
     "host": "cd build/web && python -mhttp.server 8080",
+    "host-min": "cd build/webMin && python -mhttp.server 8080",
     "terser": "terser --compress --mangle --comments",
     "uglifycss": "uglifycss --max-line-len 120"
   },

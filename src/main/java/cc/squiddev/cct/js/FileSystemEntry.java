@@ -2,6 +2,7 @@ package cc.squiddev.cct.js;
 
 import org.teavm.jso.JSObject;
 import org.teavm.jso.core.JSBoolean;
+import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
 

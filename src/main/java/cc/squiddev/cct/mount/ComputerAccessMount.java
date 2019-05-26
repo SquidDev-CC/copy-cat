@@ -3,12 +3,12 @@ package cc.squiddev.cct.mount;
 import cc.squiddev.cct.js.ComputerAccess;
 import cc.squiddev.cct.js.ComputerAccess.Result;
 import cc.squiddev.cct.js.FileSystemEntry;
-import cc.squiddev.cct.js.Int8Array;
 import cc.squiddev.cct.stub.ReadableByteChannel;
 import cc.squiddev.cct.stub.SeekableByteChannel;
 import cc.squiddev.cct.stub.WritableByteChannel;
 import dan200.computercraft.api.filesystem.IWritableMount;
 import org.teavm.jso.core.JSBoolean;
+import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

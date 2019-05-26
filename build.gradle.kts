@@ -2,7 +2,7 @@ import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.teavm.tooling.RuntimeCopyOperation
+import org.teavm.tooling.TeaVMProblemRenderer
 import org.teavm.tooling.TeaVMTargetType
 import org.teavm.tooling.TeaVMTool
 import org.teavm.tooling.TeaVMToolLog
@@ -10,17 +10,20 @@ import org.teavm.tooling.sources.DirectorySourceFileProvider
 import org.teavm.tooling.sources.JarSourceFileProvider
 import org.teavm.vm.TeaVMOptimizationLevel
 import java.net.URLClassLoader
-import java.util.regex.Pattern
 
 buildscript {
     repositories {
         mavenCentral()
-        maven("https://dl.bintray.com/konsoletyper/teavm")
+        mavenLocal()
     }
 
     dependencies {
+        // TeaVM and tooling
         classpath("org.teavm:teavm-core:${project.properties["teavm_version"]}")
         classpath("org.teavm:teavm-tooling:${project.properties["teavm_version"]}")
+        classpath("commons-io:commons-io:2.6")
+
+        // Misc buildscript stuff
         classpath("io.github.java-diff-utils:java-diff-utils:4.0")
         classpath("org.ajoberstar.grgit:grgit-gradle:3.0.0")
     }
@@ -33,7 +36,9 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
+
 dependencies {
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 
@@ -89,8 +94,9 @@ tasks {
                 tool.targetDirectory = dir
                 tool.targetFileName = "classes.js"
                 tool.mainClass = application.mainClassName
-                tool.runtime = RuntimeCopyOperation.MERGED
-                tool.isMinifying = true
+                // Our TeaVM patches get borked under minification, so this is kept off.
+                // Yes, it adds ~60kb to the download size :/.
+                tool.isMinifying = false
                 tool.optimizationLevel = TeaVMOptimizationLevel.ADVANCED
                 tool.log = log
                 tool.targetType = TeaVMTargetType.JAVASCRIPT
@@ -104,6 +110,7 @@ tasks {
 
                 tool.generate()
 
+                TeaVMProblemRenderer.describeProblems(tool.getDependencyInfo().getCallGraph(), tool.getProblemProvider(), log)
                 if (tool.problemProvider.severeProblems.isNotEmpty()) throw IllegalStateException("Build failed")
             }
         }
@@ -119,23 +126,9 @@ tasks {
 
         doLast {
             File("$buildDir/javascript/classes.js").bufferedWriter().use { writer ->
-                // No clue why this cast is needed.
-                val contents = File("$buildDir/teaVM/classes.js").readText() as java.lang.String
+                File("$buildDir/teaVM/classes.js").reader().use { it.copyTo(writer) }
 
-                // TeaVM assumes we execute in the top level, but we don't! As a result, attempting to use
-                // $rt_global as a proxy for all our functions causes issues. Thus we remove the getter for it,
-                // transforming `otp_Platform_getConsole().foo` into `foo`
-                val matcher = Pattern
-                    .compile("""function (\w+)\(\) ?\{\s*return \${"$"}rt_global;\s*\}""")
-                    .matcher(contents)
-                if (!matcher.find()) {
-                    throw IllegalStateException("Cannot find global returner")
-                }
-
-                println("Removing global returner '${matcher.group(1)}'.")
-                writer.write(contents.replaceAll("""\b${matcher.group(1)}\(\)\.""", ""));
-
-                // Also export a simple function which sets the callbacks and then boots the VM
+                // Export a simple function which sets the callbacks and then boots the VM
                 writer.write("export default callbacks => {\n")
                 writer.write("  window.callbacks = callbacks;\n")
                 writer.write("  main();\n");
