@@ -10,6 +10,7 @@ import org.teavm.tooling.sources.DirectorySourceFileProvider
 import org.teavm.tooling.sources.JarSourceFileProvider
 import org.teavm.vm.TeaVMOptimizationLevel
 import java.net.URLClassLoader
+import java.util.Properties
 
 buildscript {
     repositories {
@@ -377,6 +378,10 @@ tasks {
                 val modified = File("src/main/")
                 val original = files.dir
 
+                // We load CC:T's properties and use them to substitute in the mod version
+                val props = Properties()
+                File("original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
+
                 files.forEach { originalFile ->
                     val relativeFile = originalFile.relativeTo(original)
                     val modifiedFile = modified.resolve(relativeFile)
@@ -389,7 +394,13 @@ tasks {
                         val modifiedContents = DiffUtils.patch(originalFile.readLines(), patch)
                         modifiedFile.bufferedWriter().use { writer ->
                             modifiedContents.forEach {
-                                writer.write(it)
+                                if (modifiedFile.name == "ComputerCraft.java" && it.startsWith("    static final String VERSION = \"")) {
+                                    // Update the version number within ComputerCraft.java. Yes, ugly, but easier than
+                                    // the alternatives.
+                                    writer.write("    static final String VERSION = \"${props["mod_version"]}\";")
+                                } else {
+                                    writer.write(it)
+                                }
                                 writer.write("\n")
                             }
                         }

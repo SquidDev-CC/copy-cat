@@ -82,8 +82,8 @@
 -            boolean ssl = uri.getScheme().equalsIgnoreCase( "wss" );
 +            WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
 +            client.setBinaryType("arraybuffer");
-+            client.setOnOpen(e -> success(client));
-+            client.setOnError(e -> ComputerCraft.log.error("Error " + e));
++            client.onOpen(e -> success(client));
++            client.onError(e -> ComputerCraft.log.error("Error " + e));
 +            client.setOnMessage(e -> {
 +                if (isClosed()) return;
  
@@ -138,7 +138,7 @@
 +                }
 +                environment.queueEvent(MESSAGE_EVENT, new Object[]{address, converted, true});
 +            });
-+            client.setOnClose(e -> close(e.getCode(), e.getReason()));
++            client.onClose(e -> close(e.getCode(), e.getReason()));
              checkClosed();
          }
 -        catch( HTTPRequestException e )

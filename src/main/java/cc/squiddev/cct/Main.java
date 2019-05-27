@@ -105,7 +105,7 @@ public class Main implements IComputerEnvironment {
 
     @Override
     public String getHostString() {
-        return "ComputerCraft " + ComputerCraft.getVersion() + " (Online)";
+        return "ComputerCraft " + ComputerCraft.getVersion() + " (copy-cat)";
     }
 
     @Override

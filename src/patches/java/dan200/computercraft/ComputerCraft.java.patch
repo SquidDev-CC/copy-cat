@@ -8,7 +8,7 @@
  import dan200.computercraft.api.filesystem.IMount;
  import dan200.computercraft.api.filesystem.IWritableMount;
  import dan200.computercraft.api.lua.ILuaAPIFactory;
-@@ -89,14 +90,19 @@
+@@ -89,16 +90,21 @@
  import java.util.concurrent.TimeUnit;
  import java.util.zip.ZipEntry;
  import java.util.zip.ZipFile;
@@ -28,8 +28,11 @@
 +*/
 +public class ComputerCraft {
      public static final String MOD_ID = "computercraft";
-     static final String VERSION = "${version}";
+-    static final String VERSION = "${version}";
++    static final String VERSION = "1.82.3";
      static final String NAME = "CC: Tweaked";
+ 
+     // Configuration options
 @@ -120,13 +126,11 @@
      public static boolean logPeripheralErrors = false;
  
