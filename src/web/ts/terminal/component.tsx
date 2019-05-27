@@ -5,7 +5,7 @@ import saveBlob from "../files/save";
 import { Camera, NoEntry, Off, On, Videocam, VideocamRecording } from "../font";
 import logger from "../log";
 import { TerminalData } from "./data";
-import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
+import { convertKey as convertKeyCode, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
 
 enum RecordingState { None, Recording, Rendering }
@@ -75,7 +75,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
         onMouseDown={this.onMouse} onMouseUp={this.onMouse} onMouseMove={this.onMouse}
         onWheel={this.onMouseWheel} onContextMenu={this.onEventDefault} />,
       <input type="text" class="terminal-input"
-        onPaste={this.onPaste} onKeyDown={this.onKey} onKeyUp={this.onKey}></input>,
+        onPaste={this.onPaste} onKeyDown={this.onKey} onKeyUp={this.onKey} onInput={this.onInput}></input>,
     ];
   }
 
@@ -377,8 +377,7 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
   }
 
   private onKey = (event: KeyboardEvent) => {
-    const code = convertKey(event.code);
-    if (!code || !this.canvasElem) return;
+    if (!this.canvasElem) return;
 
     // Handle pasting. Might be worth adding shift+insert support too.
     // Note this is needed as we block the main paste event.
@@ -386,23 +385,43 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
       const data = (window as any).clipboardData;
       if (data) {
         this.paste(data);
-        event.preventDefault();
+        this.onEventDefault(event);
       }
       return;
     }
 
-    // Prevent the default action from occuring. This is a little
-    // overkill, but there you go.
-    event.preventDefault();
+    // Try to pull the key number from the event. We first try the key code
+    // (ideal, as it's independent of layout), then the key itself, or the
+    // uppercase key (tacky shortcut to handle 'a' and 'A').
+    const code
+       = convertKeyCode(event.code)
+      || convertKeyCode(event.key)
+      || convertKeyCode(event.key.toUpperCase());
+
+    if (code || event.key.length === 1) this.onEventDefault(event);
 
     if (event.type === "keydown") {
-      this.props.computer.queueEvent("key", [code, event.repeat]);
+      if (code) this.props.computer.queueEvent("key", [code, event.repeat]);
       if (!event.altKey && !event.ctrlKey && event.key.length === 1) {
         this.props.computer.queueEvent("char", [event.key]);
       }
     } else if (event.type === "keyup") {
-      this.props.computer.queueEvent("key_up", [code]);
+      if (code) this.props.computer.queueEvent("key_up", [code]);
     }
+  }
+
+  private onInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    this.onEventDefault(event);
+
+    // Some browsers (*cough* Chrome *cough*) don't provide
+    // KeyboardEvent.{code, key} for printable characters. Let's scrape it from
+    // the input instead.
+    const value = target.value;
+    if (!value) return;
+    target.value = "";
+
+    this.props.computer.queueEvent(value.length === 1 ? "char" : "paste", [value]);
   }
 
   private onTerminate = (event: Event) => {
