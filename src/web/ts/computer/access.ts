@@ -182,7 +182,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
 
   public setPaletteColour(colour: number, r: number, g: number, b: number): void {
     this.terminal.palette[colours.charAt(colour)] =
-      `rgb(${(r * 0xFF) & 0xFF},${(g * 0xFF) & 0xFF},${(b * 0xFF) & 0xFF}`;
+      `rgb(${(r * 0xFF) & 0xFF},${(g * 0xFF) & 0xFF},${(b * 0xFF) & 0xFF})`;
   }
 
   public flushTerminal() {

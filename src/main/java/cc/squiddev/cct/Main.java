@@ -71,7 +71,7 @@ public class Main implements IComputerEnvironment {
                 }
 
                 Palette palette = terminal.getPalette();
-                for (int i = 0; i < 15; i++) {
+                for (int i = 0; i < 16; i++) {
                     double[] colours = palette.getColour(i);
                     computerAccess.setPaletteColour(15 - i, colours[0], colours[1], colours[2]);
                 }
