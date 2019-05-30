@@ -5,7 +5,7 @@ import saveBlob from "../files/save";
 import { Camera, NoEntry, Off, On, Videocam, VideocamRecording } from "../font";
 import logger from "../log";
 import { TerminalData } from "./data";
-import { convertKey as convertKeyCode, convertMouseButton, convertMouseButtons } from "./input";
+import { convertKey, convertMouseButton, convertMouseButtons } from "./input";
 import * as render from "./render";
 
 enum RecordingState { None, Recording, Rendering }
@@ -394,9 +394,9 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
     // (ideal, as it's independent of layout), then the key itself, or the
     // uppercase key (tacky shortcut to handle 'a' and 'A').
     const code
-       = convertKeyCode(event.code)
-      || convertKeyCode(event.key)
-      || convertKeyCode(event.key.toUpperCase());
+       = convertKey(event.code)
+      || convertKey(event.key)
+      || convertKey(event.key.toUpperCase());
 
     if (code || event.key.length === 1) this.onEventDefault(event);
 

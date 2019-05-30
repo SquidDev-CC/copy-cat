@@ -15,7 +15,7 @@ import java.util.Properties
 buildscript {
     repositories {
         mavenCentral()
-        mavenLocal()
+        maven("https://dl.bintray.com/konsoletyper/teavm")
     }
 
     dependencies {
@@ -37,7 +37,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    maven("https://dl.bintray.com/konsoletyper/teavm")
 }
 
 dependencies {
@@ -95,9 +95,7 @@ tasks {
                 tool.targetDirectory = dir
                 tool.targetFileName = "classes.js"
                 tool.mainClass = application.mainClassName
-                // Our TeaVM patches get borked under minification, so this is kept off.
-                // Yes, it adds ~60kb to the download size :/.
-                tool.isMinifying = false
+                tool.isMinifying = true
                 tool.optimizationLevel = TeaVMOptimizationLevel.ADVANCED
                 tool.log = log
                 tool.targetType = TeaVMTargetType.JAVASCRIPT
