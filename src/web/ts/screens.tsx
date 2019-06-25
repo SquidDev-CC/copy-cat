@@ -72,7 +72,7 @@ export const About = () => <div class="dialogue-box">
     </li>
     <li>
       Numerous Javascript libraries. A full list can be found <a href="assets/dependencies.txt" target="_blank">in the
-      dependnecies list</a> or at the top of any Javascript file.
+      dependencies list</a> or at the top of any Javascript file.
     </li>
   </ul>
 
