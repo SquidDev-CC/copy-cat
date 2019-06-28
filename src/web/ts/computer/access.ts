@@ -83,9 +83,9 @@ export class FileSystemEntry implements IFileSystemEntry {
   public delete(): void {
     this.exists = false;
     if (this.children === null) {
-      this.persistance.removeChildren(this.path);
-    } else {
       this.persistance.removeContents(this.path);
+    } else {
+      this.persistance.removeChildren(this.path);
     }
     if (this.semaphore) this.semaphore.signal();
   }
