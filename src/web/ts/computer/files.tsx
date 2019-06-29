@@ -70,6 +70,9 @@ export class FileTree extends Component<FileListProperties, FileListState> {
   }
 
   public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState) {
+    // Handle the case when we may have been deleted.
+    if (!entry.doesExist()) return "";
+
     // Gather all children, and then sort them.
     const entries: ChildNode[] = (children || entry.getChildren()).map(childName => {
       const childPath = joinName(path, childName);

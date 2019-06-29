@@ -247,7 +247,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       const entry = this.filesystem.get(file);
       if (!entry) continue;
 
-      this.filesystem.delete(path);
+      this.filesystem.delete(file);
       entry.delete();
 
       if (!entry.isDirectory()) continue;

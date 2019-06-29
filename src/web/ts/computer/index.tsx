@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import { Component, h } from "preact";
 import saveBlob from "../files/save";
 import newZip from "../files/zip";
@@ -58,6 +59,24 @@ const createZip = async (computer: ComputerAccess) => {
   }
 
   return zip.generateAsync({ type: "blob" });
+};
+
+/**
+ * Determine if this is a simple archive - namely every child within it occurs
+ * within a directory with the same name as the archive.
+ * @param zip The zip to check.
+ * @param name The zip file's name, without the `.zip` extension.
+ * @return If this is a simple archive.
+ */
+const isSimpleZip = (zip: JSZip, name: string) => {
+  for (const fileName in zip.files) {
+    if (!zip.files.hasOwnProperty(fileName)) continue;
+
+    // Require every child to be in the ${name} directory.
+    if (!fileName.startsWith(name + "/")) return false;
+  }
+
+  return true;
 };
 
 export class Computer extends Component<ComputerProps, ComputerState> {
@@ -185,8 +204,10 @@ fn()`);
       if (!result.value) continue;
 
       result.value.setContents(contents);
-      break;
+      return;
     }
+
+    console.warn(`Cannot write contents of ${name}.`);
   }
 
   private addFile(file: File): void {
@@ -208,14 +229,16 @@ fn()`);
             if (result.value) break;
           }
 
+          const offset = isSimpleZip(zip, zipName) ? zipName.length + 1 : 0;
           for (const fileName in zip.files) {
-            if (!zip.files.hasOwnProperty(fileName)) continue;
+            if (!zip.files.hasOwnProperty(fileName) || fileName.length === offset) continue;
 
-            let fullName = `${dirName}/${fileName}`;
+            let fullName = `${dirName}/${fileName.substr(offset)}`;
             const entry = zip.files[fileName];
             if (entry.dir) {
               if (fullName.endsWith("/")) fullName = fullName.substring(0, fullName.length - 1);
-              computer.createDirectory(fullName);
+              if (!computer.createDirectory(fullName)) console.warn(`Cannot create directory ${fullName}.`);
+
             } else {
               this.addOneFile(fullName, await entry.async("arraybuffer"));
             }
