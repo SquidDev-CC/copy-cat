@@ -1,29 +1,86 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\OSAPI.java
 +++ src\main\java\dan200\computercraft\core\apis\OSAPI.java
-@@ -283,7 +283,7 @@
-             {
-                 // time
+@@ -6,17 +6,13 @@
+ 
+ package dan200.computercraft.core.apis;
+ 
++import cc.squiddev.cct.stub.LuaDateTime;
+ import dan200.computercraft.api.lua.ILuaAPI;
+ import dan200.computercraft.api.lua.ILuaContext;
+ import dan200.computercraft.api.lua.LuaException;
+ import dan200.computercraft.shared.util.StringUtil;
+ 
+ import javax.annotation.Nonnull;
+-import java.time.Instant;
+-import java.time.ZoneId;
+-import java.time.ZoneOffset;
+-import java.time.ZonedDateTime;
+-import java.time.format.DateTimeFormatterBuilder;
+ import java.util.*;
+ 
+ import static dan200.computercraft.api.lua.ArgumentHelper.*;
+@@ -290,7 +286,7 @@
+                 if( value instanceof Map ) return new Object[] { LuaDateTime.fromTable( (Map<?, ?>) value ) };
+ 
                  String param = optString( args, 0, "ingame" );
 -                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase( ) )
++                switch( param.toLowerCase() )
                  {
                      case "utc":
                      {
-@@ -311,7 +311,7 @@
+@@ -318,7 +314,7 @@
              {
                  // day
                  String param = optString( args, 0, "ingame" );
 -                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase( ) )
++                switch( param.toLowerCase() )
                  {
                      case "utc":
                      {
-@@ -359,7 +359,7 @@
+@@ -365,7 +361,7 @@
+             case 15: // epoch
              {
-                 // epoch
                  String param = optString( args, 0, "ingame" );
 -                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase( ) )
++                switch( param.toLowerCase() )
                  {
                      case "utc":
                      {
+@@ -392,29 +388,24 @@
+             case 16: // date
+             {
+                 String format = optString( args, 0, "%c" );
+-                long time = optLong( args, 1, Instant.now().getEpochSecond() );
++                long time = optLong( args, 1, Calendar.getInstance().getTimeInMillis() );
+ 
+-                Instant instant = Instant.ofEpochSecond( time );
+-                ZonedDateTime date;
+-                ZoneOffset offset;
++                Calendar instant;
+                 if( format.startsWith( "!" ) )
+                 {
+-                    offset = ZoneOffset.UTC;
+-                    date = ZonedDateTime.ofInstant( instant, offset );
++                    instant = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
++                    instant.setTimeInMillis(time);
+                     format = format.substring( 1 );
+                 }
+                 else
+                 {
+-                    ZoneId id = ZoneId.systemDefault();
+-                    offset = id.getRules().getOffset( instant );
+-                    date = ZonedDateTime.ofInstant( instant, id );
++                    instant = Calendar.getInstance();
++                    instant.setTimeInMillis(time);
+                 }
+ 
+-                if( format.equals( "*t" ) ) return new Object[] { LuaDateTime.toTable( date, offset, instant ) };
++                if( format.equals( "*t" ) ) return new Object[] { LuaDateTime.toTable( instant ) };
+ 
+-                DateTimeFormatterBuilder formatter = new DateTimeFormatterBuilder();
+-                LuaDateTime.format( formatter, format, offset );
+-                return new Object[] { formatter.toFormatter( Locale.ROOT ).format( date ) };
++                return new Object[] { instant.toString() }; // TODO: Something!
+             }
+             default:
+                 return null;

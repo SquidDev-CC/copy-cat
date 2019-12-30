@@ -9,15 +9,15 @@
  public class Palette
  {
      private static final int PALETTE_SIZE = 16;
-@@ -80,6 +78,7 @@
-             };
+@@ -79,6 +77,7 @@
+         };
      }
  
 +    /*
      public NBTTagCompound writeToNBT( NBTTagCompound nbt )
      {
          int[] rgb8 = new int[colours.length];
-@@ -105,4 +104,5 @@
+@@ -104,4 +103,5 @@
              colours[i] = decodeRGB8( rgb8[i] );
          }
      }

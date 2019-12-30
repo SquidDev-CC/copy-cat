@@ -8,7 +8,7 @@
  import dan200.computercraft.api.filesystem.IMount;
  import dan200.computercraft.api.filesystem.IWritableMount;
  import dan200.computercraft.api.lua.ILuaAPIFactory;
-@@ -89,16 +90,21 @@
+@@ -85,16 +86,21 @@
  import java.util.concurrent.TimeUnit;
  import java.util.zip.ZipEntry;
  import java.util.zip.ZipFile;
@@ -29,11 +29,11 @@
 +public class ComputerCraft {
      public static final String MOD_ID = "computercraft";
 -    static final String VERSION = "${version}";
-+    static final String VERSION = "1.82.3";
++    static final String VERSION = "1.85.0";
      static final String NAME = "CC: Tweaked";
  
      // Configuration options
-@@ -120,13 +126,11 @@
+@@ -116,13 +122,11 @@
      public static boolean logPeripheralErrors = false;
  
      public static int computer_threads = 1;
@@ -49,7 +49,7 @@
  
      public static int httpTimeout = 30000;
      public static int httpMaxRequests = 16;
-@@ -147,7 +151,6 @@
+@@ -143,7 +147,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -57,7 +57,7 @@
  
      public static final int terminalWidth_computer = 51;
      public static final int terminalHeight_computer = 19;
-@@ -158,6 +161,13 @@
+@@ -154,6 +157,13 @@
      public static final int terminalWidth_pocketComputer = 26;
      public static final int terminalHeight_pocketComputer = 20;
  
@@ -71,7 +71,7 @@
      // Blocks and Items
      public static final class Blocks
      {
-@@ -657,4 +667,5 @@
+@@ -662,4 +672,5 @@
          return server != null && server.getPlayerList().canSendCommands( player.getGameProfile() );
      }
      //endregion

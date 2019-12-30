@@ -1,22 +1,31 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\shared\util\StringUtil.java
 +++ src\main\java\dan200\computercraft\shared\util\StringUtil.java
-@@ -34,7 +34,6 @@
+@@ -6,8 +6,6 @@
  
-     /**
-      * Translates a Stat name
+ package dan200.computercraft.shared.util;
+ 
+-import net.minecraft.util.text.TextComponentTranslation;
+-
+ public final class StringUtil
+ {
+     private StringUtil() {}
+@@ -41,7 +39,6 @@
+      *
+      * @param key The key to translate.
+      * @return The translated string.
 -     */
      @SuppressWarnings( "deprecation" )
      public static String translate( String key )
      {
-@@ -43,12 +42,12 @@
- 
-     /**
-      * Translates a Stat name with format args
+@@ -56,12 +53,12 @@
+      * @param key  The key to translate.
+      * @param args The arguments to supply to {@link String#format(String, Object...)}.
+      * @return The translated and formatted string.
 -     */
      @SuppressWarnings( "deprecation" )
-     public static String translateFormatted( String key, Object... format )
+     public static String translateFormatted( String key, Object... args )
      {
-         return net.minecraft.util.text.translation.I18n.translateToLocalFormatted( key, format );
+         return net.minecraft.util.text.translation.I18n.translateToLocalFormatted( key, args );
      }
 +    */
  

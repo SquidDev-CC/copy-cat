@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\Resource.java
 +++ src\main\java\dan200\computercraft\core\apis\http\Resource.java
-@@ -7,8 +7,6 @@
+@@ -7,15 +7,12 @@
  package dan200.computercraft.core.apis.http;
  
  import dan200.computercraft.shared.util.IoUtil;
@@ -9,7 +9,14 @@
  
  import java.io.Closeable;
  import java.lang.ref.Reference;
-@@ -23,7 +21,7 @@
+ import java.lang.ref.ReferenceQueue;
+ import java.lang.ref.WeakReference;
+ import java.util.concurrent.Future;
+-import java.util.concurrent.atomic.AtomicBoolean;
+ import java.util.function.Consumer;
+ 
+ /**
+@@ -25,7 +22,7 @@
   */
  public abstract class Resource<T extends Resource<T>> implements Closeable
  {
@@ -18,7 +25,7 @@
      private final ResourceGroup<T> limiter;
  
      protected Resource( ResourceGroup<T> limiter )
-@@ -38,7 +36,7 @@
+@@ -40,7 +37,7 @@
       */
      public final boolean isClosed()
      {
@@ -27,7 +34,7 @@
      }
  
      /**
-@@ -47,7 +45,7 @@
+@@ -50,7 +47,7 @@
       */
      public final boolean checkClosed()
      {
@@ -36,7 +43,7 @@
          dispose();
          return true;
      }
-@@ -59,7 +57,8 @@
+@@ -62,7 +59,8 @@
       */
      protected final boolean tryClose()
      {
@@ -46,7 +53,7 @@
          dispose();
          return true;
      }
-@@ -105,6 +104,7 @@
+@@ -111,6 +109,7 @@
          return null;
      }
  
@@ -54,13 +61,11 @@
      protected static ChannelFuture closeChannel( ChannelFuture future )
      {
          if( future != null )
-@@ -122,8 +122,8 @@
-         if( future != null ) future.cancel( true );
+@@ -122,6 +121,7 @@
+ 
          return null;
      }
 +    */
  
--
-     private static final ReferenceQueue<Object> QUEUE = new ReferenceQueue<>();
- 
-     private static class CloseReference<T> extends WeakReference<T>
+     protected static <T extends Future<?>> T closeFuture( T future )
+     {

@@ -8,7 +8,7 @@
  
  public class Terminal
  {
-@@ -334,6 +333,7 @@
+@@ -337,6 +336,7 @@
          m_changed = false;
      }
  
@@ -16,7 +16,7 @@
      public synchronized NBTTagCompound writeToNBT( NBTTagCompound nbt )
      {
          nbt.setInteger( "term_cursorX", m_cursorX );
-@@ -386,4 +386,5 @@
+@@ -389,4 +389,5 @@
          }
          setChanged();
      }

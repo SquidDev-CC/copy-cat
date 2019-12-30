@@ -1,61 +1,50 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IMount.java
 +++ src\main\java\dan200\computercraft\api\filesystem\IMount.java
-@@ -6,27 +6,17 @@
+@@ -6,15 +6,12 @@
  
  package dan200.computercraft.api.filesystem;
  
 -import dan200.computercraft.api.ComputerCraftAPI;
-+import cc.squiddev.cct.stub.ReadableByteChannel;
  import dan200.computercraft.api.peripheral.IComputerAccess;
 -import net.minecraft.world.World;
  
  import javax.annotation.Nonnull;
  import java.io.IOException;
--import java.io.InputStream;
+ import java.io.InputStream;
 -import java.nio.channels.Channels;
 -import java.nio.channels.ReadableByteChannel;
++import cc.squiddev.cct.stub.ReadableByteChannel;
  import java.util.List;
  
  /**
-  * Represents a read only part of a virtual filesystem that can be mounted onto a computer using
-  * {@link IComputerAccess#mount(String, IMount)}
-  *
-- * Ready made implementations of this interface can be created using
-- * {@link ComputerCraftAPI#createSaveDirMount(World, String, long)} or
-- * {@link ComputerCraftAPI#createResourceMount(Class, String, String)}, or you're free to implement it yourselves!
-- *
-- * @see ComputerCraftAPI#createSaveDirMount(World, String, long)
-- * @see ComputerCraftAPI#createResourceMount(Class, String, String)
-  * @see IComputerAccess#mount(String, IMount)
-  * @see IWritableMount
-  */
-@@ -69,18 +59,6 @@
+@@ -68,7 +65,7 @@
+      */
      long getSize( @Nonnull String path ) throws IOException;
  
-     /**
--     * Opens a file with a given path, and returns an {@link InputStream} representing its contents.
--     *
--     * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
--     * @return A stream representing the contents of the file.
--     * @throws IOException If the file does not exist, or could not be opened.
--     * @deprecated Use {@link #openChannelForRead(String)} instead
--     */
--    @Nonnull
--    @Deprecated
--    InputStream openForRead( @Nonnull String path ) throws IOException;
--
 -    /**
-      * Opens a file with a given path, and returns an {@link ReadableByteChannel} representing its contents.
++    /*
+      * Opens a file with a given path, and returns an {@link InputStream} representing its contents.
       *
       * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -90,9 +68,5 @@
+@@ -76,9 +73,11 @@
+      * @throws IOException If the file does not exist, or could not be opened.
+      * @deprecated Use {@link #openChannelForRead(String)} instead
+      */
++    /*
+     @Nonnull
+     @Deprecated
+     InputStream openForRead( @Nonnull String path ) throws IOException;
++    */
+ 
+     /**
+      * Opens a file with a given path, and returns an {@link ReadableByteChannel} representing its contents.
+@@ -90,8 +89,5 @@
       * @throws IOException If the file does not exist, or could not be opened.
       */
      @Nonnull
--    @SuppressWarnings( "deprecation" )
 -    default ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException
 -    {
 -        return Channels.newChannel( openForRead( path ) );
 -    }
-+    ReadableByteChannel openChannelForRead(@Nonnull String path ) throws IOException;
++    ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException;
  }

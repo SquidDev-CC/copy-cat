@@ -1,18 +1,14 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
 +++ src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
-@@ -6,7 +6,10 @@
+@@ -6,7 +6,6 @@
  
  package dan200.computercraft.core.filesystem;
  
 -import com.google.common.io.ByteStreams;
-+import cc.squiddev.cct.stub.Channel;
-+import cc.squiddev.cct.stub.ChannelHelpers;
-+import cc.squiddev.cct.stub.ReadableByteChannel;
-+import cc.squiddev.cct.stub.WritableByteChannel;
  import dan200.computercraft.ComputerCraft;
+ import dan200.computercraft.api.filesystem.FileOperationException;
  import dan200.computercraft.api.filesystem.IFileSystem;
- import dan200.computercraft.api.filesystem.IMount;
-@@ -19,10 +22,6 @@
+@@ -20,10 +19,10 @@
  import java.lang.ref.Reference;
  import java.lang.ref.ReferenceQueue;
  import java.lang.ref.WeakReference;
@@ -20,19 +16,14 @@
 -import java.nio.channels.ReadableByteChannel;
 -import java.nio.channels.WritableByteChannel;
 -import java.nio.file.AccessDeniedException;
++import cc.squiddev.cct.stub.ChannelHelpers;
++import cc.squiddev.cct.stub.Channel;
++import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
  import java.util.*;
  import java.util.function.Function;
  import java.util.regex.Pattern;
-@@ -158,7 +157,7 @@
-             }
-         }
- 
--        public ReadableByteChannel openForRead( String path ) throws FileSystemException
-+        public ReadableByteChannel openForRead(String path ) throws FileSystemException
-         {
-             path = toLocal( path );
-             try
-@@ -221,17 +220,13 @@
+@@ -215,10 +214,6 @@
                      m_writableMount.delete( path );
                  }
              }
@@ -42,16 +33,8 @@
 -            }
              catch( IOException e )
              {
-                 throw new FileSystemException( e.getMessage() );
-             }
-         }
- 
--        public WritableByteChannel openForWrite( String path ) throws FileSystemException
-+        public WritableByteChannel openForWrite(String path ) throws FileSystemException
-         {
-             if( m_writableMount == null )
-             {
-@@ -257,10 +252,6 @@
+                 throw localExceptionOf( e );
+@@ -249,10 +244,6 @@
                      return m_writableMount.openChannelForWrite( path );
                  }
              }
@@ -61,8 +44,8 @@
 -            }
              catch( IOException e )
              {
-                 throw new FileSystemException( e.getMessage() );
-@@ -297,10 +288,6 @@
+                 throw localExceptionOf( e );
+@@ -287,10 +278,6 @@
                      return m_writableMount.openChannelForAppend( path );
                  }
              }
@@ -72,8 +55,8 @@
 -            }
              catch( IOException e )
              {
-                 throw new FileSystemException( e.getMessage() );
-@@ -636,12 +623,8 @@
+                 throw localExceptionOf( e );
+@@ -646,12 +633,8 @@
                   WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
              {
                  // Copy bytes as fast as we can
@@ -87,16 +70,7 @@
              catch( IOException e )
              {
                  throw new FileSystemException( e.getMessage() );
-@@ -662,7 +645,7 @@
-         }
-     }
- 
--    private synchronized <T extends Closeable> FileSystemWrapper<T> openFile( @Nonnull Channel channel, @Nonnull T file ) throws FileSystemException
-+    private synchronized <T extends Closeable> FileSystemWrapper<T> openFile(@Nonnull Channel channel, @Nonnull T file ) throws FileSystemException
-     {
-         synchronized( m_openFiles )
-         {
-@@ -785,7 +768,7 @@
+@@ -795,7 +778,7 @@
  
          // Collapse the string into its component parts, removing ..'s
          String[] parts = path.split( "/" );
@@ -105,7 +79,7 @@
          for( String part : parts )
          {
              if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -798,32 +781,32 @@
+@@ -808,32 +791,32 @@
              if( part.equals( ".." ) )
              {
                  // .. can cancel out the last folder entered
