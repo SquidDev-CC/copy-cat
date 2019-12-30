@@ -407,6 +407,16 @@ tasks {
                     }
                 }
             }
+
+            // Generate Resources.java
+            println("Making Resources.java")
+            val builder = StringBuilder()
+            val resources = fileTree("original/CC-Tweaked/src/main/resources/assets/computercraft/lua/rom/")
+            resources.forEach { builder.append("        \"").append(it.relativeTo(resources.dir).toString().replace('\\', '/')).append("\",\n") }
+
+            val contents = File("src/main/java/cc/squiddev/cct/mount/Resources.java.txt").readText().replace("__FILES__", builder.toString())
+            File("src/main/java/cc/squiddev/cct/mount/Resources.java").writeText(contents)
+
         }
     }
 
