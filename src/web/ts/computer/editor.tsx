@@ -96,12 +96,12 @@ export default class Editor extends Component<EditorProps, {}> {
     this.editorPromise = undefined;
 
     // Clear the body of any elements
-    const base = this.base!;
+    const base = this.base as HTMLElement;
     while (base.firstChild) base.firstChild.remove();
 
-    this.editor = monaco.editor.create(this.base!, {
+    this.editor = monaco.editor.create(base, {
       roundedSelection: false,
-      autoIndent: true,
+      autoIndent: "full",
     });
 
     this.editor.addAction({

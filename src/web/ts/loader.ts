@@ -3,7 +3,7 @@ requirejs.config({
     ? ""
     : "?v={{version}}",
   paths: {
-    vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.17.0/min/vs",
+    vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs",
   },
 });
 
@@ -11,9 +11,9 @@ requirejs.config({
   getWorkerUrl: (_workerId: string, _label: string) =>
     `data:text/javascript;charset=utf-8,${encodeURIComponent(`
       self.MonacoEnvironment = {
-        baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.17.0/min/"
+        baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/"
       };
-      importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.17.0/min/vs/base/worker/workerMain.js");
+      importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.1/min/vs/base/worker/workerMain.js");
     `)}`,
 };
 

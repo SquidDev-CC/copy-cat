@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { JSX, h } from "preact";
 import { IConfigGroup } from "./classes";
 import * as storage from "./storage";
 
@@ -87,7 +87,7 @@ export class ConfigGroup implements IConfigGroup {
   }
 
   private add<K extends keyof PropertyTypes>(property: IConfigProperty<K>): IConfigProperty<K> {
-    this.properties.push(property as ConfigProperty);
+    this.properties.push(property as unknown as ConfigProperty); // FIXME: Work out an appropriate cast.
     const value = this.store.get(property);
     if (value !== property.def) property.changed(value);
     return property;

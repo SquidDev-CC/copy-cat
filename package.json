@@ -19,22 +19,22 @@
   },
   "dependencies": {
     "gif.js": "^0.2.0",
-    "jszip": "^3.2.1",
-    "monaco-editor": "^0.17.0",
-    "preact": "^8.4.2",
+    "jszip": "^3.2.2",
+    "monaco-editor": "^0.19.0",
+    "preact": "^10.1.1",
     "requirejs": "^2.3.6",
     "setimmediate": "^1.0.5"
   },
   "devDependencies": {
     "@types/requirejs": "^2.1.31",
-    "rollup": "^1.12.3",
-    "rollup-plugin-commonjs": "^10.0.0",
-    "rollup-plugin-license": "^0.8.1",
+    "rollup": "^1.27.14",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-license": "^0.13.0",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^5.0.0",
-    "terser": "^4.0.0",
-    "tslint": "^5.13.1",
-    "typescript": "^3.3.3333",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "terser": "^4.4.3",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4",
     "uglifycss": "0.0.29"
   }
 }

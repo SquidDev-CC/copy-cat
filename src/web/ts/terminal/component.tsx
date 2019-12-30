@@ -1,4 +1,4 @@
-import { Component, h } from "preact";
+import { Component, JSX, h } from "preact";
 import { IComputerActionable, Semaphore } from "../computer/actions";
 import { GIF } from "../files/gif";
 import saveBlob from "../files/save";
@@ -65,10 +65,10 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
   public constructor(props: TerminalProps, context: any) {
     super(props, context);
 
-    this.state = {
+    this.setState({
       recording: RecordingState.None,
       progress: 0,
-    };
+    });
 
     this.vdom = [
       <canvas class="terminal-canvas"
@@ -81,10 +81,11 @@ export class Terminal extends Component<TerminalProps, TerminalState> {
 
   public componentDidMount() {
     // Fetch the "key" elements
-    this.canvasElem = this.base!.querySelector(".terminal-canvas") as HTMLCanvasElement;
+    const base = this.base as Element;
+    this.canvasElem = base.querySelector(".terminal-canvas") as HTMLCanvasElement;
     this.canvasContext = this.canvasElem.getContext("2d") as CanvasRenderingContext2D;
-    this.inputElem = this.base!.querySelector(".terminal-input") as HTMLInputElement;
-    this.wrapperElem = this.base!.querySelector(".terminal-wrapper") as HTMLDivElement;
+    this.inputElem = base.querySelector(".terminal-input") as HTMLInputElement;
+    this.wrapperElem = base.querySelector(".terminal-wrapper") as HTMLDivElement;
 
     // Subscribe to some events to allow us to shedule a redraw
     window.addEventListener("resize", this.onResized);

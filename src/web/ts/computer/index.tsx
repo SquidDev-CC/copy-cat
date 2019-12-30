@@ -122,14 +122,14 @@ fn()`);
       }
     }
 
-    this.state = {
+    this.setState({
       terminal, terminalChanged, computer,
       activeFile: null, openFiles: new Map(),
 
       id: 0, on: false, label: computer.getLabel(),
 
       dragging: false,
-    };
+    });
   }
 
   public componentDidMount() {
@@ -286,7 +286,6 @@ fn()`);
   }
 
   private openComputer = () => {
-    const oldActive = this.state.activeFile;
     this.setState({ activeFile: null });
   }
 

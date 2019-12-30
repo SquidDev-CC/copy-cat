@@ -1,4 +1,4 @@
-import { Component, h, render } from "preact";
+import { Component, JSX, h, render } from "preact";
 import { IConfigGroup } from "./classes";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
@@ -26,7 +26,7 @@ class Main extends Component<{}, MainState> {
     const configTerminal = new ConfigGroup("Editor", "Configure the terminal display", settingStorage);
     const configGroups = [configEditor, configTerminal];
 
-    this.state = {
+    const state: MainState = {
       settingStorage, configGroups,
       settings: {
         showInvisible: true, trimWhitespace: true, darkMode: false,
@@ -34,29 +34,30 @@ class Main extends Component<{}, MainState> {
       },
       currentVDom: this.computerVDom,
     };
+    this.setState(state);
 
     // Declare our settings
-    configEditor.addBoolean("editor.invisible", "Show invisible", this.state.settings.showInvisible,
+    configEditor.addBoolean("editor.invisible", "Show invisible", state.settings.showInvisible,
       "Show invisible characters, such as spaces and tabs.",
-      x => this.setState({ settings: { ...this.state.settings, showInvisible: x } }),
+      x => this.setState(s => ({ settings: { ...s.settings, showInvisible: x } })),
     );
 
-    configEditor.addBoolean("editor.trim_whitespace", "Trim whitespace", this.state.settings.trimWhitespace,
+    configEditor.addBoolean("editor.trim_whitespace", "Trim whitespace", state.settings.trimWhitespace,
       "Trim whitespace from files when saving.",
-      x => this.setState({ settings: { ...this.state.settings, trimWhitespace: x } }),
+      x => this.setState(s => ({ settings: { ...s.settings, trimWhitespace: x } })),
     );
 
-    configEditor.addBoolean("editor.dark", "Dark mode", this.state.settings.darkMode,
+    configEditor.addBoolean("editor.dark", "Dark mode", state.settings.darkMode,
       "Only the editor currently, sorry.",
-      x => this.setState({ settings: { ...this.state.settings, darkMode: x } }),
+      x => this.setState(s => ({ settings: { ...s.settings, darkMode: x } })),
     );
 
-    configTerminal.addOption("terminal.font", "Font", this.state.settings.terminalFont,
+    configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
       [
         { key: "assets/term_font.png", value: "Standard font" },
         { key: "assets/term_font_hd.png", value: "High-definition font" },
       ], "Which font the we should use within the terminal",
-      x => this.setState({ settings: { ...this.state.settings, terminalFont: x } }),
+      x => this.setState(s => ({ settings: { ...s.settings, terminalFont: x } })),
     );
   }
 
@@ -105,7 +106,7 @@ class Main extends Component<{}, MainState> {
 
   private configFactory = (name: string, description: string | null): IConfigGroup => {
     const group = new ConfigGroup(name, description, this.state.settingStorage);
-    this.setState({ configGroups: [...this.state.configGroups, group] });
+    this.setState(s => ({ configGroups: [...s.configGroups, group] }));
     return group;
   }
 }

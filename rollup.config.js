@@ -34,9 +34,11 @@ export default {
       });
 
       // Add some additional packages which depend on elsewhere. Yes, this is horrible.
+      /*
       for (const pkg of ["gif.js", "monaco-editor", "requirejs"]) {
         plugin.load(`${__dirname}/node_modules/${pkg}/_.js`);
       }
+      */
 
       return plugin;
     })(),
