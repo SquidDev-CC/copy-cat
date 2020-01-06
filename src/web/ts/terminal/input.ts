@@ -124,7 +124,7 @@ const keyboardCodes: { [key: string]: number } = {
   "Stop": 149,
   "Ax": 150,
 
-  "NumpadEnter": 156,
+  "NumpadEnter": 28, // While LWJGL says this is 156, Minecraft doesn't treat it as such
   "ControlRight": 157,
   "NumpadComma": 179,
   "NumpadDivide": 181,
