@@ -184,8 +184,8 @@ tasks {
             try {
                 FileRepositoryBuilder().setWorkTree(File(".")).build()
                     .use { it.resolve("HEAD").name() }
-            } catch (ignored: Exception) {
-                ignored.printStackTrace()
+            } catch (e: Exception) {
+                project.logger.warn("Cannot get current commit ($e)")
                 "unknown"
             }
         })

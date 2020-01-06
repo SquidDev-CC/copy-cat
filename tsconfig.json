@@ -21,5 +21,9 @@
       "jszip": [ "src/web/typings/jszip.d.ts" ]
     }
   },
-  "include": [ "src/web/ts/**/*.ts", "src/web/ts/**/*.tsx" ]
+  "include": [
+    "src/web/ts/**/*.ts",
+    "src/web/ts/**/*.tsx",
+    "src/web/typings/globals.d.ts",
+   ]
 }

@@ -1,7 +1,8 @@
-import commonJs from "rollup-plugin-commonjs";
-import license from "rollup-plugin-license"
 import builtins from "rollup-plugin-node-builtins";
-import resolve from "rollup-plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import license from "rollup-plugin-license"
+import replace from "@rollup/plugin-replace";
+import resolve from "@rollup/plugin-node-resolve";
 
 export default {
   input: "build/javascript/main.js",
@@ -14,17 +15,21 @@ export default {
     preferConst: true,
   },
   context: "window",
-  external: [ "monaco-editor" ],
+  external: ["monaco-editor"],
 
   plugins: [
+    replace({
+      __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage")
+    }),
+
     builtins(),
     resolve({ browser: true, }),
-    commonJs(),
+    commonjs(),
 
     (() => {
       const plugin = license({
         banner:
-`<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
+          `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
 <% _.forEach(_.sortBy(dependencies, ["name"]), ({ name, author, license }) => { %>
   - <%= name %>: Copyright <%= author ? author.name : "" %> (<%= license %>)<% }) %>
 
