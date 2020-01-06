@@ -77,6 +77,8 @@ export default class Editor extends Component<EditorProps, {}> {
   private editorPromise?: Promise<void>;
 
   public componentDidMount() {
+    window.addEventListener("resize", this.onResize);
+
     this.setupEditor();
   }
 
@@ -125,6 +127,8 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   public componentWillUnmount() {
+    window.removeEventListener("resize", this.onResize);
+
     if (!this.editor) return;
 
     // Save the view state back to the model
@@ -176,4 +180,9 @@ export default class Editor extends Component<EditorProps, {}> {
       {monaco ? undefined : <div class="editor-placeholder">Loading...</div>}
     </div>;
   }
+
+  /**
+   * When the window resizes, we also need to update the editor's dimensions.
+   */
+  private onResize = () => this.editor?.layout();
 }
