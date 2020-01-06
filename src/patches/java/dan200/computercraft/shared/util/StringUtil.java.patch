@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\shared\util\StringUtil.java
 +++ src\main\java\dan200\computercraft\shared\util\StringUtil.java
-@@ -6,8 +6,6 @@
- 
+@@ -5,8 +5,6 @@
+  */
  package dan200.computercraft.shared.util;
  
 -import net.minecraft.util.text.TextComponentTranslation;
@@ -9,7 +9,7 @@
  public final class StringUtil
  {
      private StringUtil() {}
-@@ -41,7 +39,6 @@
+@@ -40,7 +38,6 @@
       *
       * @param key The key to translate.
       * @return The translated string.
@@ -17,7 +17,7 @@
      @SuppressWarnings( "deprecation" )
      public static String translate( String key )
      {
-@@ -56,12 +53,12 @@
+@@ -55,12 +52,12 @@
       * @param key  The key to translate.
       * @param args The arguments to supply to {@link String#format(String, Object...)}.
       * @return The translated and formatted string.

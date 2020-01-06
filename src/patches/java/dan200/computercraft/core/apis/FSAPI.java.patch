@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\FSAPI.java
 +++ src\main\java\dan200\computercraft\core\apis\FSAPI.java
-@@ -20,9 +20,9 @@
+@@ -19,9 +19,9 @@
  
  import javax.annotation.Nonnull;
  import java.io.BufferedReader;
@@ -13,7 +13,7 @@
  import java.util.HashMap;
  import java.util.Map;
  import java.util.function.Function;
-@@ -253,13 +253,13 @@
+@@ -252,13 +252,13 @@
                          case "w":
                          {
                              // Open the file for writing, then create a wrapper around the writer

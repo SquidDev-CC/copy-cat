@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\Computer.java
 +++ src\main\java\dan200\computercraft\core\computer\Computer.java
-@@ -42,12 +42,11 @@
+@@ -41,12 +41,11 @@
      private final IComputerEnvironment m_environment;
      private final Terminal m_terminal;
      private final ComputerExecutor executor;
@@ -14,7 +14,7 @@
  
      private boolean startRequested;
      private int m_ticksSinceStart = -1;
-@@ -59,7 +58,6 @@
+@@ -58,7 +57,6 @@
          m_terminal = terminal;
  
          executor = new ComputerExecutor( this );
@@ -22,7 +22,7 @@
      }
  
      IComputerEnvironment getComputerEnvironment()
-@@ -117,20 +115,9 @@
+@@ -116,20 +114,9 @@
          executor.queueEvent( event, args );
      }
  
@@ -44,7 +44,7 @@
      }
  
      public int getID()
-@@ -162,7 +149,7 @@
+@@ -161,7 +148,7 @@
          if( !Objects.equal( label, m_label ) )
          {
              m_label = label;
@@ -53,7 +53,7 @@
          }
      }
  
-@@ -187,7 +174,7 @@
+@@ -186,7 +173,7 @@
          internalEnvironment.update();
  
          // Propagate the environment's output to the world.
@@ -62,7 +62,7 @@
  
          // Set output changed if the terminal has changed from blinking to not
          boolean blinking = m_terminal.getCursorBlink() &&
-@@ -196,18 +183,20 @@
+@@ -195,18 +182,20 @@
          if( blinking != m_blinking )
          {
              m_blinking = blinking;

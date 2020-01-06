@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
-@@ -6,35 +6,21 @@
- 
+@@ -5,35 +5,21 @@
+  */
  package dan200.computercraft.core.apis.http.websocket;
  
 +import cc.squiddev.cct.js.WebsocketClient;
@@ -40,7 +40,7 @@
  
  /**
   * Provides functionality to verify and connect to a remote websocket.
-@@ -48,16 +34,14 @@
+@@ -47,16 +33,14 @@
      static final String CLOSE_EVENT = "websocket_closed";
      static final String MESSAGE_EVENT = "websocket_message";
  
@@ -59,7 +59,7 @@
      {
          super( limiter );
          this.environment = environment;
-@@ -107,14 +91,13 @@
+@@ -106,14 +90,13 @@
              throw new HTTPRequestException( "Invalid scheme '" + scheme + "'" );
          }
  
@@ -75,7 +75,7 @@
          checkClosed();
      }
  
-@@ -125,54 +108,27 @@
+@@ -124,54 +107,27 @@
  
          try
          {
@@ -148,7 +148,7 @@
          catch( Exception e )
          {
              failure( "Could not connect" );
-@@ -180,7 +136,7 @@
+@@ -179,7 +135,7 @@
          }
      }
  
@@ -157,7 +157,7 @@
      {
          if( isClosed() ) return;
  
-@@ -202,7 +158,7 @@
+@@ -201,7 +157,7 @@
          {
              environment.queueEvent( CLOSE_EVENT, new Object[] {
                  address,
@@ -166,7 +166,7 @@
                  status < 0 ? null : status,
              } );
          }
-@@ -213,9 +169,6 @@
+@@ -212,9 +168,6 @@
      {
          super.dispose();
  

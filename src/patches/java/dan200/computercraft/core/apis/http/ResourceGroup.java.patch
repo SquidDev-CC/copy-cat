@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
 +++ src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
-@@ -6,9 +6,8 @@
- 
+@@ -5,9 +5,8 @@
+  */
  package dan200.computercraft.core.apis.http;
  
 -import java.util.Collections;
@@ -11,7 +11,7 @@
  import java.util.function.IntSupplier;
  import java.util.function.Supplier;
  
-@@ -25,7 +24,7 @@
+@@ -24,7 +23,7 @@
  
      boolean active = false;
  

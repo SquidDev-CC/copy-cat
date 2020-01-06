@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
 +++ src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
-@@ -29,7 +29,6 @@
+@@ -28,7 +28,6 @@
  
      public synchronized void start()
      {
@@ -8,7 +8,7 @@
          tracking = true;
  
          timings.clear();
-@@ -40,7 +39,6 @@
+@@ -39,7 +38,6 @@
      {
          if( !tracking ) return false;
  

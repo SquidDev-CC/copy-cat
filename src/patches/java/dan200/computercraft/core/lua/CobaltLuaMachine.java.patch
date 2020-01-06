@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
 +++ src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
-@@ -9,11 +9,7 @@
+@@ -8,11 +8,7 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.api.lua.*;
  import dan200.computercraft.core.computer.Computer;
@@ -12,7 +12,7 @@
  import org.squiddev.cobalt.*;
  import org.squiddev.cobalt.compiler.CompileException;
  import org.squiddev.cobalt.compiler.LoadState;
-@@ -31,9 +27,6 @@
+@@ -30,9 +26,6 @@
  import java.util.HashMap;
  import java.util.IdentityHashMap;
  import java.util.Map;
@@ -22,7 +22,7 @@
  
  import static org.squiddev.cobalt.ValueFactory.valueOf;
  import static org.squiddev.cobalt.ValueFactory.varargsOf;
-@@ -42,12 +35,14 @@
+@@ -41,12 +34,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -37,7 +37,7 @@
  
      private final Computer m_computer;
      private final TimeoutState timeout;
-@@ -70,6 +65,7 @@
+@@ -69,6 +64,7 @@
          LuaState state = m_state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
@@ -45,7 +45,7 @@
              .coroutineExecutor( command -> {
                  Tracking.addValue( m_computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
-@@ -83,6 +79,7 @@
+@@ -82,6 +78,7 @@
                      }
                  } );
              } )
@@ -53,7 +53,7 @@
              .build();
  
          m_globals = new LuaTable();
-@@ -261,6 +258,7 @@
+@@ -260,6 +257,7 @@
                  } );
              }
          }
@@ -61,7 +61,7 @@
          return table;
      }
  
-@@ -295,7 +293,7 @@
+@@ -294,7 +292,7 @@
              // Start remembering stuff
              if( values == null )
              {
@@ -70,7 +70,7 @@
              }
              else if( values.containsKey( object ) )
              {
-@@ -362,7 +360,7 @@
+@@ -361,7 +359,7 @@
                  // Start remembering stuff
                  if( objects == null )
                  {
@@ -79,7 +79,7 @@
                  }
                  else if( objects.containsKey( value ) )
                  {
-@@ -479,7 +477,6 @@
+@@ -478,7 +476,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -87,7 +87,7 @@
              handleSoftAbort();
          }
  
-@@ -505,24 +502,26 @@
+@@ -504,24 +501,26 @@
      {
          @Nonnull
          @Override
@@ -117,7 +117,7 @@
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -562,9 +561,12 @@
+@@ -561,9 +560,12 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }

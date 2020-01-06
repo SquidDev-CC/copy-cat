@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\terminal\Terminal.java
 +++ src\main\java\dan200\computercraft\core\terminal\Terminal.java
-@@ -7,7 +7,6 @@
+@@ -6,7 +6,6 @@
  package dan200.computercraft.core.terminal;
  
  import dan200.computercraft.shared.util.Palette;
@@ -8,7 +8,7 @@
  
  public class Terminal
  {
-@@ -337,6 +336,7 @@
+@@ -336,6 +335,7 @@
          m_changed = false;
      }
  
@@ -16,7 +16,7 @@
      public synchronized NBTTagCompound writeToNBT( NBTTagCompound nbt )
      {
          nbt.setInteger( "term_cursorX", m_cursorX );
-@@ -389,4 +389,5 @@
+@@ -388,4 +388,5 @@
          }
          setChanged();
      }

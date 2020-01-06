@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\peripheral\IComputerAccess.java
 +++ src\main\java\dan200\computercraft\api\peripheral\IComputerAccess.java
-@@ -6,12 +6,10 @@
- 
+@@ -5,12 +5,10 @@
+  */
  package dan200.computercraft.api.peripheral;
  
 -import dan200.computercraft.api.ComputerCraftAPI;
@@ -13,7 +13,7 @@
  
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
-@@ -33,8 +31,6 @@
+@@ -32,8 +30,6 @@
       * @return The location on the computer's file system where you the mount mounted, or {@code null} if there was already a
       * file in the desired location. Store this value if you wish to unmount the mount later.
       * @throws RuntimeException If the peripheral has been detached.

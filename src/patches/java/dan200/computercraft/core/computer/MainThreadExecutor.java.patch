@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\MainThreadExecutor.java
 +++ src\main\java\dan200\computercraft\core\computer\MainThreadExecutor.java
-@@ -9,8 +9,6 @@
+@@ -8,8 +8,6 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.api.peripheral.IWorkMonitor;
  import dan200.computercraft.core.tracking.Tracking;
@@ -9,7 +9,7 @@
  
  import javax.annotation.Nonnull;
  import java.util.ArrayDeque;
-@@ -22,14 +20,14 @@
+@@ -21,14 +19,14 @@
   * them.
   *
   * This provides rate-limiting mechanism for tasks enqueued with {@link Computer#queueMainThread(Runnable)}, but also

@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
-@@ -13,12 +13,12 @@
+@@ -12,12 +12,12 @@
  import java.io.BufferedReader;
  import java.io.Closeable;
  import java.io.IOException;
@@ -15,7 +15,7 @@
  
  import static dan200.computercraft.api.lua.ArgumentHelper.optBoolean;
  import static dan200.computercraft.api.lua.ArgumentHelper.optInt;
-@@ -162,7 +162,7 @@
+@@ -161,7 +161,7 @@
  
      public static BufferedReader openUtf8( ReadableByteChannel channel )
      {
@@ -24,7 +24,7 @@
      }
  
      public static BufferedReader open( ReadableByteChannel channel, Charset charset )
-@@ -172,6 +172,6 @@
+@@ -171,6 +171,6 @@
          CharsetDecoder decoder = charset.newDecoder()
              .onMalformedInput( CodingErrorAction.REPLACE )
              .onUnmappableCharacter( CodingErrorAction.REPLACE );

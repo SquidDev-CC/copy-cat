@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\lua\ILuaObject.java
 +++ src\main\java\dan200\computercraft\api\lua\ILuaObject.java
-@@ -8,6 +8,7 @@
+@@ -7,6 +7,7 @@
  
  import dan200.computercraft.api.peripheral.IComputerAccess;
  import dan200.computercraft.api.peripheral.IPeripheral;
@@ -8,7 +8,7 @@
  
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
-@@ -53,4 +54,7 @@
+@@ -52,4 +53,7 @@
       */
      @Nullable
      Object[] callMethod( @Nonnull ILuaContext context, int method, @Nonnull Object[] arguments ) throws LuaException, InterruptedException;

@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\ArrayByteChannel.java
 +++ src\main\java\dan200\computercraft\core\apis\handles\ArrayByteChannel.java
-@@ -6,90 +6,105 @@
- 
+@@ -5,90 +5,105 @@
+  */
  package dan200.computercraft.core.apis.handles;
  
 +import cc.squiddev.cct.stub.SeekableByteChannel;

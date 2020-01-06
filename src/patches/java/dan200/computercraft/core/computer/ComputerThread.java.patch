@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\ComputerThread.java
 +++ src\main\java\dan200\computercraft\core\computer\ComputerThread.java
-@@ -295,7 +295,7 @@
+@@ -294,7 +294,7 @@
      private static void afterWork( TaskRunner runner, ComputerExecutor executor )
      {
          // Clear the executor's thread.
@@ -9,7 +9,7 @@
          if( currentThread != runner.owner )
          {
              ComputerCraft.log.error(
-@@ -376,8 +376,6 @@
+@@ -375,8 +375,6 @@
                                  if( !running ) continue;
  
                                  // Mark the old runner as dead and start a new one.
@@ -18,7 +18,7 @@
                                  if( runner != null ) runner.running = false;
                                  runnerFactory.newThread( runners[i] = new TaskRunner() ).start();
                              }
-@@ -479,9 +477,9 @@
+@@ -478,9 +476,9 @@
  
                  // If we're trying to executing some task on this computer while someone else is doing work, something
                  // is seriously wrong.

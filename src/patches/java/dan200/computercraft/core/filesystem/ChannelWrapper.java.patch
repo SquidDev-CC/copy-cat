@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
 +++ src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
-@@ -6,9 +6,10 @@
- 
+@@ -5,9 +5,10 @@
+  */
  package dan200.computercraft.core.filesystem;
  
 +import cc.squiddev.cct.stub.Channel;

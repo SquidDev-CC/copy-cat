@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
-@@ -14,23 +14,24 @@
+@@ -13,23 +13,24 @@
  import java.io.Closeable;
  import java.io.IOException;
  import java.nio.channels.Channels;
@@ -30,7 +30,7 @@
      {
          this( writer, writer );
      }
-@@ -73,7 +74,7 @@
+@@ -72,7 +73,7 @@
                  try
                  {
                      m_writer.write( text, 0, text.length() );
@@ -39,7 +39,7 @@
                      return null;
                  }
                  catch( IOException e )
-@@ -102,9 +103,9 @@
+@@ -101,9 +102,9 @@
      }
  
  
@@ -51,7 +51,7 @@
      }
  
      public static BufferedWriter open( WritableByteChannel channel, Charset charset )
-@@ -114,6 +115,6 @@
+@@ -113,6 +114,6 @@
          CharsetEncoder encoder = charset.newEncoder()
              .onMalformedInput( CodingErrorAction.REPLACE )
              .onUnmappableCharacter( CodingErrorAction.REPLACE );

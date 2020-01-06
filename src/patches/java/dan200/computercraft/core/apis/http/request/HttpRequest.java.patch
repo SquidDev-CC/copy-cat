@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
 +++ src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
-@@ -6,38 +6,27 @@
- 
+@@ -5,38 +5,27 @@
+  */
  package dan200.computercraft.core.apis.http.request;
  
 +import cc.squiddev.cct.Main;
@@ -50,7 +50,7 @@
  
  /**
   * Represents an in-progress HTTP request.
-@@ -49,43 +38,34 @@
+@@ -48,43 +37,34 @@
  
      private static final int MAX_REDIRECTS = 16;
  
@@ -105,7 +105,7 @@
      }
  
      public IAPIEnvironment environment()
-@@ -115,91 +95,84 @@
+@@ -114,91 +94,84 @@
          if( url.getScheme() == null ) throw new HTTPRequestException( "Must specify http or https" );
          if( url.getHost() == null ) throw new HTTPRequestException( "URL malformed" );
  
@@ -249,7 +249,7 @@
      }
  
      void failure( String message )
-@@ -214,14 +187,6 @@
+@@ -213,14 +186,6 @@
          {
              message = cause.getMessage();
          }
@@ -264,7 +264,7 @@
          else
          {
              message = "Could not connect";
-@@ -244,16 +209,12 @@
+@@ -243,16 +208,12 @@
      protected void dispose()
      {
          super.dispose();
@@ -283,7 +283,7 @@
          {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -261,12 +222,12 @@
+@@ -260,12 +221,12 @@
          return size;
      }
  

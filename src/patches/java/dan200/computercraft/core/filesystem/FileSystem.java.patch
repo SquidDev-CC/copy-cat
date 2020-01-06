@@ -1,14 +1,14 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
 +++ src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
-@@ -6,7 +6,6 @@
- 
+@@ -5,7 +5,6 @@
+  */
  package dan200.computercraft.core.filesystem;
  
 -import com.google.common.io.ByteStreams;
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.api.filesystem.FileOperationException;
  import dan200.computercraft.api.filesystem.IFileSystem;
-@@ -20,10 +19,10 @@
+@@ -19,10 +18,10 @@
  import java.lang.ref.Reference;
  import java.lang.ref.ReferenceQueue;
  import java.lang.ref.WeakReference;
@@ -23,7 +23,7 @@
  import java.util.*;
  import java.util.function.Function;
  import java.util.regex.Pattern;
-@@ -215,10 +214,6 @@
+@@ -214,10 +213,6 @@
                      m_writableMount.delete( path );
                  }
              }
@@ -34,7 +34,7 @@
              catch( IOException e )
              {
                  throw localExceptionOf( e );
-@@ -249,10 +244,6 @@
+@@ -248,10 +243,6 @@
                      return m_writableMount.openChannelForWrite( path );
                  }
              }
@@ -45,7 +45,7 @@
              catch( IOException e )
              {
                  throw localExceptionOf( e );
-@@ -287,10 +278,6 @@
+@@ -286,10 +277,6 @@
                      return m_writableMount.openChannelForAppend( path );
                  }
              }
@@ -56,7 +56,7 @@
              catch( IOException e )
              {
                  throw localExceptionOf( e );
-@@ -646,12 +633,8 @@
+@@ -645,12 +632,8 @@
                   WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
              {
                  // Copy bytes as fast as we can
@@ -70,7 +70,7 @@
              catch( IOException e )
              {
                  throw new FileSystemException( e.getMessage() );
-@@ -795,7 +778,7 @@
+@@ -794,7 +777,7 @@
  
          // Collapse the string into its component parts, removing ..'s
          String[] parts = path.split( "/" );
@@ -79,7 +79,7 @@
          for( String part : parts )
          {
              if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -808,32 +791,32 @@
+@@ -807,32 +790,32 @@
              if( part.equals( ".." ) )
              {
                  // .. can cancel out the last folder entered

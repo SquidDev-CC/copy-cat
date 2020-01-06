@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
-@@ -6,17 +6,16 @@
- 
+@@ -5,17 +5,16 @@
+  */
  package dan200.computercraft.core.apis.http.websocket;
  
 +import cc.squiddev.cct.http.WebsocketReceiveFunction;
@@ -22,7 +22,7 @@
  
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
-@@ -30,11 +29,11 @@
+@@ -29,11 +28,11 @@
  public class WebsocketHandle implements ILuaObject, Closeable
  {
      private final Websocket websocket;
@@ -37,7 +37,7 @@
      {
          this.websocket = websocket;
          this.channel = channel;
-@@ -54,6 +53,8 @@
+@@ -53,6 +52,8 @@
          switch( method )
          {
              case 0: // receive
@@ -46,7 +46,7 @@
                  checkOpen();
                  while( true )
                  {
-@@ -67,6 +68,7 @@
+@@ -66,6 +67,7 @@
                          return null;
                      }
                  }
@@ -54,7 +54,7 @@
  
              case 1: // send
              {
-@@ -81,12 +83,19 @@
+@@ -80,12 +82,19 @@
                  boolean binary = optBoolean( arguments, 1, false );
                  websocket.environment().addTrackingChange( TrackingField.WEBSOCKET_OUTGOING, text.length() );
  
@@ -78,7 +78,7 @@
                  }
  
                  return null;
-@@ -111,11 +120,16 @@
+@@ -110,11 +119,16 @@
      {
          closed = true;
  

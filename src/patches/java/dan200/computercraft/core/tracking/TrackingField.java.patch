@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingField.java
 +++ src\main\java\dan200\computercraft\core\tracking\TrackingField.java
-@@ -6,12 +6,9 @@
- 
+@@ -5,12 +5,9 @@
+  */
  package dan200.computercraft.core.tracking;
  
 -import dan200.computercraft.shared.util.StringUtil;
@@ -13,7 +13,7 @@
  
  public final class TrackingField
  {
-@@ -19,31 +16,30 @@
+@@ -18,31 +15,30 @@
  
      private static final Map<String, TrackingField> fields = new HashMap<>();
  
@@ -61,7 +61,7 @@
  
      public String id()
      {
-@@ -58,24 +54,23 @@
+@@ -57,24 +53,23 @@
      @Deprecated
      public String displayName()
      {

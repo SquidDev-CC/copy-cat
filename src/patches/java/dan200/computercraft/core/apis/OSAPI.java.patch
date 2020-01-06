@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\OSAPI.java
 +++ src\main\java\dan200\computercraft\core\apis\OSAPI.java
-@@ -6,17 +6,13 @@
- 
+@@ -5,17 +5,13 @@
+  */
  package dan200.computercraft.core.apis;
  
 +import cc.squiddev.cct.stub.LuaDateTime;
@@ -19,7 +19,7 @@
  import java.util.*;
  
  import static dan200.computercraft.api.lua.ArgumentHelper.*;
-@@ -290,7 +286,7 @@
+@@ -289,7 +285,7 @@
                  if( value instanceof Map ) return new Object[] { LuaDateTime.fromTable( (Map<?, ?>) value ) };
  
                  String param = optString( args, 0, "ingame" );
@@ -28,7 +28,7 @@
                  {
                      case "utc":
                      {
-@@ -318,7 +314,7 @@
+@@ -317,7 +313,7 @@
              {
                  // day
                  String param = optString( args, 0, "ingame" );
@@ -37,7 +37,7 @@
                  {
                      case "utc":
                      {
-@@ -365,7 +361,7 @@
+@@ -364,7 +360,7 @@
              case 15: // epoch
              {
                  String param = optString( args, 0, "ingame" );
@@ -46,7 +46,7 @@
                  {
                      case "utc":
                      {
-@@ -392,29 +388,24 @@
+@@ -391,29 +387,24 @@
              case 16: // date
              {
                  String format = optString( args, 0, "%c" );

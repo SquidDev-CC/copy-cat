@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
 +++ src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
-@@ -6,15 +6,13 @@
- 
+@@ -5,15 +5,13 @@
+  */
  package dan200.computercraft.api.filesystem;
  
 -import dan200.computercraft.api.ComputerCraftAPI;
@@ -17,7 +17,7 @@
  
  /**
   * Represents a part of a virtual filesystem that can be mounted onto a computer using {@link IComputerAccess#mount(String, IMount)}
-@@ -46,7 +44,7 @@
+@@ -45,7 +43,7 @@
       */
      void delete( @Nonnull String path ) throws IOException;
  
@@ -26,7 +26,7 @@
       * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
       *
       * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -54,9 +52,11 @@
+@@ -53,9 +51,11 @@
       * @throws IOException If the file could not be opened for writing.
       * @deprecated Use {@link #openChannelForWrite(String)} instead.
       */
@@ -38,7 +38,7 @@
  
      /**
       * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
-@@ -67,12 +67,9 @@
+@@ -66,12 +66,9 @@
       * @throws IOException If the file could not be opened for writing.
       */
      @Nonnull
@@ -53,7 +53,7 @@
       * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
       *
       * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -80,9 +77,11 @@
+@@ -79,9 +76,11 @@
       * @throws IOException If the file could not be opened for writing.
       * @deprecated Use {@link #openChannelForAppend(String)} instead.
       */
@@ -65,7 +65,7 @@
  
      /**
       * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
-@@ -93,10 +92,7 @@
+@@ -92,10 +91,7 @@
       * @throws IOException If the file could not be opened for writing.
       */
      @Nonnull

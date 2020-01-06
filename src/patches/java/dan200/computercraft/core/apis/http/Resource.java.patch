@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\Resource.java
 +++ src\main\java\dan200\computercraft\core\apis\http\Resource.java
-@@ -7,15 +7,12 @@
+@@ -6,15 +6,12 @@
  package dan200.computercraft.core.apis.http;
  
  import dan200.computercraft.shared.util.IoUtil;
@@ -16,7 +16,7 @@
  import java.util.function.Consumer;
  
  /**
-@@ -25,7 +22,7 @@
+@@ -24,7 +21,7 @@
   */
  public abstract class Resource<T extends Resource<T>> implements Closeable
  {
@@ -25,7 +25,7 @@
      private final ResourceGroup<T> limiter;
  
      protected Resource( ResourceGroup<T> limiter )
-@@ -40,7 +37,7 @@
+@@ -39,7 +36,7 @@
       */
      public final boolean isClosed()
      {
@@ -34,7 +34,7 @@
      }
  
      /**
-@@ -50,7 +47,7 @@
+@@ -49,7 +46,7 @@
       */
      public final boolean checkClosed()
      {
@@ -43,7 +43,7 @@
          dispose();
          return true;
      }
-@@ -62,7 +59,8 @@
+@@ -61,7 +58,8 @@
       */
      protected final boolean tryClose()
      {
@@ -53,7 +53,7 @@
          dispose();
          return true;
      }
-@@ -111,6 +109,7 @@
+@@ -110,6 +108,7 @@
          return null;
      }
  
@@ -61,7 +61,7 @@
      protected static ChannelFuture closeChannel( ChannelFuture future )
      {
          if( future != null )
-@@ -122,6 +121,7 @@
+@@ -121,6 +120,7 @@
  
          return null;
      }

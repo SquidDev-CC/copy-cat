@@ -1,7 +1,7 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IMount.java
 +++ src\main\java\dan200\computercraft\api\filesystem\IMount.java
-@@ -6,15 +6,12 @@
- 
+@@ -5,15 +5,12 @@
+  */
  package dan200.computercraft.api.filesystem;
  
 -import dan200.computercraft.api.ComputerCraftAPI;
@@ -17,7 +17,7 @@
  import java.util.List;
  
  /**
-@@ -68,7 +65,7 @@
+@@ -67,7 +64,7 @@
       */
      long getSize( @Nonnull String path ) throws IOException;
  
@@ -26,7 +26,7 @@
       * Opens a file with a given path, and returns an {@link InputStream} representing its contents.
       *
       * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -76,9 +73,11 @@
+@@ -75,9 +72,11 @@
       * @throws IOException If the file does not exist, or could not be opened.
       * @deprecated Use {@link #openChannelForRead(String)} instead
       */
@@ -38,7 +38,7 @@
  
      /**
       * Opens a file with a given path, and returns an {@link ReadableByteChannel} representing its contents.
-@@ -90,8 +89,5 @@
+@@ -89,8 +88,5 @@
       * @throws IOException If the file does not exist, or could not be opened.
       */
      @Nonnull
