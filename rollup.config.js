@@ -19,7 +19,7 @@ export default {
 
   plugins: [
     replace({
-      __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage")
+      __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
     }),
 
     builtins(),

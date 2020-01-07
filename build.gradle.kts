@@ -180,6 +180,11 @@ tasks {
 
         dependsOn(rollup)
 
+        /** Replace various template strings within our files. */
+        fun replaceTemplate(x: String) = x
+            .replace("{{version}}", inputs.properties["hash"].toString())
+            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.19.2")
+
         inputs.property("hash", {
             try {
                 FileRepositoryBuilder().setWorkTree(File(".")).build()
@@ -197,13 +202,13 @@ tasks {
         }
 
         from("$buildDir/javascript/loader.js") {
-            filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
+            filter { replaceTemplate(it) }
             into("assets")
         }
 
         from("src/web/public") {
             include("*.html")
-            filter { it.replace("{{version}}", inputs.properties["hash"].toString()) }
+            filter { replaceTemplate(it) }
         }
 
         from("src/web/public") {
