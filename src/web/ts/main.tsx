@@ -23,7 +23,7 @@ class Main extends Component<{}, MainState> {
     const settingStorage = new SettingStore();
 
     const configEditor = new ConfigGroup("Editor", "Configure the built-in eidtor", settingStorage);
-    const configTerminal = new ConfigGroup("Editor", "Configure the terminal display", settingStorage);
+    const configTerminal = new ConfigGroup("Terminal", "Configure the terminal display", settingStorage);
     const configGroups = [configEditor, configTerminal];
 
     const state: MainState = {
@@ -105,6 +105,15 @@ class Main extends Component<{}, MainState> {
   }
 
   private configFactory = (name: string, description: string | null): IConfigGroup => {
+    const existing = this.state.configGroups.find(x => x.name === name);
+    if (existing) {
+      if (existing.description !== description) {
+        console.warn(`Different descriptions for ${name} ("${description}" and "${existing.description}")`)
+      }
+
+      return existing;
+    }
+
     const group = new ConfigGroup(name, description, this.state.settingStorage);
     this.setState(s => ({ configGroups: [...s.configGroups, group] }));
     return group;

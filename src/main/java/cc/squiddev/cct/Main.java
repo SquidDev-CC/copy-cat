@@ -21,6 +21,9 @@ import java.io.InputStream;
 public class Main implements IComputerEnvironment {
     public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
 
+    private static int width = ComputerCraft.terminalWidth_computer;
+    private static int height = ComputerCraft.terminalHeight_computer;
+
     private long ticks;
 
     public static void main(String[] args) {
@@ -32,7 +35,7 @@ public class Main implements IComputerEnvironment {
     public void run() {
         TerminalMonitor terminalMonitor = new TerminalMonitor();
 
-        Terminal terminal = new Terminal(ComputerCraft.terminalWidth_computer, ComputerCraft.terminalHeight_computer, terminalMonitor);
+        Terminal terminal = new Terminal(width, height, terminalMonitor);
         Computer computer = new Computer(this, terminal, 0);
 
         ComputerAccess computerAccess = Callbacks.computer();
@@ -53,6 +56,11 @@ public class Main implements IComputerEnvironment {
 
             if (computer.pollAndResetChanged()) {
                 computerAccess.setState(computer.getLabel(), computer.isOn());
+            }
+
+            if (terminal.getWidth() != width || terminal.getHeight() != height) {
+                terminal.resize(width, height);
+                computer.queueEvent("term_resize", null);
             }
 
             if (terminalMonitor.pollChanged()) {
@@ -153,6 +161,18 @@ public class Main implements IComputerEnvironment {
         general.addBoolean("debug_enabled", "Debug enabled", ComputerCraft.debug_enable,
             "Enable Lua's debug library. This is sandboxed to each computer, so is generally safe to be used by players.",
             x -> ComputerCraft.debug_enable = x
+        );
+
+        ConfigGroup terminal = Callbacks.config("Terminal", "Configure the terminal display");
+
+        terminal.addInt("terminal.width", "Width", ComputerCraft.terminalWidth_computer, 1, 100,
+            "The width of the computer's terminal",
+            x -> width = x
+        );
+
+        terminal.addInt("terminal.height", "Height", ComputerCraft.terminalHeight_computer, 1, 100,
+            "The height of the computer's terminal",
+            x -> height = x
         );
 
         ConfigGroup http = Callbacks.config("HTTP API", "Controls the HTTP API");
