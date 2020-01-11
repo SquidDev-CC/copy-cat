@@ -147,31 +147,56 @@ tasks {
             listOf("sh", "-c", cmd)
         }
 
+    val genCssTypes by registering(Exec::class) {
+        group = "build"
+        description = "Generates type stubs for CSS files"
+
+        inputs.file("src/web/ts/styles.css").withPropertyName("styles.css")
+        outputs.file("src/web/ts/styles.css.d.ts").withPropertyName("styles.css.d.ts")
+
+        commandLine(mkCommand("npm run --silent prepare:setup"))
+    }
+
     val compileTypescript by registering(Exec::class) {
         group = "build"
         description = "Converts TypeScript code to Javascript"
 
+        dependsOn(genCssTypes)
         inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("tsconfig.json").withPropertyName("TypeScript config")
 
         outputs.dir("$buildDir/javascript").withPropertyName("output")
 
-        commandLine(mkCommand("npm run --silent tsc"))
+        commandLine(mkCommand("npm run --silent prepare:tsc"))
+    }
+
+    val copyCss by registering(Copy::class) {
+        group = "build"
+        description = "Copies CSS files into the rollup directory."
+
+        inputs.file("src/web/ts/styles.css").withPropertyName("styles.css")
+        outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
+
+        from("src/web/ts") {
+            include("styles.css")
+        }
+
+        into("$buildDir/javascript/")
     }
 
     val rollup by registering(Exec::class) {
         group = "build"
         description = "Combines multiple Javascript files into one"
 
-        dependsOn(bundleTeaVM, compileTypescript)
+        dependsOn(bundleTeaVM, compileTypescript, copyCss)
         inputs.files(fileTree("$buildDir/javascript")).withPropertyName("sources")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
         outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
 
-        commandLine(mkCommand("npm run rollup --silent"))
+        commandLine(mkCommand("npm run --silent prepare:rollup"))
     }
 
     val website by registering(Sync::class) {
@@ -195,30 +220,16 @@ tasks {
             }
         })
 
-        from("$buildDir/rollup") {
-            include("*.js")
-            include("dependencies.txt")
-            into("assets")
-        }
+        from("$buildDir/rollup");
+        from("node_modules/requirejs/require.js");
 
         from("$buildDir/javascript/loader.js") {
             filter { replaceTemplate(it) }
-            into("assets")
         }
 
         from("src/web/public") {
             include("*.html")
             filter { replaceTemplate(it) }
-        }
-
-        from("src/web/public") {
-            exclude("*.html")
-            exclude("assets/font/config.json")
-        }
-
-        from("node_modules/gif.js/dist") {
-            include("gif.worker.js")
-            into("assets")
         }
 
         into("$buildDir/web")
@@ -248,7 +259,7 @@ tasks {
                 renamed.parentFile.mkdirs()
 
                 exec {
-                    commandLine(mkCommand("npm run terser --silent -- --output \"$renamed\" \"$original\""))
+                    commandLine(mkCommand("npm run --silent prepare:terser -- --output \"$renamed\" \"$original\""))
                 }
             }
 
@@ -258,7 +269,7 @@ tasks {
                 renamed.parentFile.mkdirs()
 
                 exec {
-                    commandLine(mkCommand("npm run uglifycss --silent -- --output \"$renamed\" \"$original\""))
+                    commandLine(mkCommand("npm run --silent prepare:uglifycss -- --output \"$renamed\" \"$original\""))
                 }
             }
         }

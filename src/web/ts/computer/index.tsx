@@ -1,17 +1,19 @@
+import { Semaphore, Terminal, TerminalData, save as saveBlob } from "cc-web-term";
 import JSZip from "jszip";
 import { Component, h } from "preact";
-import saveBlob from "../files/save";
 import newZip from "../files/zip";
 import { Download } from "../font";
 import { ConfigFactory, start } from "../java";
 import { Settings } from "../settings";
-import { Terminal } from "../terminal/component";
-import { TerminalData } from "../terminal/data";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
-import { Semaphore } from "./actions";
 import Editor, { LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
+import {
+  computer_view, computer_split, file_list, dragging as dragging_class, file_computer_control, file_computer,
+  active, file_computer_actions, file_drop_marker, terminal_view, action_button
+} from "../styles.css";
+import { Styles } from "cc-web-term";
 
 export type ComputerProps = {
   focused: boolean,
@@ -153,16 +155,16 @@ fn()`);
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, activeFile, id, label, on, dragging }: ComputerState,
   ) {
-    return <div class="computer-view">
-      <div class="computer-split">
-        <div class={`file-list ${dragging ? "dragging" : ""}`}
+    return <div class={computer_view}>
+      <div class={computer_split}>
+        <div class={`${file_list} ${dragging ? dragging_class : ""}`}
           onDragOver={this.startDrag} onDragLeave={this.stopDrag} onDrop={this.dropFile}>
-          <div class="file-computer-control">
-            <div class={`file-computer ${activeFile == null ? "active" : ""}`} onClick={this.openComputer}>
+          <div class={file_computer_control}>
+            <div class={`${file_computer} ${activeFile == null ? active : ""}`} onClick={this.openComputer}>
               {id ? `Computer #${id}` : "Computer"}
             </div>
-            <div class="file-computer-actions">
-              <button class="action-button" type="button" onClick={this.saveZip}
+            <div class={file_computer_actions}>
+              <button class={action_button} type="button" onClick={this.saveZip}
                 title="Download all files as a zip">
                 <Download />
               </button>
@@ -172,13 +174,16 @@ fn()`);
           <FileTree computer={computer} entry={computer.getEntry("")!} path=""
             opened={activeFile === null ? null : activeFile.path} open={this.openFile} />
 
-          <div class="file-drop-marker">
+          <div class={file_drop_marker}>
             <span>Upload to your computer!</span>
           </div>
         </div>
         {activeFile == null
-          ? <Terminal terminal={terminal} changed={terminalChanged} focused={focused}
-            computer={computer} font={settings.terminalFont} id={id} label={label} on={on} />
+          ? <div class={terminal_view}>
+            <Terminal terminal={terminal} changed={terminalChanged} focused={focused} computer={computer}
+              font={settings.terminalFont}
+              id={id} label={label} on={on} />
+          </div>
           : <Editor model={activeFile.model} settings={settings} focused={focused}
             doSave={contents => activeFile.file.setContents(contents)} />}
       </div>

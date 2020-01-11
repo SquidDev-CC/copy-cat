@@ -1,5 +1,7 @@
 import { Component, VNode, h } from "preact";
+import { active, file_entry_head, file_entry_icon, file_entry_name, file_tree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
+import { DownOpen, RightOpen, Lua, Text } from "../font";
 
 export type Opener = (path: string, entry: FileSystemEntry) => void;
 
@@ -18,10 +20,10 @@ type FileEntryState = {
   expanded?: boolean;
 };
 
-const getExtension = (name: string, directory: boolean, expanded: boolean) => {
-  if (directory) return expanded ? "down-open" : "right-open";
-  if (name.endsWith(".lua")) return "lua";
-  return "doc-text";
+const getIcon = (name: string, directory: boolean, expanded: boolean) => {
+  if (directory) return expanded ? <DownOpen /> : <RightOpen />;
+  if (name.endsWith(".lua")) return <Lua />;
+  return <Text />;
 };
 
 class FileEntry extends Component<FileEntryProperties, FileEntryState> {
@@ -34,14 +36,16 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
     { computer, entry, name, path, depth, opened, open }: FileEntryProperties,
     { expanded }: FileEntryState,
   ) {
-    return <li class="file-entry">
-      <div class={`file-entry-head ${opened === path ? "active" : ""}`} style={`padding-left: ${depth}em`}
+    return <li>
+      <div class={`${file_entry_head} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
-        <span class={`file-entry-icon icon icon-${getExtension(name, entry.isDirectory(), expanded || false)}`}></span>
-        <span class="file-entry-name">{name}</span>
+        <span class={file_entry_icon}>
+          {getIcon(name, entry.isDirectory(), expanded || false)}
+        </span>
+        <span class={file_entry_name}>{name}</span>
       </div>
       {expanded
-        ? <FileTree computer={computer} entry={entry} path={path}  depth={depth} opened={opened} open={open} />
+        ? <FileTree computer={computer} entry={entry} path={path} depth={depth} opened={opened} open={open} />
         : null}
     </li>;
   }
@@ -89,7 +93,7 @@ export class FileTree extends Component<FileListProperties, FileListState> {
       return a.name < b.name ? -1 : 1;
     });
 
-    return <ul class="file-tree">{entries.map(x => x.node)}</ul>;
+    return <ul class={file_tree}>{entries.map(x => x.node)}</ul>;
   }
 
   public componentDidMount() {

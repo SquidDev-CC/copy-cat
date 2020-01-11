@@ -1,8 +1,10 @@
 import builtins from "rollup-plugin-node-builtins";
 import commonjs from "@rollup/plugin-commonjs";
 import license from "rollup-plugin-license"
+import postcss from 'rollup-plugin-postcss';
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
+import url from '@rollup/plugin-url';
 
 export default {
   input: "build/javascript/main.js",
@@ -22,30 +24,30 @@ export default {
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
     }),
 
+    postcss({
+      extract: true,
+      namedExports: name => name.replace(/-/g, '_'),
+      modules: true,
+    }),
+    url({
+      limit: 1024,
+      fileName: '[name]-[hash][extname]',
+      include: ['**/*.worker.js', '**/*.png'],
+    }),
+
     builtins(),
     resolve({ browser: true, }),
     commonjs(),
 
-    (() => {
-      const plugin = license({
-        banner:
-          `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
+    license({
+      banner:
+        `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
 <% _.forEach(_.sortBy(dependencies, ["name"]), ({ name, author, license }) => { %>
   - <%= name %>: Copyright <%= author ? author.name : "" %> (<%= license %>)<% }) %>
 
 @license
   `,
-        thirdParty: { output: "build/rollup/dependencies.txt" },
-      });
-
-      // Add some additional packages which depend on elsewhere. Yes, this is horrible.
-      /*
-      for (const pkg of ["gif.js", "monaco-editor", "requirejs"]) {
-        plugin.load(`${__dirname}/node_modules/${pkg}/_.js`);
-      }
-      */
-
-      return plugin;
-    })(),
+      thirdParty: { output: "build/rollup/dependencies.txt" },
+    }),
   ],
 };

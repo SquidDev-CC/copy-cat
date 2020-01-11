@@ -2,6 +2,7 @@ import { Component, h } from "preact";
 import { Settings } from "../settings";
 
 import * as mTypes from "../editor";
+import { editor_view, editor_placeholder } from "../styles.css";
 
 let monaco: typeof mTypes | null = null;
 
@@ -176,8 +177,8 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   public render() {
-    return <div class="editor-view">
-      {monaco ? undefined : <div class="editor-placeholder">Loading...</div>}
+    return <div class={editor_view}>
+      {monaco ? undefined : <div class={editor_placeholder}>Loading...</div>}
     </div>;
   }
 

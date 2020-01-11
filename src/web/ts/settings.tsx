@@ -1,6 +1,7 @@
 import { JSX, h } from "preact";
 import { IConfigGroup } from "./classes";
 import * as storage from "./storage";
+import { dialogue_box, tiny_text, form_group } from "./styles.css";
 
 export type Settings = {
   // Editor Settings
@@ -146,12 +147,12 @@ export type SettingsProperties = {
 };
 
 export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element =>
-  <div class="settings-box dialogue-box">
+  <div class={dialogue_box}>
     <h2>Settings</h2>
     {configGroups.map(({ name, description, properties }) => [
       <h3>{name}</h3>,
-      description ? <p class="tiny-text">{description}</p> : null,
-      <div class="form-group">
+      description ? <p class={tiny_text}>{description}</p> : null,
+      <div class={form_group}>
         {properties.map(property => {
           switch (property.type) {
             case "string":
@@ -159,21 +160,21 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 {property.name}
                 <input type="text" value={store.get(property)}
                   onChange={getUpdater(store, property, getString)}></input>
-                <p class="tiny-text">{property.description}</p>
+                <p class={tiny_text}>{property.description}</p>
               </label>;
             case "int":
               return <label>
                 {property.name}
                 <input type="number" value={store.get(property)} min={property.min} max={property.max} step={1}
                   onChange={getUpdater(store, property, getNumber)}></input>
-                <p class="tiny-text">{property.description}</p>
+                <p class={tiny_text}>{property.description}</p>
               </label>;
             case "boolean":
               return <label>
                 <input type="checkbox" checked={store.get(property)}
                   onInput={getUpdater(store, property, getBool)}></input>
                 {property.name}
-                <p class="tiny-text">{property.description}</p>
+                <p class={tiny_text}>{property.description}</p>
               </label>;
             case "option":
               return <label>
@@ -181,7 +182,7 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 <select value={store.get(property)} onInput={getUpdater(store, property, getString)}>
                   {property.choices.map(({ key, value }) => <option value={key}>{value}</option>)}
                 </select>
-                <p class="tiny-text">{property.description}</p>
+                <p class={tiny_text}>{property.description}</p>
               </label>;
           }
         })}

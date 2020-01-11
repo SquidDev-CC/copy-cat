@@ -1,9 +1,13 @@
+import { Styles } from "cc-web-term";
 import { Component, JSX, h, render } from "preact";
 import { IConfigGroup } from "./classes";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
+import { container, dialogue_overlay, info_buttons, action_button } from "./styles.css";
+import term_font from "cc-web-term/assets/term_font.png";
+import term_font_hd from "cc-web-term/assets/term_font_hd.png";
 
 type MainState = {
   settings: Settings,
@@ -30,7 +34,7 @@ class Main extends Component<{}, MainState> {
       settingStorage, configGroups,
       settings: {
         showInvisible: true, trimWhitespace: true, darkMode: false,
-        terminalFont: "assets/term_font.png",
+        terminalFont: term_font,
       },
       currentVDom: this.computerVDom,
     };
@@ -54,8 +58,8 @@ class Main extends Component<{}, MainState> {
 
     configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
       [
-        { key: "assets/term_font.png", value: "Standard font" },
-        { key: "assets/term_font_hd.png", value: "High-definition font" },
+        { key: term_font, value: "Standard font" },
+        { key: term_font_hd, value: "High-definition font" },
       ], "Which font the we should use within the terminal",
       x => this.setState(s => ({ settings: { ...s.settings, terminalFont: x } })),
     );
@@ -68,21 +72,21 @@ class Main extends Component<{}, MainState> {
   }
 
   public render({ }: {}, state: MainState) {
-    return <div class="container">
+    return <div class={container}>
       {state.currentVDom(state)}
-      <div class="info-buttons">
-        <button class="action-button" title="Configure how the emulator behaves" type="button"
+      <div class={info_buttons}>
+        <button class={action_button} title="Configure how the emulator behaves" type="button"
           onClick={this.openSettings}>
           <Cog />
         </button>
-        <button class="action-button" title="Find out more about the emulator" type="button"
+        <button class={action_button} title="Find out more about the emulator" type="button"
           onClick={() => this.setState({ dialogue: () => <About /> })}>
           <Info />
         </button>
       </div>
       {
         state.dialogue ?
-          <div class="dialogue-overlay" onClick={this.closeDialogueClick}>
+          <div class={dialogue_overlay} onClick={this.closeDialogueClick}>
             {state.dialogue(state)}
           </div> : ""
       }

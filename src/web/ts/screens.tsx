@@ -1,7 +1,8 @@
 import { h } from "preact";
+import { dialogue_box, error_view, info_description, info_view } from "./styles.css";
 
 const githubLink =
-  <div class="info-description">
+  <div class={info_description}>
     <p>
       Think you've found a bug? Have a suggestion? Why not put it
       on <a href="https://github.com/SquidDev-CC/" title="The GitHub repository">the GitHub repo</a>?
@@ -9,15 +10,15 @@ const githubLink =
   </div>;
 
 export const UnknownError = ({ error }: { error: string }) =>
-  <div class="info-container">
-    <div class="info-view error-view">
+  <div class={info_description}>
+    <div class={`${info_view} ${error_view}`}>
       <h2>An error occured</h2>
       <pre>{error}</pre>
     </div>
     {githubLink}
   </div>;
 
-export const About = () => <div class="dialogue-box">
+export const About = () => <div class={dialogue_box}>
   <h2>About</h2>
   <p>
     Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/SquidDev-CC/CC-Tweaked"

@@ -1,7 +1,5 @@
-import { decode, encode } from "../files/encode";
+import { IComputerActionable, LuaValue, Semaphore, TerminalData } from "cc-web-term";
 import { IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "../java";
-import { TerminalData } from "../terminal/data";
-import { IComputerActionable, LuaValue, Semaphore } from "./actions";
 import { IComputerPersistance } from "./persist";
 
 const colours = "0123456789abcdef";
