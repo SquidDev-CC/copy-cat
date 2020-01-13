@@ -10,10 +10,10 @@
 +import java.io.Writer;
 +import cc.squiddev.cct.stub.ReadableByteChannel;
 +import cc.squiddev.cct.stub.WritableByteChannel;
- import java.util.HashMap;
- import java.util.Map;
  import java.util.function.Function;
-@@ -252,13 +252,13 @@
+ 
+ import static dan200.computercraft.api.lua.ArgumentHelper.getString;
+@@ -244,13 +244,13 @@
                          case "w":
                          {
                              // Open the file for writing, then create a wrapper around the writer

@@ -1,28 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
 +++ src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
-@@ -8,11 +8,7 @@
- import dan200.computercraft.ComputerCraft;
- import dan200.computercraft.api.lua.*;
- import dan200.computercraft.core.computer.Computer;
--import dan200.computercraft.core.computer.MainThread;
- import dan200.computercraft.core.computer.TimeoutState;
--import dan200.computercraft.core.tracking.Tracking;
--import dan200.computercraft.core.tracking.TrackingField;
--import dan200.computercraft.shared.util.ThreadUtils;
- import org.squiddev.cobalt.*;
- import org.squiddev.cobalt.compiler.CompileException;
- import org.squiddev.cobalt.compiler.LoadState;
-@@ -30,9 +26,6 @@
- import java.util.HashMap;
- import java.util.IdentityHashMap;
- import java.util.Map;
--import java.util.concurrent.SynchronousQueue;
--import java.util.concurrent.ThreadPoolExecutor;
--import java.util.concurrent.TimeUnit;
- 
- import static org.squiddev.cobalt.ValueFactory.valueOf;
- import static org.squiddev.cobalt.ValueFactory.varargsOf;
-@@ -41,12 +34,14 @@
+@@ -39,12 +39,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -37,7 +15,7 @@
  
      private final Computer m_computer;
      private final TimeoutState timeout;
-@@ -69,6 +64,7 @@
+@@ -67,6 +69,7 @@
          LuaState state = m_state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
@@ -45,7 +23,7 @@
              .coroutineExecutor( command -> {
                  Tracking.addValue( m_computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
-@@ -82,6 +78,7 @@
+@@ -80,6 +83,7 @@
                      }
                  } );
              } )
@@ -53,7 +31,7 @@
              .build();
  
          m_globals = new LuaTable();
-@@ -260,6 +257,7 @@
+@@ -258,6 +262,7 @@
                  } );
              }
          }
@@ -61,25 +39,40 @@
          return table;
      }
  
-@@ -294,7 +292,7 @@
-             // Start remembering stuff
-             if( values == null )
-             {
--                values = new IdentityHashMap<>();
-+                values = new HashMap<>();
-             }
-             else if( values.containsKey( object ) )
-             {
-@@ -361,7 +359,7 @@
-                 // Start remembering stuff
-                 if( objects == null )
-                 {
--                    objects = new IdentityHashMap<>();
-+                    objects = new HashMap<>();
-                 }
-                 else if( objects.containsKey( value ) )
-                 {
-@@ -478,7 +476,6 @@
+@@ -308,7 +313,6 @@
+             return table;
+         }
+ 
+-        if( object instanceof Object[] )
+         {
+             Object[] objects = (Object[]) object;
+             LuaTable table = new LuaTable( objects.length, 0 );
+@@ -317,18 +321,22 @@
+             return table;
+         }
+ 
++        // String[] is not an instance of Object[] under TeaVM. So instead, we abuse the lack of
++        // cast assertions and just assume what we're doing is correct.
++        /*
+         if( ComputerCraft.logPeripheralErrors )
+         {
+-            ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
++            ComputerCraft.log.warn( "Received unknown type, returning nil." );
+         }
+         return Constants.NIL;
++        */
+     }
+ 
+     private Varargs toValues( Object[] objects )
+     {
+         if( objects == null || objects.length == 0 ) return Constants.NONE;
+ 
+-        Map<Object, LuaValue> result = new IdentityHashMap<>( 0 );
++        Map<Object, LuaValue> result = new HashMap<>( 0 );
+         LuaValue[] values = new LuaValue[objects.length];
+         for( int i = 0; i < values.length; i++ )
+         {
+@@ -475,7 +483,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -87,7 +80,7 @@
              handleSoftAbort();
          }
  
-@@ -504,24 +501,26 @@
+@@ -501,24 +508,26 @@
      {
          @Nonnull
          @Override
@@ -117,7 +110,7 @@
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -561,9 +560,12 @@
+@@ -558,9 +567,12 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }
