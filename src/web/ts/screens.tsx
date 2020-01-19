@@ -72,7 +72,7 @@ export const About = () => <div class={dialogue_box}>
       : CC BY 4.0
     </li>
     <li>
-      Numerous Javascript libraries. A full list can be found <a href="assets/dependencies.txt" target="_blank">in the
+      Numerous Javascript libraries. A full list can be found <a href="dependencies.txt" target="_blank">in the
       dependencies list</a> or at the top of any Javascript file.
     </li>
   </ul>
