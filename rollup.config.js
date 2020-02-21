@@ -1,10 +1,10 @@
 import builtins from "rollup-plugin-node-builtins";
 import commonjs from "@rollup/plugin-commonjs";
-import license from "rollup-plugin-license"
-import postcss from 'rollup-plugin-postcss';
+import license from "rollup-plugin-license";
+import postcss from "rollup-plugin-postcss";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
-import url from '@rollup/plugin-url';
+import url from "@rollup/plugin-url";
 
 export default {
   input: "build/javascript/main.js",
@@ -26,13 +26,13 @@ export default {
 
     postcss({
       extract: true,
-      namedExports: name => name.replace(/-/g, '_'),
+      namedExports: name => name.replace(/-([a-z])/g, (_, x) => x.toUpperCase()),
       modules: true,
     }),
     url({
       limit: 1024,
-      fileName: '[name]-[hash][extname]',
-      include: ['**/*.worker.js', '**/*.png'],
+      fileName: "[name]-[hash][extname]",
+      include: ["**/*.worker.js", "**/*.png"],
     }),
 
     builtins(),

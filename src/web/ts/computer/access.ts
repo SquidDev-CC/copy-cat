@@ -1,6 +1,6 @@
-import { IComputerActionable, LuaValue, Semaphore, TerminalData } from "cc-web-term";
-import { IComputerAccess, IFileSystemEntry, QueueEventHandler, Result } from "../java";
-import { IComputerPersistance } from "./persist";
+import { ComputerActionable, LuaValue, Semaphore, TerminalData } from "cc-web-term";
+import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
+import type { ComputerPersistance } from "./persist";
 
 const colours = "0123456789abcdef";
 
@@ -17,21 +17,21 @@ const decoder = new TextDecoder("UTF-8", { fatal: false });
 const encoder = new TextEncoder();
 
 export class FileSystemEntry implements IFileSystemEntry {
-  private readonly persistance: IComputerPersistance;
+  private readonly persistance: ComputerPersistance;
   private readonly path: string;
   private children: string[] | null;
   private contents: Int8Array | null;
   private exists: boolean = true;
   private semaphore?: Semaphore;
 
-  constructor(persistance: IComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null) {
+  public constructor(persistance: ComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null) {
     this.persistance = persistance;
     this.path = path;
     this.children = children;
     this.contents = contents;
   }
 
-  public static create(persistance: IComputerPersistance, path: string, directory: boolean) {
+  public static create(persistance: ComputerPersistance, path: string, directory: boolean) {
     const instance = new FileSystemEntry(persistance, path, directory ? [] : null, directory ? null : empty);
     instance.save();
     return instance;
@@ -102,8 +102,8 @@ export class FileSystemEntry implements IFileSystemEntry {
   }
 }
 
-export class ComputerAccess implements IComputerAccess, IComputerActionable {
-  private readonly persistance: IComputerPersistance;
+export class ComputerAccess implements IComputerAccess, ComputerActionable {
+  private readonly persistance: ComputerPersistance;
 
   private readonly terminal: TerminalData;
   private readonly semaphore: Semaphore;
@@ -117,8 +117,8 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
   private shutdownHandler?: () => void;
   private rebootHander?: () => void;
 
-  constructor(
-    persistance: IComputerPersistance, terminal: TerminalData, semaphore: Semaphore,
+  public constructor(
+    persistance: ComputerPersistance, terminal: TerminalData, semaphore: Semaphore,
     stateChange: (label: string | null, on: boolean) => void,
   ) {
     this.persistance = persistance;
@@ -205,7 +205,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
     } else if (entry.isDirectory()) {
       return { value: entry };
     } else {
-      return { error: `/$path: File exists`, value: null };
+      return { error: `/${path}: File exists`, value: null };
     }
   }
 
@@ -221,7 +221,7 @@ export class ComputerAccess implements IComputerAccess, IComputerActionable {
       this.filesystem.set(path, file);
       return { value: file };
     } else if (entry.isDirectory()) {
-      return { error: `/$path: Cannot write to directory`, value: null };
+      return { error: `/${path}: Cannot write to directory`, value: null };
     } else {
       return { value: entry };
     }

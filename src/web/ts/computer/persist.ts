@@ -9,7 +9,7 @@ const empty = new Int8Array(0);
  * This should not be treated as the cannonical source of file information (see {@link ComputerAccess} for that), but
  * rather as a backend for the computer to finally save to.
  */
-export interface IComputerPersistance {
+export interface ComputerPersistance {
   getLabel(): string | null;
 
   setLabel(label: string | null): void;
@@ -30,7 +30,7 @@ export interface IComputerPersistance {
 /**
  * A persistance instance which saves nothing, useful for temporary file systems.
  */
-export class VoidPersistence implements IComputerPersistance {
+export class VoidPersistence implements ComputerPersistance {
   public getLabel(): string | null {
     return null;
   }
@@ -62,10 +62,10 @@ export class VoidPersistence implements IComputerPersistance {
 /**
  * Persistance instance which saves to storage.
  */
-export class StoragePersistence implements IComputerPersistance {
+export class StoragePersistence implements ComputerPersistance {
   private readonly prefix: string;
 
-  constructor(id: number) {
+  public constructor(id: number) {
     this.prefix = `computer[${id}]`;
   }
 

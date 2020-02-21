@@ -208,7 +208,7 @@ tasks {
         /** Replace various template strings within our files. */
         fun replaceTemplate(x: String) = x
             .replace("{{version}}", inputs.properties["hash"].toString())
-            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.19.2")
+            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.20.0")
 
         inputs.property("hash", {
             try {

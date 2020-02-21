@@ -1,19 +1,18 @@
 import { Semaphore, Terminal, TerminalData, save as saveBlob } from "cc-web-term";
-import JSZip from "jszip";
+import type JSZip from "jszip";
 import { Component, h } from "preact";
 import newZip from "../files/zip";
 import { Download } from "../font";
 import { ConfigFactory, start } from "../java";
-import { Settings } from "../settings";
+import type { Settings } from "../settings";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import Editor, { LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
-  computer_view, computer_split, file_list, dragging as dragging_class, file_computer_control, file_computer,
-  active, file_computer_actions, file_drop_marker, terminal_view, action_button
+  actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer,
+  fileComputerActions, fileComputerControl, fileDropMarker, fileList, terminalView
 } from "../styles.css";
-import { Styles } from "cc-web-term";
 
 export type ComputerProps = {
   focused: boolean,
@@ -72,7 +71,7 @@ const createZip = async (computer: ComputerAccess) => {
  */
 const isSimpleZip = (zip: JSZip, name: string) => {
   for (const fileName in zip.files) {
-    if (!zip.files.hasOwnProperty(fileName)) continue;
+    if (!Object.prototype.hasOwnProperty.call(zip.files, fileName)) continue;
 
     // Require every child to be in the ${name} directory.
     if (!fileName.startsWith(name + "/")) return false;
@@ -82,7 +81,7 @@ const isSimpleZip = (zip: JSZip, name: string) => {
 };
 
 export class Computer extends Component<ComputerProps, ComputerState> {
-  public constructor(props: ComputerProps, context: any) {
+  public constructor(props: ComputerProps, context: unknown) {
     super(props, context);
 
     const terminal = new TerminalData();
@@ -107,7 +106,7 @@ export class Computer extends Component<ComputerProps, ComputerState> {
       }
 
       contents = contents
-        .replace(/(\\|\n|\")/g, "\\$1")
+        .replace(/(\\|\n|")/g, "\\$1")
         .replace("\r", "\\r").replace("\0", "\\0");
 
       // We create a startup script which deletes itself, and then runs the
@@ -155,16 +154,16 @@ fn()`);
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, activeFile, id, label, on, dragging }: ComputerState,
   ) {
-    return <div class={computer_view}>
-      <div class={computer_split}>
-        <div class={`${file_list} ${dragging ? dragging_class : ""}`}
+    return <div class={computerView}>
+      <div class={computerSplit}>
+        <div class={`${fileList} ${dragging ? draggingClass : ""}`}
           onDragOver={this.startDrag} onDragLeave={this.stopDrag} onDrop={this.dropFile}>
-          <div class={file_computer_control}>
-            <div class={`${file_computer} ${activeFile == null ? active : ""}`} onClick={this.openComputer}>
+          <div class={fileComputerControl}>
+            <div class={`${fileComputer} ${activeFile == null ? active : ""}`} onClick={this.openComputer}>
               {id ? `Computer #${id}` : "Computer"}
             </div>
-            <div class={file_computer_actions}>
-              <button class={action_button} type="button" onClick={this.saveZip}
+            <div class={fileComputerActions}>
+              <button class={actionButton} type="button" onClick={this.saveZip}
                 title="Download all files as a zip">
                 <Download />
               </button>
@@ -174,12 +173,12 @@ fn()`);
           <FileTree computer={computer} entry={computer.getEntry("")!} path=""
             opened={activeFile === null ? null : activeFile.path} open={this.openFile} />
 
-          <div class={file_drop_marker}>
+          <div class={fileDropMarker}>
             <span>Upload to your computer!</span>
           </div>
         </div>
         {activeFile == null
-          ? <div class={terminal_view}>
+          ? <div class={terminalView}>
             <Terminal terminal={terminal} changed={terminalChanged} focused={focused} computer={computer}
               font={settings.terminalFont}
               id={id} label={label} on={on} />
@@ -232,7 +231,7 @@ fn()`);
 
           const offset = isSimpleZip(zip, zipName) ? zipName.length + 1 : 0;
           for (const fileName in zip.files) {
-            if (!zip.files.hasOwnProperty(fileName) || fileName.length === offset) continue;
+            if (!Object.prototype.hasOwnProperty.call(zip.files, fileName) || fileName.length === offset) continue;
 
             let fullName = `${dirName}/${fileName.substr(offset)}`;
             const entry = zip.files[fileName];

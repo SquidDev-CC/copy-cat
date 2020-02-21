@@ -1,6 +1,6 @@
-export default Start;
+declare function Start(callbacks: Callbacks): void;
 
-declare function Start(callbacks: ICallbacks): void;
+export default Start;
 
 /**
  * A handler for {@link ICallbacks.onEvent}
@@ -12,7 +12,7 @@ export type QueueEventHandler = (event: string, args: string[]) => void;
  */
 export type Result<T> = { value: T } | { error: string, value: null };
 
-export interface IFileSystemEntry {
+export interface FileSystemEntry {
   /**
    * If this entry is a directory.
    */
@@ -47,7 +47,7 @@ export interface IFileSystemEntry {
 /**
  * Controls a specific computer on the Javascript side. See {@code js/ComputerAccess.java}.
  */
-export interface IComputerAccess {
+export interface ComputerAccess {
   /**
    * Get the computer's label.
    *
@@ -106,7 +106,7 @@ export interface IComputerAccess {
    * @param path The path to find
    * @return A file entry, or {@code null} if none could be found.
    */
-  getEntry(path: string): IFileSystemEntry | null;
+  getEntry(path: string): FileSystemEntry | null;
 
   /**
    * Create a new directory with the given path
@@ -114,7 +114,7 @@ export interface IComputerAccess {
    * @param path The directory to create
    * @return A file entry if the directory exists or could be created, an empty one otherwise.
    */
-  createDirectory(path: string): Result<IFileSystemEntry>;
+  createDirectory(path: string): Result<FileSystemEntry>;
 
   /**
    * Create a new file with the given path. The owning folder must exist already.
@@ -122,7 +122,7 @@ export interface IComputerAccess {
    * @param path The file to create
    * @return A file entry if the file exists or could be created, an empty one otherwise.
    */
-  createFile(path: string): Result<IFileSystemEntry>;
+  createFile(path: string): Result<FileSystemEntry>;
 
   /**
    * Recursively delete a file system entry.
@@ -160,7 +160,7 @@ export interface IComputerAccess {
   onReboot(handler: () => void): void;
 }
 
-export interface IConfigGroup {
+export interface ConfigGroup {
   /**
    * Add a string property to this config group
    *
@@ -197,13 +197,13 @@ export interface IConfigGroup {
   addInt(id: string, name: string, def: number, min: number, max: number, description: string, changed: (value: number) => void): void;
 }
 
-export interface ICallbacks {
+export interface Callbacks {
   /**
    * Get the current callback instance
    *
    * @return The callback instance
    */
-  getComputer(): IComputerAccess;
+  getComputer(): ComputerAccess;
 
   /**
 * Get or create a config group
@@ -212,7 +212,7 @@ export interface ICallbacks {
 * @param description A short description of this group
 * @return The constructed config group
 */
-  config(name: string, description: string | null): IConfigGroup;
+  config(name: string, description: string | null): ConfigGroup;
 
   setInterval(callback: () => void, delay: number): void;
 

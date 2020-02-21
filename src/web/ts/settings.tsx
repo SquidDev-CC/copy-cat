@@ -1,7 +1,7 @@
 import { JSX, h } from "preact";
-import { IConfigGroup } from "./classes";
+import type { ConfigGroup as IConfigGroup } from "./classes";
 import * as storage from "./storage";
-import { dialogue_box, tiny_text, form_group } from "./styles.css";
+import { dialogueBox, formGroup, tinyText } from "./styles.css";
 
 export type Settings = {
   // Editor Settings
@@ -23,10 +23,10 @@ type PropertyTypes = {
 
 /** Additional properties for a specific type */
 type TypeExtensions = {
-  string: {};
-  boolean: {};
-  int: { min: number, max: number };
-  option: { choices: Array<{ key: string, value: string }> }
+  string: {},
+  boolean: {},
+  int: { min: number, max: number },
+  option: { choices: Array<{ key: string, value: string }> },
 };
 
 export type IConfigProperty<K extends keyof PropertyTypes> = {
@@ -47,9 +47,9 @@ export type ConfigProperty
  * The persisted map for settings
  */
 export class SettingStore {
-  private data: { [key: string]: any } = {};
+  private data: { [key: string]: any } = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  constructor() {
+  public constructor() {
     const settingJson = storage.get("settings");
     if (settingJson !== null) {
       try {
@@ -81,7 +81,7 @@ export class ConfigGroup implements IConfigGroup {
   public readonly description: string | null;
   public readonly properties: ConfigProperty[] = [];
 
-  constructor(name: string, description: string | null, store: SettingStore) {
+  public constructor(name: string, description: string | null, store: SettingStore) {
     this.name = name;
     this.description = description;
     this.store = store;
@@ -143,16 +143,16 @@ const getBool = (x: HTMLInputElement) => x.checked;
 
 export type SettingsProperties = {
   store: SettingStore,
-  configGroups: ConfigGroup[];
+  configGroups: ConfigGroup[],
 };
 
 export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element =>
-  <div class={dialogue_box}>
+  <div class={dialogueBox}>
     <h2>Settings</h2>
     {configGroups.map(({ name, description, properties }) => [
       <h3>{name}</h3>,
-      description ? <p class={tiny_text}>{description}</p> : null,
-      <div class={form_group}>
+      description ? <p class={tinyText}>{description}</p> : null,
+      <div class={formGroup}>
         {properties.map(property => {
           switch (property.type) {
             case "string":
@@ -160,21 +160,21 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 {property.name}
                 <input type="text" value={store.get(property)}
                   onChange={getUpdater(store, property, getString)}></input>
-                <p class={tiny_text}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "int":
               return <label>
                 {property.name}
                 <input type="number" value={store.get(property)} min={property.min} max={property.max} step={1}
                   onChange={getUpdater(store, property, getNumber)}></input>
-                <p class={tiny_text}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "boolean":
               return <label>
                 <input type="checkbox" checked={store.get(property)}
                   onInput={getUpdater(store, property, getBool)}></input>
                 {property.name}
-                <p class={tiny_text}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "option":
               return <label>
@@ -182,7 +182,7 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 <select value={store.get(property)} onInput={getUpdater(store, property, getString)}>
                   {property.choices.map(({ key, value }) => <option value={key}>{value}</option>)}
                 </select>
-                <p class={tiny_text}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
           }
         })}

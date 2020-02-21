@@ -1,7 +1,7 @@
 import { Component, VNode, h } from "preact";
-import { active, file_entry_head, file_entry_icon, file_entry_name, file_tree } from "../styles.css";
+import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
-import { DownOpen, RightOpen, Lua, Text } from "../font";
+import { DownOpen, Lua, RightOpen, Text } from "../font";
 
 export type Opener = (path: string, entry: FileSystemEntry) => void;
 
@@ -17,7 +17,7 @@ type FileEntryProperties = {
 };
 
 type FileEntryState = {
-  expanded?: boolean;
+  expanded?: boolean,
 };
 
 const getIcon = (name: string, directory: boolean, expanded: boolean) => {
@@ -37,12 +37,12 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
     { expanded }: FileEntryState,
   ) {
     return <li>
-      <div class={`${file_entry_head} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
+      <div class={`${fileEntryHead} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
-        <span class={file_entry_icon}>
+        <span class={fileEntryIcon}>
           {getIcon(name, entry.isDirectory(), expanded || false)}
         </span>
-        <span class={file_entry_name}>{name}</span>
+        <span class={fileEntryName}>{name}</span>
       </div>
       {expanded
         ? <FileTree computer={computer} entry={entry} path={path} depth={depth} opened={opened} open={open} />
@@ -52,20 +52,20 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
 }
 
 export type FileListProperties = {
-  computer: ComputerAccess;
-  entry: FileSystemEntry;
-  path: string;
-  depth?: number;
+  computer: ComputerAccess,
+  entry: FileSystemEntry,
+  path: string,
+  depth?: number,
 
   opened: string | null,
   open: Opener,
 };
 
 type FileListState = {
-  children?: string[];
+  children?: string[],
 };
 
-type ChildNode = { name: string, dir: boolean, node: VNode<any> };
+type ChildNode = { name: string, dir: boolean, node: VNode<unknown> };
 
 export class FileTree extends Component<FileListProperties, FileListState> {
   public shouldComponentUpdate({ entry, depth, opened }: FileListProperties, { children }: FileListState) {
@@ -93,7 +93,7 @@ export class FileTree extends Component<FileListProperties, FileListState> {
       return a.name < b.name ? -1 : 1;
     });
 
-    return <ul class={file_tree}>{entries.map(x => x.node)}</ul>;
+    return <ul class={fileTree}>{entries.map(x => x.node)}</ul>;
   }
 
   public componentDidMount() {

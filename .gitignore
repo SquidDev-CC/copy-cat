@@ -6,6 +6,7 @@
 /out
 /node_modules
 /.gradle
+/.vscode
 
 # Exclude modified/generated sources
 /src/main/java/org/squiddev/cobalt/
@@ -13,3 +14,4 @@
 /src/main/resources/assets/computercraft
 /src/main/java/cc/squiddev/cct/mount/Resources.java
 /src/web/ts/styles.css.d.ts
+/.eslintignore

@@ -1,20 +1,20 @@
-import { ICallbacks, IComputerAccess, IConfigGroup } from "./classes";
-export { ICallbacks, IComputerAccess, IFileSystemEntry, QueueEventHandler, Result, IConfigGroup } from "./classes";
+import type { ComputerAccess, ConfigGroup, Callbacks as ICallbacks } from "./classes";
+export type { ComputerAccess, FileSystemEntry, QueueEventHandler, Result, ConfigGroup as IConfigGroup } from "./classes";
 
 import "setimmediate";
 
-export type ConfigFactory = (name: string, description: string | null) => IConfigGroup;
+export type ConfigFactory = (name: string, description: string | null) => ConfigGroup;
 
 export class Callbacks implements ICallbacks {
-  private readonly computer: IComputerAccess;
+  private readonly computer: ComputerAccess;
   public readonly config: ConfigFactory;
 
-  constructor(computer: IComputerAccess, config: ConfigFactory) {
+  public constructor(computer: ComputerAccess, config: ConfigFactory) {
     this.computer = computer;
     this.config = config;
   }
 
-  public getComputer(): IComputerAccess {
+  public getComputer(): ComputerAccess {
     return this.computer;
   }
 
@@ -24,11 +24,11 @@ export class Callbacks implements ICallbacks {
 
   public setImmediate(callback: () => void): void {
     // Bodge, as there's no types for 'setImmediate'
-    (window as any).setImmediate(callback);
+    (window as any).setImmediate(callback); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 
-export const start = (computer: IComputerAccess, config: ConfigFactory) => {
+export const start = (computer: ComputerAccess, config: ConfigFactory) => {
   import("./classes")
     .then(x => x.default(new Callbacks(computer, config)))
     .catch(x => console.error("Cannot load classes", x));

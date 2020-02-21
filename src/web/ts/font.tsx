@@ -1,8 +1,8 @@
 import { Styles } from "cc-web-term";
 import { VNode, h } from "preact";
 
-const mk = (child: VNode<any>) => {
-  const node = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class={Styles.icon_font}>
+const mk = (child: VNode<unknown>) => {
+  const node = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class={Styles.iconFont}>
     {child}
   </svg>;
   return () => node;

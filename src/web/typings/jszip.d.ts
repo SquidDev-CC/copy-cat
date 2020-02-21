@@ -11,7 +11,7 @@ interface JSZipSupport {
   nodebuffer: boolean;
 }
 
-type Compression = 'STORE' | 'DEFLATE';
+type Compression = "STORE" | "DEFLATE";
 
 interface Metadata  {
   percent: number;
@@ -105,7 +105,7 @@ declare namespace JSZip {
   interface JSZipGeneratorOptions<T extends OutputType = OutputType> {
       compression?: Compression;
       compressionOptions?: null | {
-          level: number;
+          level: number,
       };
       type?: T;
       comment?: string;
@@ -119,7 +119,7 @@ declare namespace JSZip {
       /** Stream the files and create file descriptors */
       streamFiles?: boolean;
       /** DOS (default) or UNIX */
-      platform?: 'DOS' | 'UNIX';
+      platform?: "DOS" | "UNIX";
   }
 
   interface JSZipLoadOptions {
@@ -235,11 +235,11 @@ interface JSZip {
   prototype: JSZip;
   support: JSZipSupport;
   external: {
-      Promise: PromiseConstructorLike;
+      Promise: PromiseConstructorLike,
   };
   version: string;
 }
 
-declare var JSZip: JSZip;
+declare const JSZip: JSZip;
 
 export default JSZip;

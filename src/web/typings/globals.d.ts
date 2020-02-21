@@ -2,4 +2,4 @@
  *
  *  This is injected by `rollup.config.js`.
  */
-declare var __storageBackend__ : string;
+declare const __storageBackend__: string;

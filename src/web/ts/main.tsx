@@ -1,13 +1,11 @@
-import { Styles } from "cc-web-term";
 import { Component, JSX, h, render } from "preact";
-import { IConfigGroup } from "./classes";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
-import { container, dialogue_overlay, info_buttons, action_button } from "./styles.css";
-import term_font from "cc-web-term/assets/term_font.png";
-import term_font_hd from "cc-web-term/assets/term_font_hd.png";
+import { actionButton, container, dialogueOverlay, infoButtons } from "./styles.css";
+import termFont from "cc-web-term/assets/term_font.png";
+import termFontHd from "cc-web-term/assets/term_font_hd.png";
 
 type MainState = {
   settings: Settings,
@@ -19,7 +17,7 @@ type MainState = {
 };
 
 class Main extends Component<{}, MainState> {
-  public constructor(props: {}, context: any) {
+  public constructor(props: {}, context: unknown) {
     super(props, context);
   }
 
@@ -34,7 +32,7 @@ class Main extends Component<{}, MainState> {
       settingStorage, configGroups,
       settings: {
         showInvisible: true, trimWhitespace: true, darkMode: false,
-        terminalFont: term_font,
+        terminalFont: termFont,
       },
       currentVDom: this.computerVDom,
     };
@@ -58,35 +56,35 @@ class Main extends Component<{}, MainState> {
 
     configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
       [
-        { key: term_font, value: "Standard font" },
-        { key: term_font_hd, value: "High-definition font" },
+        { key: termFont, value: "Standard font" },
+        { key: termFontHd, value: "High-definition font" },
       ], "Which font the we should use within the terminal",
       x => this.setState(s => ({ settings: { ...s.settings, terminalFont: x } })),
     );
   }
 
-  public shouldComponentUpdate({ }: {}, newState: MainState) {
+  public shouldComponentUpdate(_: {}, newState: MainState) {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
   }
 
-  public render({ }: {}, state: MainState) {
+  public render(_: {}, state: MainState) {
     return <div class={container}>
       {state.currentVDom(state)}
-      <div class={info_buttons}>
-        <button class={action_button} title="Configure how the emulator behaves" type="button"
+      <div class={infoButtons}>
+        <button class={actionButton} title="Configure how the emulator behaves" type="button"
           onClick={this.openSettings}>
           <Cog />
         </button>
-        <button class={action_button} title="Find out more about the emulator" type="button"
+        <button class={actionButton} title="Find out more about the emulator" type="button"
           onClick={() => this.setState({ dialogue: () => <About /> })}>
           <Info />
         </button>
       </div>
       {
         state.dialogue ?
-          <div class={dialogue_overlay} onClick={this.closeDialogueClick}>
+          <div class={dialogueOverlay} onClick={this.closeDialogueClick}>
             {state.dialogue(state)}
           </div> : ""
       }
@@ -108,11 +106,11 @@ class Main extends Component<{}, MainState> {
     return <Computer settings={settings} focused={dialogue === undefined} computerSettings={this.configFactory} />;
   }
 
-  private configFactory = (name: string, description: string | null): IConfigGroup => {
+  private configFactory = (name: string, description: string | null): ConfigGroup => {
     const existing = this.state.configGroups.find(x => x.name === name);
     if (existing) {
       if (existing.description !== description) {
-        console.warn(`Different descriptions for ${name} ("${description}" and "${existing.description}")`)
+        console.warn(`Different descriptions for ${name} ("${description}" and "${existing.description}")`);
       }
 
       return existing;

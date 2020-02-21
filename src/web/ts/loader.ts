@@ -1,3 +1,5 @@
+import type * as monaco from "monaco-editor";
+
 requirejs.config({
   urlArgs: (_, url) => url.startsWith("{{monaco}}") || url.includes("-")
     ? ""
@@ -7,6 +9,7 @@ requirejs.config({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).MonacoEnvironment = {
   getWorkerUrl: (_workerId: string, _label: string) =>
     `data:text/javascript;charset=utf-8,${encodeURIComponent(`
@@ -15,7 +18,7 @@ requirejs.config({
       };
       importScripts("{{monaco}}/min/vs/base/worker/workerMain.js");
     `)}`,
-};
+} as monaco.Environment;
 
 /* tslint:disable:no-var-requires */
 require(["./main"], (main: () => void) => main());

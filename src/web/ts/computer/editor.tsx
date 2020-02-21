@@ -1,15 +1,14 @@
 import { Component, h } from "preact";
-import { Settings } from "../settings";
+import type { Settings } from "../settings";
+import type * as monaco from "../editor";
+import { editorPlaceholder, editorView } from "../styles.css";
 
-import * as mTypes from "../editor";
-import { editor_view, editor_placeholder } from "../styles.css";
-
-let monaco: typeof mTypes | null = null;
+let monacoVal: typeof monaco | null = null;
 
 export type Model = {
   resolved: true,
-  text: mTypes.editor.ITextModel,
-  view: mTypes.editor.ICodeEditorViewState | null,
+  text: monaco.editor.ITextModel,
+  view: monaco.editor.ICodeEditorViewState | null,
 };
 
 export type LazyModel = Model | {
@@ -21,7 +20,7 @@ export type LazyModel = Model | {
 
 let unique = 0;
 
-const modelFactory = (m: typeof mTypes, out: {}, contents: string, name: string): Model => {
+const modelFactory = (m: typeof monaco, out: {}, contents: string, name: string): Model => {
   unique++; // We keep a unique id to ensure the Uri is not repeated.
   const mode = name.endsWith(".lua") ? "luax" : undefined;
   const text = m.editor.createModel(contents, mode, m.Uri.file(`f${unique.toString(16)}/${name}`));
@@ -39,7 +38,7 @@ const modelFactory = (m: typeof mTypes, out: {}, contents: string, name: string)
 const forceModel = (model: LazyModel): Model => {
   if (model.resolved) return model;
 
-  const resolved = modelFactory(monaco!, model, model.contents, model.name);
+  const resolved = modelFactory(monacoVal!, model, model.contents, model.name);
 
   const old: { contents?: string, mode?: string } = model;
   delete old.contents;
@@ -49,12 +48,12 @@ const forceModel = (model: LazyModel): Model => {
 };
 
 export const createModel = (contents: string, name: string): LazyModel => {
-  if (monaco) return modelFactory(monaco, {}, contents, name);
+  if (monacoVal) return modelFactory(monacoVal, {}, contents, name);
 
   const model: LazyModel = {
     resolved: false, contents, name,
     promise: import("../editor").then(m => {
-      monaco = m;
+      monacoVal = m;
       return forceModel(model);
     }),
   };
@@ -74,7 +73,7 @@ export type EditorProps = {
 };
 
 export default class Editor extends Component<EditorProps, {}> {
-  private editor?: mTypes.editor.IStandaloneCodeEditor;
+  private editor?: monaco.editor.IStandaloneCodeEditor;
   private editorPromise?: Promise<void>;
 
   public componentDidMount() {
@@ -84,10 +83,10 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   private setupEditor() {
-    if (!monaco) {
+    if (!monacoVal) {
       const promise = this.editorPromise = import("../editor")
         .then(x => {
-          monaco = x;
+          monacoVal = x;
           if (this.editorPromise !== promise) return;
           this.setupEditor();
         })
@@ -102,7 +101,7 @@ export default class Editor extends Component<EditorProps, {}> {
     const base = this.base as HTMLElement;
     while (base.firstChild) base.firstChild.remove();
 
-    this.editor = monaco.editor.create(base, {
+    this.editor = monacoVal.editor.create(base, {
       roundedSelection: false,
       autoIndent: "full",
     });
@@ -111,7 +110,7 @@ export default class Editor extends Component<EditorProps, {}> {
       id: "save",
       label: "Save",
       keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+        monacoVal.KeyMod.CtrlCmd | monacoVal.KeyCode.KEY_S,
       ],
       contextMenuGroupId: "file",
       contextMenuOrder: 1.5,
@@ -167,8 +166,8 @@ export default class Editor extends Component<EditorProps, {}> {
       renderWhitespace: settings.showInvisible ? "boundary" : "none",
     });
 
-    if (monaco !== null) {
-      monaco.editor.setTheme(settings.darkMode ? "vs-dark" : "vs");
+    if (monacoVal !== null) {
+      monacoVal.editor.setTheme(settings.darkMode ? "vs-dark" : "vs");
     }
 
     // TODO: Tab size
@@ -177,8 +176,8 @@ export default class Editor extends Component<EditorProps, {}> {
   }
 
   public render() {
-    return <div class={editor_view}>
-      {monaco ? undefined : <div class={editor_placeholder}>Loading...</div>}
+    return <div class={editorView}>
+      {monacoVal ? undefined : <div class={editorPlaceholder}>Loading...</div>}
     </div>;
   }
 

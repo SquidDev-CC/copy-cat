@@ -1,8 +1,8 @@
 import { h } from "preact";
-import { dialogue_box, error_view, info_description, info_view } from "./styles.css";
+import { dialogueBox, errorView, infoDescription, infoView } from "./styles.css";
 
 const githubLink =
-  <div class={info_description}>
+  <div class={infoDescription}>
     <p>
       Think you've found a bug? Have a suggestion? Why not put it
       on <a href="https://github.com/SquidDev-CC/" title="The GitHub repository">the GitHub repo</a>?
@@ -10,19 +10,19 @@ const githubLink =
   </div>;
 
 export const UnknownError = ({ error }: { error: string }) =>
-  <div class={info_description}>
-    <div class={`${info_view} ${error_view}`}>
+  <div class={infoDescription}>
+    <div class={`${infoView} ${errorView}`}>
       <h2>An error occured</h2>
       <pre>{error}</pre>
     </div>
     {githubLink}
   </div>;
 
-export const About = () => <div class={dialogue_box}>
+export const About = () => <div class={dialogueBox}>
   <h2>About</h2>
   <p>
     Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/SquidDev-CC/CC-Tweaked"
-    target="_blank" title="CC: Tweaked's source code">CC: Tweaked</a> (based on ComputerCraft by Dan200). Here you can
+      target="_blank" title="CC: Tweaked's source code">CC: Tweaked</a> (based on ComputerCraft by Dan200). Here you can
     play with a ComputerCraft computer, write and test programs and experiment to your heart's desire, without having to
     leave your browser!
   </p>
@@ -30,14 +30,14 @@ export const About = () => <div class={dialogue_box}>
   <p>
     However, due to the limitations of Javascript, some functionality may not be 100% accurate (most notably, that to do
      with HTTP and filesystems). For even closer emulation, I'd recommend <a href="https://emux.cc/" target="_blank"
-    title="The CCEmuX emulator">CCEmuX</a>.
+      title="The CCEmuX emulator">CCEmuX</a>.
   </p>
 
   <p>
     If you need help writing a program, I'd recommend checking out the <a href="https://forums.computercraft.cc/"
-    target="_blank" title ="The CC: Tweaked forums">CC: Tweaked</a> or <a href="http://www.computercraft.info/forums2/"
-    title="The ComputerCraft forums" target="_blank">ComputerCraft</a> forums. <a
-    href="http://www.computercraft.info/wiki/Main_Page" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
+      target="_blank" title ="The CC: Tweaked forums">CC: Tweaked</a> or <a href="http://www.computercraft.info/forums2/"
+      title="The ComputerCraft forums" target="_blank">ComputerCraft</a> forums. <a
+      href="http://www.computercraft.info/wiki/Main_Page" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
     wiki</a> may also be a good source of documentation.
   </p>
 
@@ -72,18 +72,18 @@ export const About = () => <div class={dialogue_box}>
       : CC BY 4.0
     </li>
     <li>
-      Numerous Javascript libraries. A full list can be found <a href="dependencies.txt" target="_blank">in the
+      Numerous Javascript libraries. A full list can be found <a href="assets/dependencies.txt" target="_blank">in the
       dependencies list</a> or at the top of any Javascript file.
     </li>
   </ul>
 
   <pre>
     {
-`This product includes software developed by Alexey Andreev (http://teavm.org).
+      `This product includes software developed by Alexey Andreev (http://teavm.org).
 
 This product includes software developed by The Apache Software Foundation (http://www.apache.org/).
 
 This product includes software developed by Joda.org (http://www.joda.org/).`
-}
+    }
   </pre>
 </div>;
