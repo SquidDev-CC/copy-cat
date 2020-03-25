@@ -1,4 +1,4 @@
-import { ComputerActionable, LuaValue, Semaphore, TerminalData } from "cc-web-term";
+import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl2Code } from "cc-web-term";
 import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
 import type { ComputerPersistance } from "./persist";
 
@@ -271,6 +271,16 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
 
   public queueEvent(event: string, args: LuaValue[]): void {
     if (this.queueEventHandler !== undefined) this.queueEventHandler(event, args.map(x => JSON.stringify(x)));
+  }
+
+  public keyDown(key: KeyCode, repeat: boolean): void {
+    const code = lwjgl2Code(key);
+    if (code !== undefined) this.queueEvent("key", [code, repeat]);
+  }
+
+  public keyUp(key: KeyCode): void {
+    const code = lwjgl2Code(key);
+    if (code !== undefined) this.queueEvent("key_up", [code]);
   }
 
   public turnOn(): void {
