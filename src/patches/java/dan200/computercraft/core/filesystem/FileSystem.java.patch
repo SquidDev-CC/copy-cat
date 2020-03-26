@@ -1,62 +1,23 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
 +++ src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
-@@ -5,7 +5,6 @@
-  */
- package dan200.computercraft.core.filesystem;
- 
--import com.google.common.io.ByteStreams;
- import dan200.computercraft.ComputerCraft;
- import dan200.computercraft.api.filesystem.FileOperationException;
- import dan200.computercraft.api.filesystem.IFileSystem;
-@@ -19,10 +18,10 @@
+@@ -18,11 +18,12 @@
  import java.lang.ref.Reference;
  import java.lang.ref.ReferenceQueue;
  import java.lang.ref.WeakReference;
 -import java.nio.channels.Channel;
 -import java.nio.channels.ReadableByteChannel;
 -import java.nio.channels.WritableByteChannel;
--import java.nio.file.AccessDeniedException;
 +import cc.squiddev.cct.stub.ChannelHelpers;
 +import cc.squiddev.cct.stub.Channel;
 +import cc.squiddev.cct.stub.ReadableByteChannel;
 +import cc.squiddev.cct.stub.WritableByteChannel;
+ import java.nio.file.AccessDeniedException;
+-import java.nio.file.attribute.BasicFileAttributes;
++import cc.squiddev.cct.stub.BasicFileAttributes;
  import java.util.*;
  import java.util.function.Function;
  import java.util.regex.Pattern;
-@@ -214,10 +213,6 @@
-                     m_writableMount.delete( path );
-                 }
-             }
--            catch( AccessDeniedException e )
--            {
--                throw new FileSystemException( "Access denied" );
--            }
-             catch( IOException e )
-             {
-                 throw localExceptionOf( e );
-@@ -248,10 +243,6 @@
-                     return m_writableMount.openChannelForWrite( path );
-                 }
-             }
--            catch( AccessDeniedException e )
--            {
--                throw new FileSystemException( "Access denied" );
--            }
-             catch( IOException e )
-             {
-                 throw localExceptionOf( e );
-@@ -286,10 +277,6 @@
-                     return m_writableMount.openChannelForAppend( path );
-                 }
-             }
--            catch( AccessDeniedException e )
--            {
--                throw new FileSystemException( "Access denied" );
--            }
-             catch( IOException e )
-             {
-                 throw localExceptionOf( e );
-@@ -645,12 +632,8 @@
+@@ -346,12 +347,8 @@
                   WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
              {
                  // Copy bytes as fast as we can
@@ -70,7 +31,7 @@
              catch( IOException e )
              {
                  throw new FileSystemException( e.getMessage() );
-@@ -794,7 +777,7 @@
+@@ -503,7 +500,7 @@
  
          // Collapse the string into its component parts, removing ..'s
          String[] parts = path.split( "/" );
@@ -79,7 +40,7 @@
          for( String part : parts )
          {
              if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -807,32 +790,32 @@
+@@ -516,32 +513,32 @@
              if( part.equals( ".." ) )
              {
                  // .. can cancel out the last folder entered

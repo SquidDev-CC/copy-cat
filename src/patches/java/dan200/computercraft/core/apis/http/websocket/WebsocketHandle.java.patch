@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
-@@ -5,17 +5,16 @@
+@@ -5,6 +5,8 @@
   */
  package dan200.computercraft.core.apis.http.websocket;
  
@@ -8,11 +8,11 @@
 +import cc.squiddev.cct.js.WebsocketClient;
  import com.google.common.base.Objects;
  import dan200.computercraft.ComputerCraft;
- import dan200.computercraft.api.lua.ILuaContext;
- import dan200.computercraft.api.lua.ILuaObject;
+ import dan200.computercraft.api.lua.ArgumentHelper;
+@@ -13,10 +15,8 @@
  import dan200.computercraft.api.lua.LuaException;
  import dan200.computercraft.core.tracking.TrackingField;
--import dan200.computercraft.shared.util.StringUtil;
+ import dan200.computercraft.shared.util.StringUtil;
 -import io.netty.buffer.Unpooled;
 -import io.netty.channel.Channel;
 -import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -22,7 +22,7 @@
  
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
-@@ -29,11 +28,11 @@
+@@ -31,11 +31,11 @@
  public class WebsocketHandle implements ILuaObject, Closeable
  {
      private final Websocket websocket;
@@ -37,24 +37,24 @@
      {
          this.websocket = websocket;
          this.channel = channel;
-@@ -53,6 +52,8 @@
-         switch( method )
+@@ -56,6 +56,8 @@
          {
              case 0: // receive
+             {
 +                throw new LuaException("Illegal call to .receive(). This method should have been replaced.");
 +                /*
                  checkOpen();
-                 while( true )
-                 {
-@@ -66,6 +67,7 @@
+                 int timeoutId;
+                 if( arguments.length <= 0 || arguments[0] == null )
+@@ -89,6 +91,7 @@
                          return null;
                      }
                  }
 +                */
+             }
  
              case 1: // send
-             {
-@@ -80,12 +82,19 @@
+@@ -104,12 +107,19 @@
                  boolean binary = optBoolean( arguments, 1, false );
                  websocket.environment().addTrackingChange( TrackingField.WEBSOCKET_OUTGOING, text.length() );
  
@@ -78,7 +78,7 @@
                  }
  
                  return null;
-@@ -110,11 +119,16 @@
+@@ -134,11 +144,16 @@
      {
          closed = true;
  

@@ -1,0 +1,49 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
++++ src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
+@@ -11,10 +11,10 @@
+ 
+ import javax.annotation.Nonnull;
+ import java.io.IOException;
+-import java.nio.channels.ReadableByteChannel;
+-import java.nio.channels.WritableByteChannel;
++import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import java.nio.file.AccessDeniedException;
+-import java.nio.file.attribute.BasicFileAttributes;
++import cc.squiddev.cct.stub.BasicFileAttributes;
+ import java.util.List;
+ import java.util.OptionalLong;
+ 
+@@ -201,10 +201,6 @@
+                 writableMount.delete( path );
+             }
+         }
+-        catch( AccessDeniedException e )
+-        {
+-            throw new FileSystemException( "Access denied" );
+-        }
+         catch( IOException e )
+         {
+             throw localExceptionOf( e );
+@@ -235,10 +231,6 @@
+                 return writableMount.openChannelForWrite( path );
+             }
+         }
+-        catch( AccessDeniedException e )
+-        {
+-            throw new FileSystemException( "Access denied" );
+-        }
+         catch( IOException e )
+         {
+             throw localExceptionOf( e );
+@@ -273,10 +265,6 @@
+                 return writableMount.openChannelForAppend( path );
+             }
+         }
+-        catch( AccessDeniedException e )
+-        {
+-            throw new FileSystemException( "Access denied" );
+-        }
+         catch( IOException e )
+         {
+             throw localExceptionOf( e );

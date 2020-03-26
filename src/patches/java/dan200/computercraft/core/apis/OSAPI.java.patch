@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\OSAPI.java
 +++ src\main\java\dan200\computercraft\core\apis\OSAPI.java
-@@ -5,17 +5,13 @@
+@@ -5,6 +5,7 @@
   */
  package dan200.computercraft.core.apis;
  
@@ -8,18 +8,7 @@
  import dan200.computercraft.api.lua.ILuaAPI;
  import dan200.computercraft.api.lua.ILuaContext;
  import dan200.computercraft.api.lua.LuaException;
- import dan200.computercraft.shared.util.StringUtil;
- 
- import javax.annotation.Nonnull;
--import java.time.Instant;
--import java.time.ZoneId;
--import java.time.ZoneOffset;
--import java.time.ZonedDateTime;
--import java.time.format.DateTimeFormatterBuilder;
- import java.util.*;
- 
- import static dan200.computercraft.api.lua.ArgumentHelper.*;
-@@ -289,7 +285,7 @@
+@@ -240,7 +241,7 @@
                  if( value instanceof Map ) return new Object[] { LuaDateTime.fromTable( (Map<?, ?>) value ) };
  
                  String param = optString( args, 0, "ingame" );
@@ -28,7 +17,7 @@
                  {
                      case "utc":
                      {
-@@ -317,7 +313,7 @@
+@@ -268,7 +269,7 @@
              {
                  // day
                  String param = optString( args, 0, "ingame" );
@@ -37,7 +26,7 @@
                  {
                      case "utc":
                      {
-@@ -364,7 +360,7 @@
+@@ -312,7 +313,7 @@
              case 15: // epoch
              {
                  String param = optString( args, 0, "ingame" );
@@ -46,7 +35,7 @@
                  {
                      case "utc":
                      {
-@@ -391,29 +387,24 @@
+@@ -339,29 +340,24 @@
              case 16: // date
              {
                  String format = optString( args, 0, "%c" );

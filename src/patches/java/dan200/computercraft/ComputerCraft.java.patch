@@ -29,7 +29,7 @@
 +public class ComputerCraft {
      public static final String MOD_ID = "computercraft";
 -    static final String VERSION = "${version}";
-+    static final String VERSION = "1.86.1";
++    static final String VERSION = "1.86.2";
      static final String NAME = "CC: Tweaked";
  
      // Configuration options

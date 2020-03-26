@@ -22,21 +22,24 @@
      }
  
      IComputerEnvironment getComputerEnvironment()
-@@ -116,20 +114,9 @@
+@@ -116,20 +114,22 @@
          executor.queueEvent( event, args );
      }
  
 -    /**
--     * Queue a task to be run on the main thread, using {@link MainThread}.
--     *
--     * @param runnable The task to run
--     * @return If the task was successfully queued (namely, whether there is space on it).
--     */
--    public boolean queueMainThread( Runnable runnable )
--    {
--        return serverExecutor.enqueue( runnable );
--    }
--
++    /*
+      * Queue a task to be run on the main thread, using {@link MainThread}.
+      *
+      * @param runnable The task to run
+      * @return If the task was successfully queued (namely, whether there is space on it).
+      */
++    /*
+     public boolean queueMainThread( Runnable runnable )
+     {
+         return serverExecutor.enqueue( runnable );
+     }
++    */
+ 
      public IWorkMonitor getMainThreadMonitor()
      {
 -        return serverExecutor;
@@ -44,7 +47,7 @@
      }
  
      public int getID()
-@@ -161,7 +148,7 @@
+@@ -161,7 +161,7 @@
          if( !Objects.equal( label, m_label ) )
          {
              m_label = label;
@@ -53,8 +56,8 @@
          }
      }
  
-@@ -186,7 +173,7 @@
-         internalEnvironment.update();
+@@ -186,7 +186,7 @@
+         internalEnvironment.tick();
  
          // Propagate the environment's output to the world.
 -        if( internalEnvironment.updateOutput() ) externalOutputChanged.set( true );
@@ -62,7 +65,7 @@
  
          // Set output changed if the terminal has changed from blinking to not
          boolean blinking = m_terminal.getCursorBlink() &&
-@@ -195,18 +182,20 @@
+@@ -195,18 +195,20 @@
          if( blinking != m_blinking )
          {
              m_blinking = blinking;

@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IMount.java
 +++ src\main\java\dan200\computercraft\api\filesystem\IMount.java
-@@ -5,15 +5,12 @@
+@@ -5,16 +5,14 @@
   */
  package dan200.computercraft.api.filesystem;
  
@@ -11,13 +11,15 @@
  import javax.annotation.Nonnull;
  import java.io.IOException;
  import java.io.InputStream;
--import java.nio.channels.Channels;
+ import java.nio.channels.Channels;
 -import java.nio.channels.ReadableByteChannel;
+-import java.nio.file.attribute.BasicFileAttributes;
 +import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.BasicFileAttributes;
  import java.util.List;
  
  /**
-@@ -67,7 +64,7 @@
+@@ -68,7 +66,7 @@
       */
      long getSize( @Nonnull String path ) throws IOException;
  
@@ -26,7 +28,7 @@
       * Opens a file with a given path, and returns an {@link InputStream} representing its contents.
       *
       * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -75,9 +72,11 @@
+@@ -76,9 +74,11 @@
       * @throws IOException If the file does not exist, or could not be opened.
       * @deprecated Use {@link #openChannelForRead(String)} instead
       */
@@ -38,7 +40,7 @@
  
      /**
       * Opens a file with a given path, and returns an {@link ReadableByteChannel} representing its contents.
-@@ -89,8 +88,5 @@
+@@ -90,10 +90,7 @@
       * @throws IOException If the file does not exist, or could not be opened.
       */
      @Nonnull
@@ -47,4 +49,14 @@
 -        return Channels.newChannel( openForRead( path ) );
 -    }
 +    ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException;
+ 
+     /**
+      * Get attributes about the given file.
+@@ -106,6 +103,6 @@
+     default BasicFileAttributes getAttributes( @Nonnull String path ) throws IOException
+     {
+         if( !exists( path ) ) throw new FileOperationException( path, "No such file" );
+-        return new FileAttributes( isDirectory( path ), getSize( path ) );
++        return new BasicFileAttributes( isDirectory( path ), getSize( path ) );
+     }
  }
