@@ -3,7 +3,7 @@ package cc.squiddev.cct.stub;
 /**
  * @see java.nio.file.attribute.BasicFileAttributes
  */
-public class BasicFileAttributes {
+public final class BasicFileAttributes {
     private final long created;
     private final long modified;
     private final boolean isDirectory;

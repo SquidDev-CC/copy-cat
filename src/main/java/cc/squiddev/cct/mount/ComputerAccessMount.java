@@ -3,9 +3,12 @@ package cc.squiddev.cct.mount;
 import cc.squiddev.cct.js.ComputerAccess;
 import cc.squiddev.cct.js.ComputerAccess.Result;
 import cc.squiddev.cct.js.FileSystemEntry;
+import cc.squiddev.cct.js.JsFileAttributes;
+import cc.squiddev.cct.stub.BasicFileAttributes;
 import cc.squiddev.cct.stub.ReadableByteChannel;
 import cc.squiddev.cct.stub.SeekableByteChannel;
 import cc.squiddev.cct.stub.WritableByteChannel;
+import dan200.computercraft.api.filesystem.FileOperationException;
 import dan200.computercraft.api.filesystem.IWritableMount;
 import org.teavm.jso.core.JSBoolean;
 import org.teavm.jso.typedarrays.Int8Array;
@@ -32,7 +35,7 @@ public class ComputerAccessMount implements IWritableMount {
 
     @Override
     public void delete(@Nonnull String path) throws IOException {
-        if (path.isEmpty()) throw new IOException("/: Access denied");
+        if (path.isEmpty()) throw new FileOperationException("Access denied");
 
         computer.deleteEntry(path);
     }
@@ -70,14 +73,14 @@ public class ComputerAccessMount implements IWritableMount {
     @Override
     public void list(@Nonnull String path, @Nonnull List<String> contents) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
-        if (entry == null || !entry.isDirectory()) throw new IOException("/" + path + ": Not a directory");
+        if (entry == null || !entry.isDirectory()) throw new FileOperationException("Not a directory");
         Collections.addAll(contents, entry.getChildren());
     }
 
     @Override
     public long getSize(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
-        if (entry == null) throw new IOException("/" + path + ": No such file");
+        if (entry == null) throw new FileOperationException("No such file");
         return entry.isDirectory() ? 0 : entry.getContents().getLength();
     }
 
@@ -85,8 +88,17 @@ public class ComputerAccessMount implements IWritableMount {
     @Override
     public ReadableByteChannel openChannelForRead(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
-        if (entry == null || entry.isDirectory()) throw new IOException("/" + path + ": No such file");
+        if (entry == null || entry.isDirectory()) throw new FileOperationException("No such file");
         return new Int8ArrayByteChannel(entry.getContents());
+    }
+
+    @Nonnull
+    @Override
+    public BasicFileAttributes getAttributes(@Nonnull String path) throws IOException {
+        FileSystemEntry entry = computer.getEntry(path);
+        if (entry == null) throw new FileOperationException("No such file");
+        JsFileAttributes attr = entry.getAttributes();
+        return new BasicFileAttributes((long) attr.getCreation(), (long) attr.getModification(), attr.getDirectory(), (long) attr.getSize());
     }
 
     private static class Writer extends OutputStream implements SeekableByteChannel {

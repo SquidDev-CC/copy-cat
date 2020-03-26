@@ -42,4 +42,11 @@ public interface FileSystemEntry extends JSObject {
      */
     @Nonnull
     ComputerAccess.Result<JSBoolean> setContents(@Nonnull Int8Array contents);
+
+    /**
+     * Get the attrribut
+     * @return
+     */
+    @Nonnull
+    JsFileAttributes getAttributes();
 }

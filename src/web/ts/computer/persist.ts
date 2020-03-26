@@ -3,6 +3,11 @@ import * as storage from "../storage";
 
 const empty = new Int8Array(0);
 
+export type BasicAttributes = {
+  creation: number,
+  modification: number,
+}
+
 /**
  * A generic way of storing and loading computer information.
  *
@@ -25,38 +30,29 @@ export interface ComputerPersistance {
   setChildren(path: string, children: string[]): void;
 
   removeChildren(path: string): void;
+
+  getAttributes(path: string): BasicAttributes | null;
+
+  setAttributes(path: string, attributes: BasicAttributes): void;
+
+  removeAttributes(path: string): void;
 }
 
 /**
  * A persistance instance which saves nothing, useful for temporary file systems.
  */
 export class VoidPersistence implements ComputerPersistance {
-  public getLabel(): string | null {
-    return null;
-  }
-
-  public setLabel(): void {
-  }
-
-  public getContents(): Int8Array {
-    return empty;
-  }
-
-  public setContents(): void {
-  }
-
-  public removeContents(): void {
-  }
-
-  public getChildren(): string[] | null {
-    return null;
-  }
-
-  public setChildren(): void {
-  }
-
-  public removeChildren(): void {
-  }
+  public getLabel(): null { return null; }
+  public setLabel(): void { }
+  public getContents(): Int8Array { return empty; }
+  public setContents(): void { }
+  public removeContents(): void { }
+  public getChildren(): null { return null; }
+  public setChildren(): void { }
+  public removeChildren(): void { }
+  public getAttributes(): null { return null; }
+  public setAttributes(): void { }
+  public removeAttributes(): void { }
 }
 
 /**
@@ -112,5 +108,25 @@ export class StoragePersistence implements ComputerPersistance {
 
   public removeChildren(path: string): void {
     storage.remove(`${this.prefix}.files[${path}].children`);
+  }
+
+  public getAttributes(path: string): BasicAttributes | null {
+    const attributes = storage.get(`${this.prefix}.files[${path}].attributes`);
+    if (attributes === null) return null;
+
+    try {
+      return JSON.parse(attributes);
+    } catch (e) {
+      console.error(`Error loading attributes for "${path}"`);
+      return null;
+    }
+  }
+
+  public setAttributes(path: string, attr: BasicAttributes): void {
+    storage.set(`${this.prefix}.files[${path}].attributes`, JSON.stringify(attr));
+  }
+
+  public removeAttributes(path: string): void {
+    storage.remove(`${this.prefix}.files[${path}].attributes`);
   }
 }

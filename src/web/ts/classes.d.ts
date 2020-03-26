@@ -12,6 +12,16 @@ export type QueueEventHandler = (event: string, args: string[]) => void;
  */
 export type Result<T> = { value: T } | { error: string, value: null };
 
+/**
+ * Attributes about a file.
+ */
+export type FileAttributes = {
+  creation: number, /** When this file was created. */
+  modification: number, /** When this file was last modified. */
+  directory: boolean, /** Whether this file is a directory. */
+  size: number, /** The size of this file. */
+};
+
 export interface FileSystemEntry {
   /**
    * If this entry is a directory.
@@ -42,6 +52,11 @@ export interface FileSystemEntry {
    * @throws If this is not a file
    */
   setContents(contents: Int8Array): Result<true>;
+
+  /**
+   * Get the attributes for a file.
+   */
+  getAttributes(): FileAttributes;
 }
 
 /**

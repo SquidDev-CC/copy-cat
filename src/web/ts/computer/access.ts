@@ -1,6 +1,7 @@
 import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl2Code } from "cc-web-term";
 import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
-import type { ComputerPersistance } from "./persist";
+import type { BasicAttributes, ComputerPersistance } from "./persist";
+import type { FileAttributes } from "../classes";
 
 const colours = "0123456789abcdef";
 
@@ -23,16 +24,19 @@ export class FileSystemEntry implements IFileSystemEntry {
   private contents: Int8Array | null;
   private exists: boolean = true;
   private semaphore?: Semaphore;
+  private attributes: BasicAttributes;
 
-  public constructor(persistance: ComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null) {
+  public constructor(persistance: ComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null, attributes: BasicAttributes | null) {
     this.persistance = persistance;
     this.path = path;
     this.children = children;
     this.contents = contents;
+    this.attributes = attributes === null ? { modification: 0, creation: 0 } : attributes;
   }
 
   public static create(persistance: ComputerPersistance, path: string, directory: boolean) {
-    const instance = new FileSystemEntry(persistance, path, directory ? [] : null, directory ? null : empty);
+    const now = Date.now();
+    const instance = new FileSystemEntry(persistance, path, directory ? [] : null, directory ? null : empty, { creation: now, modification: now });
     instance.save();
     return instance;
   }
@@ -66,6 +70,7 @@ export class FileSystemEntry implements IFileSystemEntry {
   public setContents(contents: ArrayBuffer | string): Result<true> {
     if (this.children !== null) throw Error("Not a file");
     if (!this.exists) return { error: "File has been deleted", value: null };
+    this.attributes.modification = Date.now();
 
     if (typeof contents === "string") {
       const encoded = encoder.encode(contents);
@@ -91,6 +96,7 @@ export class FileSystemEntry implements IFileSystemEntry {
   private save(): void {
     if (this.children !== null) this.persistance.setChildren(this.path, this.children);
     if (this.contents !== null) this.persistance.setContents(this.path, this.contents);
+    this.persistance.setAttributes(this.path, this.attributes);
   }
 
   public getSemaphore(): Semaphore {
@@ -99,6 +105,11 @@ export class FileSystemEntry implements IFileSystemEntry {
 
   public doesExist(): boolean {
     return this.exists;
+  }
+
+  public getAttributes(): FileAttributes {
+    const directory = this.isDirectory();
+    return { directory, size: directory ? 0 : this.getContents().length, ...this.attributes };
   }
 }
 
@@ -135,15 +146,16 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
       if (path === undefined) break;
 
       const children = persistance.getChildren(path);
+      const attributes = persistance.getAttributes(path);
       if (children !== null) {
-        this.filesystem.set(path, new FileSystemEntry(persistance, path, children, null));
+        this.filesystem.set(path, new FileSystemEntry(persistance, path, children, null, attributes));
         for (const child of children) queue.push(joinName(path, child));
       } else if (path === "") {
         // Create a new entry
-        this.filesystem.set("", new FileSystemEntry(persistance, "", [], null));
+        this.filesystem.set("", new FileSystemEntry(persistance, "", [], null, attributes));
       } else {
         // Assume it's a file
-        this.filesystem.set(path, new FileSystemEntry(persistance, path, null, null));
+        this.filesystem.set(path, new FileSystemEntry(persistance, path, null, null, attributes));
       }
     }
   }
