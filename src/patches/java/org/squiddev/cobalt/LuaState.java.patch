@@ -1,14 +1,6 @@
 --- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaState.java
 +++ src\main\java\org\squiddev\cobalt\LuaState.java
-@@ -30,6 +30,7 @@
- import org.squiddev.cobalt.debug.DebugHandler;
- import org.squiddev.cobalt.lib.platform.FileResourceManipulator;
- import org.squiddev.cobalt.lib.platform.ResourceManipulator;
-+import org.squiddev.cobalt.lib.platform.VoidResourceManipulator;
- 
- import java.io.InputStream;
- import java.io.PrintStream;
-@@ -124,14 +125,7 @@
+@@ -123,11 +123,6 @@
  	private LuaThread mainThread;
  
  	/**
@@ -18,12 +10,9 @@
 -
 -	/**
  	 * If this state has been abandoned, and threads should be cleaned up.
--	 *
--	 * @see LuaThread#orphanCheckInterval
- 	 */
- 	boolean abandoned;
- 
-@@ -153,7 +147,6 @@
+ 	 *
+ 	 * @see LuaThread#orphanCheckInterval
+@@ -152,7 +147,6 @@
  		this.random = builder.random;
  		this.debug = builder.debug;
  		this.timezone = builder.timezone;
@@ -31,7 +20,7 @@
  	}
  
  	/**
-@@ -210,10 +203,6 @@
+@@ -209,10 +203,6 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
@@ -42,12 +31,12 @@
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
  		private LuaTable stringMetatable;
-@@ -222,12 +211,11 @@
+@@ -221,12 +211,11 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
 -		private ResourceManipulator resourceManipulator = new FileResourceManipulator();
-+		private ResourceManipulator resourceManipulator = new VoidResourceManipulator();
++		private ResourceManipulator resourceManipulator = new org.squiddev.cobalt.lib.platform.VoidResourceManipulator();
  		private LoadState.LuaCompiler compiler = LuaC.INSTANCE;
  		private Random random = new Random();
  		private DebugHandler debug = DebugHandler.INSTANCE;
@@ -56,7 +45,7 @@
  
  		/**
  		 * Build a Lua state from this builder
-@@ -391,18 +379,5 @@
+@@ -390,18 +379,5 @@
  			this.timezone = zone;
  			return this;
  		}

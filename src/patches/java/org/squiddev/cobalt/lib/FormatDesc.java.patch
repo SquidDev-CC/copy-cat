@@ -1,6 +1,6 @@
 --- original\Cobalt\src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
 +++ src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
-@@ -215,9 +215,12 @@
+@@ -239,9 +239,12 @@
  			buf.append(Character.isUpperCase(conversion) ? "INF" : "inf");
  			if (leftAdjust) pad(buf, ' ', effectiveWidth - 3);
  		} else {
@@ -13,7 +13,7 @@
  					return;
  				} catch (LinkageError ignored) {
  					useOracleFormatting = false;
-@@ -237,6 +240,7 @@
+@@ -261,6 +264,7 @@
  			format.append((char) conversion);
  
  			buf.append(String.format(format.toString(), number));

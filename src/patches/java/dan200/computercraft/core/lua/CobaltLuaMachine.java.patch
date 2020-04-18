@@ -31,7 +31,7 @@
              .build();
  
          m_globals = new LuaTable();
-@@ -258,6 +262,7 @@
+@@ -259,6 +263,7 @@
                  } );
              }
          }
@@ -39,7 +39,7 @@
          return table;
      }
  
-@@ -308,7 +313,6 @@
+@@ -309,7 +314,6 @@
              return table;
          }
  
@@ -47,7 +47,7 @@
          {
              Object[] objects = (Object[]) object;
              LuaTable table = new LuaTable( objects.length, 0 );
-@@ -317,18 +321,22 @@
+@@ -318,11 +322,15 @@
              return table;
          }
  
@@ -56,23 +56,14 @@
 +        /*
          if( ComputerCraft.logPeripheralErrors )
          {
--            ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
-+            ComputerCraft.log.warn( "Received unknown type, returning nil." );
+             ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
          }
          return Constants.NIL;
 +        */
      }
  
      private Varargs toValues( Object[] objects )
-     {
-         if( objects == null || objects.length == 0 ) return Constants.NONE;
- 
--        Map<Object, LuaValue> result = new IdentityHashMap<>( 0 );
-+        Map<Object, LuaValue> result = new HashMap<>( 0 );
-         LuaValue[] values = new LuaValue[objects.length];
-         for( int i = 0; i < values.length; i++ )
-         {
-@@ -475,7 +483,6 @@
+@@ -476,7 +484,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -80,14 +71,14 @@
              handleSoftAbort();
          }
  
-@@ -501,24 +508,26 @@
+@@ -502,24 +509,27 @@
      {
          @Nonnull
          @Override
 +        @Deprecated
          public Object[] yield( Object[] yieldArgs ) throws InterruptedException
          {
-             try
+-            try
              {
                  LuaState state = m_state;
                  if( state == null ) throw new InterruptedException();
@@ -95,11 +86,12 @@
 -                return toObjects( results, 1 );
 +                throw new IllegalStateException( "Cannot yield on a single threaded environment." );
              }
--            catch( LuaError e )
-+            catch( RuntimeException e )
++            /*
+             catch( LuaError e )
              {
                  throw new IllegalStateException( e.getMessage() );
              }
++            */
          }
  
          @Override
@@ -110,7 +102,7 @@
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -558,9 +567,12 @@
+@@ -559,9 +569,12 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }
