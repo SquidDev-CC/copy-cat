@@ -1,11 +1,14 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
-@@ -5,35 +5,21 @@
+@@ -5,14 +5,19 @@
   */
  package dan200.computercraft.core.apis.http.websocket;
  
 +import cc.squiddev.cct.js.WebsocketClient;
 +import cc.squiddev.cct.stub.Logger;
++import org.teavm.jso.typedarrays.Int8Array;
++import java.util.Map;
++
  import com.google.common.base.Strings;
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.core.apis.IAPIEnvironment;
@@ -14,33 +17,19 @@
  import dan200.computercraft.core.apis.http.Resource;
  import dan200.computercraft.core.apis.http.ResourceGroup;
  import dan200.computercraft.shared.util.IoUtil;
--import io.netty.bootstrap.Bootstrap;
--import io.netty.channel.Channel;
--import io.netty.channel.ChannelFuture;
--import io.netty.channel.ChannelInitializer;
--import io.netty.channel.ChannelPipeline;
--import io.netty.channel.socket.SocketChannel;
--import io.netty.channel.socket.nio.NioSocketChannel;
--import io.netty.handler.codec.http.HttpClientCodec;
--import io.netty.handler.codec.http.HttpHeaders;
--import io.netty.handler.codec.http.HttpObjectAggregator;
--import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
--import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
--import io.netty.handler.codec.http.websocketx.WebSocketVersion;
--import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
--import io.netty.handler.ssl.SslContext;
-+import org.teavm.jso.typedarrays.Int8Array;
++/*
+ import io.netty.bootstrap.Bootstrap;
+ import io.netty.channel.Channel;
+ import io.netty.channel.ChannelFuture;
+@@ -28,6 +33,7 @@
+ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+ import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
+ import io.netty.handler.ssl.SslContext;
++*/
  
  import java.lang.ref.WeakReference;
--import java.net.InetSocketAddress;
- import java.net.URI;
- import java.net.URISyntaxException;
--import java.util.concurrent.Future;
-+import java.util.Map;
- 
- /**
-  * Provides functionality to verify and connect to a remote websocket.
-@@ -47,16 +33,14 @@
+ import java.net.InetSocketAddress;
+@@ -51,16 +57,14 @@
      static final String CLOSE_EVENT = "websocket_closed";
      static final String MESSAGE_EVENT = "websocket_message";
  
@@ -59,7 +48,7 @@
      {
          super( limiter );
          this.environment = environment;
-@@ -106,14 +90,13 @@
+@@ -110,14 +114,13 @@
              throw new HTTPRequestException( "Invalid scheme '" + scheme + "'" );
          }
  
@@ -71,11 +60,11 @@
      {
          if( isClosed() ) return;
 -        executorFuture = NetworkUtils.EXECUTOR.submit( this::doConnect );
-+        this.doConnect();
++        doConnect();
          checkClosed();
      }
  
-@@ -124,54 +107,27 @@
+@@ -128,54 +131,28 @@
  
          try
          {
@@ -86,6 +75,18 @@
 +            client.onError(e -> ComputerCraft.log.error("Error " + e));
 +            client.setOnMessage(e -> {
 +                if (isClosed()) return;
++                Object converted;
++                if (e.isBinary()) {
++                    Int8Array array = Int8Array.create(e.getDataAsArray());
++                    byte[] contents = new byte[array.getLength()];
++                    for (int i = 0; i < contents.length; i++) contents[i] = array.get(i);
++                    converted = contents;
++                } else {
++                    converted = e.getDataAsString();
++                }
++                environment.queueEvent(MESSAGE_EVENT, new Object[]{address, converted, true});
++            });
++            client.onClose(e -> close(e.getCode(), e.getReason()));
  
 -            InetSocketAddress socketAddress = NetworkUtils.getAddress( uri.getHost(), uri.getPort(), ssl );
 -            SslContext sslContext = ssl ? NetworkUtils.getSslContext() : null;
@@ -126,19 +127,7 @@
 -                    if( !c.isSuccess() ) failure( c.cause().getMessage() );
 -                } );
 -
--            // Do an additional check for cancellation
-+                Object converted;
-+                if (e.isBinary()) {
-+                    Int8Array array = Int8Array.create(e.getDataAsArray());
-+                    byte[] contents = new byte[array.getLength()];
-+                    for (int i = 0; i < contents.length; i++) contents[i] = array.get(i);
-+                    converted = contents;
-+                } else {
-+                    converted = e.getDataAsString();
-+                }
-+                environment.queueEvent(MESSAGE_EVENT, new Object[]{address, converted, true});
-+            });
-+            client.onClose(e -> close(e.getCode(), e.getReason()));
+             // Do an additional check for cancellation
              checkClosed();
          }
 -        catch( HTTPRequestException e )
@@ -148,7 +137,7 @@
          catch( Exception e )
          {
              failure( "Could not connect" );
-@@ -179,7 +135,7 @@
+@@ -183,7 +160,7 @@
          }
      }
  
@@ -157,7 +146,7 @@
      {
          if( isClosed() ) return;
  
-@@ -201,7 +157,7 @@
+@@ -205,7 +182,7 @@
          {
              environment.queueEvent( CLOSE_EVENT, new Object[] {
                  address,
@@ -166,7 +155,7 @@
                  status < 0 ? null : status,
              } );
          }
-@@ -212,9 +168,6 @@
+@@ -216,9 +193,6 @@
      {
          super.dispose();
  
