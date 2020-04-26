@@ -11,7 +11,7 @@
  import dan200.computercraft.api.filesystem.IMount;
  import dan200.computercraft.api.filesystem.IWritableMount;
  import dan200.computercraft.api.lua.ILuaAPIFactory;
-@@ -90,6 +94,7 @@
+@@ -90,10 +94,11 @@
      guiFactory = "dan200.computercraft.client.gui.GuiConfigCC$Factory",
      dependencies = "required:forge@[14.23.4.2746,)"
  )
@@ -19,6 +19,11 @@
  public class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
+-    static final String VERSION = "${version}";
++    static final String VERSION = "1.87.0";
+     static final String NAME = "CC: Tweaked";
+ 
+     // Configuration options
 @@ -115,13 +120,11 @@
      public static boolean logPeripheralErrors = false;
  
