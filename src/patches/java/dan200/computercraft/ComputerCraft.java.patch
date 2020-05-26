@@ -20,12 +20,12 @@
  {
      public static final String MOD_ID = "computercraft";
 -    static final String VERSION = "${version}";
-+    static final String VERSION = "1.87.0";
++    static final String VERSION = "1.88.0";
      static final String NAME = "CC: Tweaked";
  
      // Configuration options
-@@ -115,13 +120,11 @@
-     public static boolean logPeripheralErrors = false;
+@@ -116,13 +121,11 @@
+     public static boolean commandRequireCreative = true;
  
      public static int computer_threads = 1;
 -    public static long maxMainGlobalTime = TimeUnit.MILLISECONDS.toNanos( 10 );
@@ -40,14 +40,15 @@
  
      public static int httpTimeout = 30000;
      public static int httpMaxRequests = 16;
-@@ -136,14 +139,12 @@
+@@ -137,7 +140,6 @@
      public static int modem_rangeDuringStorm = 64;
      public static int modem_highAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
 -    public static MonitorRenderer monitorRenderer = MonitorRenderer.BEST;
+     public static long monitorBandwidth = 1_000_000;
  
      public static boolean turtlesNeedFuel = true;
-     public static int turtleFuelLimit = 20000;
+@@ -145,7 +147,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -55,7 +56,7 @@
  
      public static final int terminalWidth_computer = 51;
      public static final int terminalHeight_computer = 19;
-@@ -154,6 +155,13 @@
+@@ -156,6 +157,13 @@
      public static final int terminalWidth_pocketComputer = 26;
      public static final int terminalHeight_pocketComputer = 20;
  
@@ -69,7 +70,7 @@
      // Blocks and Items
      public static final class Blocks
      {
-@@ -662,4 +670,5 @@
+@@ -664,4 +672,5 @@
          return server != null && server.getPlayerList().canSendCommands( player.getGameProfile() );
      }
      //endregion

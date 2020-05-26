@@ -64,11 +64,10 @@
          checkClosed();
      }
  
-@@ -128,54 +131,28 @@
+@@ -128,6 +131,25 @@
  
          try
          {
--            boolean ssl = uri.getScheme().equalsIgnoreCase( "wss" );
 +            WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
 +            client.setBinaryType("arraybuffer");
 +            client.onOpen(e -> success(client));
@@ -87,46 +86,16 @@
 +                environment.queueEvent(MESSAGE_EVENT, new Object[]{address, converted, true});
 +            });
 +            client.onClose(e -> close(e.getCode(), e.getReason()));
++            /*
+             boolean ssl = uri.getScheme().equalsIgnoreCase( "wss" );
  
--            InetSocketAddress socketAddress = NetworkUtils.getAddress( uri.getHost(), uri.getPort(), ssl );
--            SslContext sslContext = ssl ? NetworkUtils.getSslContext() : null;
--
--            // getAddress may have a slight delay, so let's perform another cancellation check.
--            if( isClosed() ) return;
--
--            connectFuture = new Bootstrap()
--                .group( NetworkUtils.LOOP_GROUP )
--                .channel( NioSocketChannel.class )
--                .handler( new ChannelInitializer<SocketChannel>()
--                {
--                    @Override
--                    protected void initChannel( SocketChannel ch )
--                    {
--                        ChannelPipeline p = ch.pipeline();
--                        if( sslContext != null )
--                        {
--                            p.addLast( sslContext.newHandler( ch.alloc(), uri.getHost(), socketAddress.getPort() ) );
--                        }
--
--                        WebSocketClientHandshaker handshaker = WebSocketClientHandshakerFactory.newHandshaker(
--                            uri, WebSocketVersion.V13, null, true, headers,
--                            ComputerCraft.httpMaxWebsocketMessage == 0 ? MAX_MESSAGE_SIZE : ComputerCraft.httpMaxWebsocketMessage
--                        );
--
--                        p.addLast(
--                            new HttpClientCodec(),
--                            new HttpObjectAggregator( 8192 ),
--                            WebSocketClientCompressionHandler.INSTANCE,
--                            new WebsocketHandler( Websocket.this, handshaker )
--                        );
--                    }
--                } )
--                .remoteAddress( socketAddress )
--                .connect()
--                .addListener( c -> {
--                    if( !c.isSuccess() ) failure( c.cause().getMessage() );
--                } );
--
+             InetSocketAddress socketAddress = NetworkUtils.getAddress( uri.getHost(), uri.getPort(), ssl );
+@@ -168,14 +190,11 @@
+                 .addListener( c -> {
+                     if( !c.isSuccess() ) failure( c.cause().getMessage() );
+                 } );
++            */
+ 
              // Do an additional check for cancellation
              checkClosed();
          }
@@ -137,7 +106,7 @@
          catch( Exception e )
          {
              failure( "Could not connect" );
-@@ -183,7 +160,7 @@
+@@ -183,7 +202,7 @@
          }
      }
  
@@ -146,7 +115,7 @@
      {
          if( isClosed() ) return;
  
-@@ -205,7 +182,7 @@
+@@ -205,7 +224,7 @@
          {
              environment.queueEvent( CLOSE_EVENT, new Object[] {
                  address,
@@ -155,7 +124,7 @@
                  status < 0 ? null : status,
              } );
          }
-@@ -216,9 +193,6 @@
+@@ -216,9 +235,6 @@
      {
          super.dispose();
  
@@ -164,4 +133,4 @@
 -
          WeakReference<WebsocketHandle> websocketHandleRef = websocketHandle;
          WebsocketHandle websocketHandle = websocketHandleRef == null ? null : websocketHandleRef.get();
-         if( websocketHandle != null ) IoUtil.closeQuietly( websocketHandle );
+         IoUtil.closeQuietly( websocketHandle );

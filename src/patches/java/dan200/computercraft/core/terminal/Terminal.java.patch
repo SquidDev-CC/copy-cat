@@ -1,24 +1,27 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\terminal\Terminal.java
 +++ src\main\java\dan200\computercraft\core\terminal\Terminal.java
-@@ -6,7 +6,6 @@
- package dan200.computercraft.core.terminal;
+@@ -7,8 +7,6 @@
  
+ import dan200.computercraft.shared.util.Colour;
  import dan200.computercraft.shared.util.Palette;
 -import net.minecraft.nbt.NBTTagCompound;
+-import net.minecraft.network.PacketBuffer;
  
  public class Terminal
  {
-@@ -336,6 +335,7 @@
+@@ -327,6 +325,7 @@
          m_changed = false;
      }
  
 +    /*
-     public synchronized NBTTagCompound writeToNBT( NBTTagCompound nbt )
+     public synchronized void write( PacketBuffer buffer )
      {
-         nbt.setInteger( "term_cursorX", m_cursorX );
-@@ -388,4 +388,5 @@
-         }
+         buffer.writeInt( m_cursorX );
+@@ -431,6 +430,7 @@
+         m_palette.readFromNBT( nbt );
          setChanged();
      }
 +    */
- }
+ 
+     public static int getColour( char c, Colour def )
+     {

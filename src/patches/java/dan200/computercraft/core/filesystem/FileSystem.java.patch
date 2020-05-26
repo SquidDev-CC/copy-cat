@@ -31,7 +31,7 @@
              catch( IOException e )
              {
                  throw new FileSystemException( e.getMessage() );
-@@ -503,7 +500,7 @@
+@@ -502,7 +499,7 @@
  
          // Collapse the string into its component parts, removing ..'s
          String[] parts = path.split( "/" );
@@ -40,7 +40,7 @@
          for( String part : parts )
          {
              if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -516,32 +513,32 @@
+@@ -515,32 +512,32 @@
              if( part.equals( ".." ) )
              {
                  // .. can cancel out the last folder entered
