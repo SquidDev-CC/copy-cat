@@ -23,7 +23,7 @@ pre {
 }
 
 .action-button {
-  composes: action-button from "cc-web-term/dist/styles.css";
+  composes: action-button from "@squid-dev/cc-web-term/dist/styles.css";
 }
 
 .tiny-text {

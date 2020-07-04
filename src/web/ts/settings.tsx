@@ -140,6 +140,13 @@ const getNumber = (x: HTMLInputElement) => {
   return Number.isNaN(v) ? undefined : v;
 };
 const getBool = (x: HTMLInputElement) => x.checked;
+const getOption = (def: string, choices: Array<{ key: string, value: string }>) => (x: HTMLInputElement) => {
+  for (const { key } of choices) {
+    if (key === x.value) return key;
+  }
+
+  return def;
+};
 
 export type SettingsProperties = {
   store: SettingStore,
@@ -179,7 +186,7 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
             case "option":
               return <label>
                 {property.name}
-                <select value={store.get(property)} onInput={getUpdater(store, property, getString)}>
+                <select value={store.get(property)} onInput={getUpdater(store, property, getOption(property.def, property.choices))}>
                   {property.choices.map(({ key, value }) => <option value={key}>{value}</option>)}
                 </select>
                 <p class={tinyText}>{property.description}</p>

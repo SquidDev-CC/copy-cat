@@ -4,8 +4,8 @@ import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
 import { actionButton, container, dialogueOverlay, infoButtons } from "./styles.css";
-import termFont from "cc-web-term/assets/term_font.png";
-import termFontHd from "cc-web-term/assets/term_font_hd.png";
+import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
+import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
 
 type MainState = {
   settings: Settings,
@@ -54,12 +54,20 @@ class Main extends Component<{}, MainState> {
       x => this.setState(s => ({ settings: { ...s.settings, darkMode: x } })),
     );
 
+    const fonts: { [font: string]: string } = {
+      "standard": termFont,
+      "hd": termFontHd,
+
+      // Add some fallbacks for previous versions.
+      [termFontHd]: termFontHd, "term_font_hd.png": termFontHd,
+      [termFont]: termFont, "term_font.png": termFont
+    }
     configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
       [
-        { key: termFont, value: "Standard font" },
-        { key: termFontHd, value: "High-definition font" },
+        { key: "standard", value: "Standard font" },
+        { key: "hd", value: "High-definition font" },
       ], "Which font the we should use within the terminal",
-      x => this.setState(s => ({ settings: { ...s.settings, terminalFont: x } })),
+      x => this.setState(s => ({ settings: { ...s.settings, terminalFont: fonts[x] || termFontHd } })),
     );
   }
 

@@ -1,4 +1,4 @@
-import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl2Code } from "cc-web-term";
+import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl2Code } from "@squid-dev/cc-web-term";
 import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
 import type { FileAttributes } from "../classes";

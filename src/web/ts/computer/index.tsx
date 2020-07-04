@@ -1,4 +1,4 @@
-import { Semaphore, Terminal, TerminalData, save as saveBlob } from "cc-web-term";
+import { Semaphore, Terminal, TerminalData, save as saveBlob } from "@squid-dev/cc-web-term";
 import type JSZip from "jszip";
 import { Component, h } from "preact";
 import newZip from "../files/zip";

@@ -1,4 +1,4 @@
-import { Styles } from "cc-web-term";
+import { Styles } from "@squid-dev/cc-web-term";
 import { VNode, h } from "preact";
 
 const mk = (child: VNode<unknown>) => {
