@@ -1,84 +1,58 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
-@@ -5,6 +5,8 @@
-  */
- package dan200.computercraft.core.apis.http.websocket;
- 
-+import cc.squiddev.cct.http.WebsocketReceiveFunction;
-+import cc.squiddev.cct.js.WebsocketClient;
- import com.google.common.base.Objects;
- import dan200.computercraft.ComputerCraft;
- import dan200.computercraft.api.lua.ArgumentHelper;
-@@ -13,10 +15,8 @@
- import dan200.computercraft.api.lua.LuaException;
+@@ -10,10 +10,8 @@
+ import dan200.computercraft.core.apis.http.options.Options;
  import dan200.computercraft.core.tracking.TrackingField;
  import dan200.computercraft.shared.util.StringUtil;
 -import io.netty.buffer.Unpooled;
 -import io.netty.channel.Channel;
 -import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 -import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-+import org.squiddev.cobalt.LuaTable;
++import cc.squiddev.cct.js.WebsocketClient;
 +import org.teavm.jso.typedarrays.Int8Array;
  
  import javax.annotation.Nonnull;
- import javax.annotation.Nullable;
-@@ -31,11 +31,11 @@
- public class WebsocketHandle implements ILuaObject, Closeable
+ import java.io.Closeable;
+@@ -35,11 +33,11 @@
  {
      private final Websocket websocket;
+     private final Options options;
 -    private boolean closed = false;
 +    public boolean closed = false;
  
 -    private Channel channel;
 +    private WebsocketClient channel;
  
--    public WebsocketHandle( Websocket websocket, Channel channel )
-+    public WebsocketHandle( Websocket websocket, WebsocketClient channel )
+-    public WebsocketHandle( Websocket websocket, Options options, Channel channel )
++    public WebsocketHandle( Websocket websocket, Options options, WebsocketClient channel )
      {
          this.websocket = websocket;
-         this.channel = channel;
-@@ -56,6 +56,8 @@
+         this.options = options;
+@@ -88,12 +86,19 @@
+ 
+         websocket.environment().addTrackingChange( TrackingField.WEBSOCKET_OUTGOING, text.length() );
+ 
+-        Channel channel = this.channel;
++        WebsocketClient channel = this.channel;
+         if( channel != null )
          {
-             case 0: // receive
-             {
-+                throw new LuaException("Illegal call to .receive(). This method should have been replaced.");
-+                /*
-                 checkOpen();
-                 int timeoutId;
-                 if( arguments.length <= 0 || arguments[0] == null )
-@@ -89,6 +91,7 @@
-                         return null;
-                     }
-                 }
-+                */
-             }
+-            channel.writeAndFlush( binary.orElse( false )
+-                ? new BinaryWebSocketFrame( Unpooled.wrappedBuffer( LuaValues.encode( text ) ) )
+-                : new TextWebSocketFrame( text ) );
++            if(binary.orElse(false)) {
++                Int8Array array = Int8Array.create(text.length());
++                for (int i = 0; i < array.getLength(); i++) {
++                    char c = text.charAt(i);
++                    array.set(i, c < 256 ? (byte) c : 63);
++                }
++                channel.send(array.getBuffer());
++            } else {
++                channel.send(text);
++            }
+         }
+     }
  
-             case 1: // send
-@@ -104,12 +107,19 @@
-                 boolean binary = optBoolean( arguments, 1, false );
-                 websocket.environment().addTrackingChange( TrackingField.WEBSOCKET_OUTGOING, text.length() );
- 
--                Channel channel = this.channel;
-+                WebsocketClient channel = this.channel;
-                 if( channel != null )
-                 {
--                    channel.writeAndFlush( binary
--                        ? new BinaryWebSocketFrame( Unpooled.wrappedBuffer( StringUtil.encodeString( text ) ) )
--                        : new TextWebSocketFrame( text ) );
-+                    if (binary) {
-+                        Int8Array array = Int8Array.create(text.length());
-+                        for (int i = 0; i < array.getLength(); i++) {
-+                            char c = text.charAt(i);
-+                            array.set(i, c < 256 ? (byte) c : 63);
-+                        }
-+                        channel.send(array.getBuffer());
-+                    } else {
-+                        channel.send(text);
-+                    }
-                 }
- 
-                 return null;
-@@ -134,11 +144,16 @@
+@@ -118,7 +123,7 @@
      {
          closed = true;
  
@@ -87,12 +61,3 @@
          if( channel != null )
          {
              channel.close();
-             this.channel = null;
-         }
-     }
-+
-+    @Override
-+    public void overwriteLuaTable(LuaTable table) {
-+        table.rawset("receive", new WebsocketReceiveFunction(this, websocket));
-+    }
- }

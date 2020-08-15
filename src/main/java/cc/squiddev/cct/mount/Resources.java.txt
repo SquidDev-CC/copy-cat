@@ -11,8 +11,8 @@ __FILES__
     @Override
     public String[] supplyResources(ResourceSupplierContext context) {
         String[] out = new String[FILES.length + 1];
-        out[0] = "assets/computercraft/lua/bios.lua";
-        for (int i = 0; i < FILES.length; i++) out[i + 1] = "assets/computercraft/lua/rom/" + FILES[i];
+        out[0] = "data/computercraft/lua/bios.lua";
+        for (int i = 0; i < FILES.length; i++) out[i + 1] = "data/computercraft/lua/rom/" + FILES[i];
         return out;
     }
 }

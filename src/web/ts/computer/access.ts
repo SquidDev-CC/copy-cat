@@ -1,4 +1,4 @@
-import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl2Code } from "@squid-dev/cc-web-term";
+import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
 import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
 import type { FileAttributes } from "../classes";
@@ -286,12 +286,12 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public keyDown(key: KeyCode, repeat: boolean): void {
-    const code = lwjgl2Code(key);
+    const code = lwjgl3Code(key);
     if (code !== undefined) this.queueEvent("key", [code, repeat]);
   }
 
   public keyUp(key: KeyCode): void {
-    const code = lwjgl2Code(key);
+    const code = lwjgl3Code(key);
     if (code !== undefined) this.queueEvent("key_up", [code]);
   }
 

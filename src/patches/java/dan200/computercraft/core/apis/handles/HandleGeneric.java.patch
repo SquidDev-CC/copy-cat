@@ -8,6 +8,6 @@
 -import java.nio.channels.SeekableByteChannel;
 +import cc.squiddev.cct.stub.Channel;
 +import cc.squiddev.cct.stub.SeekableByteChannel;
+ import java.util.Optional;
  
- import static dan200.computercraft.api.lua.ArgumentHelper.optLong;
- import static dan200.computercraft.api.lua.ArgumentHelper.optString;
+ public abstract class HandleGeneric

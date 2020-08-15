@@ -1,8 +1,8 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
 +++ src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
-@@ -11,10 +11,10 @@
- 
+@@ -12,10 +12,10 @@
  import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
  import java.io.IOException;
 -import java.nio.channels.ReadableByteChannel;
 -import java.nio.channels.WritableByteChannel;
@@ -14,7 +14,7 @@
  import java.util.List;
  import java.util.OptionalLong;
  
-@@ -201,10 +201,6 @@
+@@ -204,10 +204,6 @@
                  writableMount.delete( path );
              }
          }
@@ -24,9 +24,9 @@
 -        }
          catch( IOException e )
          {
-             throw localExceptionOf( e );
-@@ -235,10 +231,6 @@
-                 return writableMount.openChannelForWrite( path );
+             throw localExceptionOf( path, e );
+@@ -238,10 +234,6 @@
+                 return writableMount.openForWrite( path );
              }
          }
 -        catch( AccessDeniedException e )
@@ -35,9 +35,9 @@
 -        }
          catch( IOException e )
          {
-             throw localExceptionOf( e );
-@@ -273,10 +265,6 @@
-                 return writableMount.openChannelForAppend( path );
+             throw localExceptionOf( path, e );
+@@ -276,10 +268,6 @@
+                 return writableMount.openForAppend( path );
              }
          }
 -        catch( AccessDeniedException e )
@@ -46,4 +46,20 @@
 -        }
          catch( IOException e )
          {
-             throw localExceptionOf( e );
+             throw localExceptionOf( path, e );
+@@ -299,6 +287,7 @@
+             if( ex.getFilename() != null ) return localExceptionOf( ex.getFilename(), ex.getMessage() );
+         }
+ 
++        /*
+         if( e instanceof java.nio.file.FileSystemException )
+         {
+             // This error will contain the absolute path, leaking information about where MC is installed. We drop that,
+@@ -306,6 +295,7 @@
+             String message = ((java.nio.file.FileSystemException) e).getReason().trim();
+             return localPath == null ? new FileSystemException( message ) : localExceptionOf( localPath, message );
+         }
++        */
+ 
+         return new FileSystemException( e.getMessage() );
+     }

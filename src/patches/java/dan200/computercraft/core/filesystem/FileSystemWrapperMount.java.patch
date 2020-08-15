@@ -1,70 +1,13 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
 +++ src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
-@@ -5,15 +5,14 @@
-  */
- package dan200.computercraft.core.filesystem;
- 
-+import cc.squiddev.cct.stub.ReadableByteChannel;
-+import cc.squiddev.cct.stub.WritableByteChannel;
- import dan200.computercraft.api.filesystem.IFileSystem;
+@@ -9,8 +9,8 @@
  
  import javax.annotation.Nonnull;
  import java.io.IOException;
- import java.io.InputStream;
- import java.io.OutputStream;
--import java.nio.channels.Channels;
 -import java.nio.channels.ReadableByteChannel;
 -import java.nio.channels.WritableByteChannel;
++import cc.squiddev.cct.stub.ReadableByteChannel;
++import cc.squiddev.cct.stub.WritableByteChannel;
  import java.util.Collections;
  import java.util.List;
  import java.util.function.Function;
-@@ -55,7 +54,7 @@
- 
-     @Nonnull
-     @Override
--    public ReadableByteChannel openChannelForRead( @Nonnull String path ) throws IOException
-+    public ReadableByteChannel openChannelForRead(@Nonnull String path ) throws IOException
-     {
-         try
-         {
-@@ -70,7 +69,7 @@
- 
-     @Nonnull
-     @Override
--    public WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException
-+    public WritableByteChannel openChannelForWrite(@Nonnull String path ) throws IOException
-     {
-         try
-         {
-@@ -96,31 +95,7 @@
-         }
-     }
- 
--    @Nonnull
-     @Override
--    @Deprecated
--    public InputStream openForRead( @Nonnull String path ) throws IOException
--    {
--        return Channels.newInputStream( openChannelForRead( path ) );
--    }
--
--    @Nonnull
--    @Override
--    @Deprecated
--    public OutputStream openForWrite( @Nonnull String path ) throws IOException
--    {
--        return Channels.newOutputStream( openChannelForWrite( path ) );
--    }
--
--    @Nonnull
--    @Override
--    @Deprecated
--    public OutputStream openForAppend( @Nonnull String path ) throws IOException
--    {
--        return Channels.newOutputStream( openChannelForAppend( path ) );
--    }
--
--    @Override
-     public long getRemainingSpace() throws IOException
-     {
-         try

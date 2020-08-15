@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
 +++ src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
-@@ -39,12 +39,14 @@
+@@ -41,12 +41,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -13,9 +13,9 @@
      );
 +    */
  
-     private final Computer m_computer;
-     private final TimeoutState timeout;
-@@ -67,6 +69,7 @@
+     private static final LuaMethod FUNCTION_METHOD = ( target, context, args ) -> ((ILuaFunction) target).call( args );
+ 
+@@ -71,6 +73,7 @@
          LuaState state = m_state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
@@ -23,7 +23,7 @@
              .coroutineExecutor( command -> {
                  Tracking.addValue( m_computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
-@@ -80,6 +83,7 @@
+@@ -84,6 +87,7 @@
                      }
                  } );
              } )
@@ -31,39 +31,34 @@
              .build();
  
          m_globals = new LuaTable();
-@@ -259,6 +263,7 @@
-                 } );
-             }
-         }
-+        object.overwriteLuaTable( table );
-         return table;
-     }
- 
-@@ -309,7 +314,6 @@
-             return table;
-         }
- 
--        if( object instanceof Object[] )
+@@ -122,7 +126,7 @@
+         LuaTable table = wrapLuaObject( api );
+         if( table == null )
          {
-             Object[] objects = (Object[]) object;
-             LuaTable table = new LuaTable( objects.length, 0 );
-@@ -318,11 +322,15 @@
-             return table;
+-            ComputerCraft.log.warn( "API {} does not provide any methods", api );
++            ComputerCraft.log.warn( "API does not provide any methods" );
+             table = new LuaTable();
          }
  
-+        // String[] is not an instance of Object[] under TeaVM. So instead, we abuse the lack of
-+        // cast assertions and just assume what we're doing is correct.
-+        /*
-         if( ComputerCraft.logPeripheralErrors )
+@@ -237,7 +241,7 @@
+             table.rawset( method, new ResultInterpreterFunction( this, LuaMethod.DYNAMIC.get( i ), object, context, method ) );
+         }
+ 
+-        ObjectSource.allMethods( LuaMethod.GENERATOR, object, ( instance, method ) ->
++        ObjectSource.allMethods( object, ( instance, method ) ->
+             table.rawset( method.getName(), method.nonYielding()
+                 ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
+                 : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
+@@ -332,7 +336,7 @@
+ 
+         if( ComputerCraft.logComputerErrors )
          {
-             ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
+-            ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
++            ComputerCraft.log.warn( "Received unknown type returning nil." );
          }
          return Constants.NIL;
-+        */
      }
- 
-     private Varargs toValues( Object[] objects )
-@@ -476,7 +484,6 @@
+@@ -487,7 +491,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -71,47 +66,20 @@
              handleSoftAbort();
          }
  
-@@ -502,24 +509,27 @@
-     {
-         @Nonnull
+@@ -514,6 +517,8 @@
          @Override
-+        @Deprecated
-         public Object[] yield( Object[] yieldArgs ) throws InterruptedException
-         {
--            try
-             {
-                 LuaState state = m_state;
-                 if( state == null ) throw new InterruptedException();
--                Varargs results = LuaThread.yieldBlocking( state, toValues( yieldArgs ) );
--                return toObjects( results, 1 );
-+                throw new IllegalStateException( "Cannot yield on a single threaded environment." );
-             }
-+            /*
-             catch( LuaError e )
-             {
-                 throw new IllegalStateException( e.getMessage() );
-             }
-+            */
-         }
- 
-         @Override
-+        @Deprecated
          public long issueMainThreadTask( @Nonnull final ILuaTask task ) throws LuaException
          {
++            throw new LuaException("Cannot throw main-thread task");
 +            /*
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -559,9 +569,12 @@
+@@ -553,6 +558,7 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }
 +            */
-+            throw new LuaException("Cannot issue tasks on a single threaded environment.");
          }
+     }
  
-         @Override
-+        @Deprecated
-         public Object[] executeMainThreadTask( @Nonnull final ILuaTask task ) throws LuaException, InterruptedException
-         {
-             // Issue task

@@ -1,44 +1,26 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\FSAPI.java
 +++ src\main\java\dan200\computercraft\core\apis\FSAPI.java
-@@ -19,10 +19,10 @@
+@@ -19,9 +19,9 @@
  
- import javax.annotation.Nonnull;
  import java.io.BufferedReader;
--import java.io.BufferedWriter;
+ import java.io.BufferedWriter;
 -import java.nio.channels.ReadableByteChannel;
 -import java.nio.channels.WritableByteChannel;
 -import java.nio.file.attribute.BasicFileAttributes;
-+import java.io.Writer;
 +import cc.squiddev.cct.stub.ReadableByteChannel;
 +import cc.squiddev.cct.stub.WritableByteChannel;
 +import cc.squiddev.cct.stub.BasicFileAttributes;
  import java.nio.file.attribute.FileTime;
  import java.util.HashMap;
  import java.util.Map;
-@@ -251,13 +251,13 @@
-                         case "w":
-                         {
-                             // Open the file for writing, then create a wrapper around the writer
--                            FileSystemWrapper<BufferedWriter> writer = m_fileSystem.openForWrite( path, false, EncodedWritableHandle::openUtf8 );
-+                            FileSystemWrapper<Writer> writer = m_fileSystem.openForWrite( path, false, EncodedWritableHandle::openUtf8 );
-                             return new Object[] { new EncodedWritableHandle( writer.get(), writer ) };
-                         }
-                         case "a":
-                         {
-                             // Open the file for appending, then create a wrapper around the writer
--                            FileSystemWrapper<BufferedWriter> writer = m_fileSystem.openForWrite( path, true, EncodedWritableHandle::openUtf8 );
-+                            FileSystemWrapper<Writer> writer = m_fileSystem.openForWrite( path, true, EncodedWritableHandle::openUtf8 );
-                             return new Object[] { new EncodedWritableHandle( writer.get(), writer ) };
-                         }
-                         case "rb":
-@@ -360,8 +360,8 @@
-                 {
-                     BasicFileAttributes attributes = m_fileSystem.getAttributes( path );
-                     Map<String, Object> result = new HashMap<>();
--                    result.put( "modification", getFileTime( attributes.lastModifiedTime() ) );
--                    result.put( "created", getFileTime( attributes.creationTime() ) );
-+                    result.put( "modification", attributes.lastModifiedTime() );
-+                    result.put( "created", attributes.creationTime() );
-                     result.put( "size", attributes.isDirectory() ? 0 : attributes.size() );
-                     result.put( "isDir", attributes.isDirectory() );
-                     return new Object[] { result };
+@@ -491,8 +491,8 @@
+         }
+     }
+ 
+-    private static long getFileTime( FileTime time )
++    private static long getFileTime( long time )
+     {
+-        return time == null ? 0 : time.toMillis();
++        return time;
+     }
+ }

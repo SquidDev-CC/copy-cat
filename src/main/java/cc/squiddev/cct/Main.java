@@ -10,7 +10,6 @@ import cc.squiddev.cct.stub.Logger;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
-import dan200.computercraft.core.apis.http.websocket.Websocket;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.computer.IComputerEnvironment;
 import dan200.computercraft.core.terminal.Terminal;
@@ -18,16 +17,14 @@ import dan200.computercraft.shared.util.Palette;
 
 import java.io.InputStream;
 
+import static dan200.computercraft.ComputerCraft.computerTermHeight;
+import static dan200.computercraft.ComputerCraft.computerTermWidth;
+
 public class Main implements IComputerEnvironment {
     public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
-
-    private static int width = ComputerCraft.terminalWidth_computer;
-    private static int height = ComputerCraft.terminalHeight_computer;
-
     private long ticks;
 
     public static void main(String[] args) {
-        ComputerCraft.log = Logger.INSTANCE;
         setupConfig();
         new Main().run();
     }
@@ -35,7 +32,7 @@ public class Main implements IComputerEnvironment {
     public void run() {
         TerminalMonitor terminalMonitor = new TerminalMonitor();
 
-        Terminal terminal = new Terminal(width, height, terminalMonitor);
+        Terminal terminal = new Terminal(computerTermWidth, computerTermHeight, terminalMonitor);
         Computer computer = new Computer(this, terminal, 0);
 
         ComputerAccess computerAccess = Callbacks.computer();
@@ -58,8 +55,8 @@ public class Main implements IComputerEnvironment {
                 computerAccess.setState(computer.getLabel(), computer.isOn());
             }
 
-            if (terminal.getWidth() != width || terminal.getHeight() != height) {
-                terminal.resize(width, height);
+            if (terminal.getWidth() != computerTermWidth || terminal.getHeight() != computerTermHeight) {
+                terminal.resize(computerTermWidth, computerTermHeight);
                 computer.queueEvent("term_resize", null);
             }
 
@@ -117,6 +114,11 @@ public class Main implements IComputerEnvironment {
     }
 
     @Override
+    public String getUserAgent() {
+        return ComputerCraft.MOD_ID + "/" + ComputerCraft.getVersion();
+    }
+
+    @Override
     public int assignNewID() {
         return 0;
     }
@@ -128,16 +130,16 @@ public class Main implements IComputerEnvironment {
 
     @Override
     public IMount createResourceMount(String domain, String subPath) {
-        return new ResourceMount("assets/" + domain + "/" + subPath);
+        return new ResourceMount("data/" + domain + "/" + subPath);
     }
 
     @Override
     public InputStream createResourceFile(String domain, String subPath) {
-        return ComputerCraft.class.getClassLoader().getResourceAsStream("assets/" + domain + "/" + subPath);
+        return ComputerCraft.class.getClassLoader().getResourceAsStream("data/" + domain + "/" + subPath);
     }
 
     private static void setupConfig() {
-        ComputerCraft.logPeripheralErrors = true;
+        ComputerCraft.logComputerErrors = true;
 
         ConfigGroup general = Callbacks.config("ComputerCraft", null);
 
@@ -146,46 +148,46 @@ public class Main implements IComputerEnvironment {
             x -> ComputerCraft.maximumFilesOpen = x
         );
 
-        general.addBoolean("disable_lua51_features", "Disable Lua 5.1 features", ComputerCraft.disable_lua51_features,
+        general.addBoolean("disable_lua51_features", "Disable Lua 5.1 features", ComputerCraft.disableLua51Features,
             "Set this to true to disable Lua 5.1 functions that will be removed in a future " +
                 "update. Useful for ensuring forward compatibility of your programs now.",
-            x -> ComputerCraft.disable_lua51_features = x
+            x -> ComputerCraft.disableLua51Features = x
         );
 
-        general.addString("default_computer_settings", "Default computer settings", ComputerCraft.default_computer_settings,
+        general.addString("default_computer_settings", "Default computer settings", ComputerCraft.defaultComputerSettings,
             "A comma separated list of default system settings to set on new computers. Example: " +
                 "\"shell.autocomplete=false,lua.autocomplete=false,edit.autocomplete=false\" will disable all autocompletion",
-            x -> ComputerCraft.default_computer_settings = x
+            x -> ComputerCraft.defaultComputerSettings = x
         );
 
-        general.addBoolean("debug_enabled", "Debug enabled", ComputerCraft.debug_enable,
+        general.addBoolean("debug_enabled", "Debug enabled", ComputerCraft.debugEnable,
             "Enable Lua's debug library. This is sandboxed to each computer, so is generally safe to be used by players.",
-            x -> ComputerCraft.debug_enable = x
+            x -> ComputerCraft.debugEnable = x
         );
 
         ConfigGroup terminal = Callbacks.config("Terminal", "Configure the terminal display");
 
-        terminal.addInt("terminal.width", "Width", ComputerCraft.terminalWidth_computer, 1, 100,
+        terminal.addInt("terminal.width", "Width", computerTermWidth, 1, 100,
             "The width of the computer's terminal",
-            x -> width = x
+            x -> computerTermWidth = x
         );
 
-        terminal.addInt("terminal.height", "Height", ComputerCraft.terminalHeight_computer, 1, 100,
+        terminal.addInt("terminal.height", "Height", computerTermHeight, 1, 100,
             "The height of the computer's terminal",
-            x -> height = x
+            a -> computerTermHeight = a
         );
 
         ConfigGroup http = Callbacks.config("HTTP API", "Controls the HTTP API");
 
-        http.addBoolean("http.enabled", "Enabled", ComputerCraft.http_enable,
+        http.addBoolean("http.enabled", "Enabled", ComputerCraft.httpEnabled,
             "Enable the \"http\" API on Computers (see \"http_whitelist\" and \"http_blacklist\" for " +
                 "more fine grained control than this)",
-            x -> ComputerCraft.http_enable = x
+            x -> ComputerCraft.httpEnabled = x
         );
 
-        http.addBoolean("http.websocket_enabled", "Websocket enabled", ComputerCraft.http_websocket_enable,
+        http.addBoolean("http.websocket_enabled", "Websocket enabled", ComputerCraft.httpWebsocketEnabled,
             "Enable use of http websockets. This requires the \"http_enable\" option to also be true.",
-            x -> ComputerCraft.http_websocket_enable = x
+            x -> ComputerCraft.httpWebsocketEnabled = x
         );
 
         http.addInt("http.max_requests", "Maximum concurrent requests", ComputerCraft.httpMaxRequests, 0, Integer.MAX_VALUE,
@@ -194,26 +196,9 @@ public class Main implements IComputerEnvironment {
             x -> ComputerCraft.httpMaxRequests = x
         );
 
-        http.addInt("http.max_download", "Maximum response size", (int) ComputerCraft.httpMaxDownload, 0, Integer.MAX_VALUE,
-            "The maximum size (in bytes) that a computer can download in a single request. " +
-                "Note that responses may receive more data than allowed, but this data will not be returned to the client.",
-            x -> ComputerCraft.httpMaxDownload = x
-        );
-
-        http.addInt("http.max_upload", "Maximum request size", (int) ComputerCraft.httpMaxUpload, 0, Integer.MAX_VALUE,
-            "The maximum size (in bytes) that a computer can upload in a single request. This " +
-                "includes headers and POST text.",
-            x -> ComputerCraft.httpMaxUpload = x
-        );
-
         http.addInt("http.max_websockets", "Maximum concurrent websockets", ComputerCraft.httpMaxWebsockets, 1, Integer.MAX_VALUE,
             "The number of websockets a computer can have open at one time. Set to 0 for unlimited.",
             x -> ComputerCraft.httpMaxWebsockets = x
-        );
-
-        http.addInt("http.max_websocket_message", "Maximum websocket message size", ComputerCraft.httpMaxWebsocketMessage, 0, Websocket.MAX_MESSAGE_SIZE,
-            "The maximum size (in bytes) that a computer can send or receive in one websocket packet.",
-            x -> ComputerCraft.httpMaxWebsocketMessage = x
         );
 
         http.addString("http.proxy", "Proxy", corsProxy,

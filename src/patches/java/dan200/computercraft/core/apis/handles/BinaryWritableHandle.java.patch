@@ -1,32 +1,29 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
-@@ -15,9 +15,8 @@
- import java.io.Closeable;
+@@ -14,8 +14,8 @@
  import java.io.IOException;
  import java.nio.ByteBuffer;
--import java.nio.channels.FileChannel;
+ import java.nio.channels.FileChannel;
 -import java.nio.channels.SeekableByteChannel;
 -import java.nio.channels.WritableByteChannel;
 +import cc.squiddev.cct.stub.SeekableByteChannel;
 +import cc.squiddev.cct.stub.WritableByteChannel;
+ import java.util.Optional;
  
- public class BinaryWritableHandle extends HandleGeneric
- {
-@@ -82,17 +81,10 @@
-                 }
-             case 1: // flush
-                 checkOpen();
--                try
-                 {
-                     // Technically this is not needed
--                    if( m_writer instanceof FileChannel ) ((FileChannel) m_writer).force( false );
--
-                     return null;
-                 }
--                catch( IOException e )
--                {
--                    return null;
--                }
-             case 2: // close
-                 checkOpen();
-                 close();
+ /**
+@@ -96,6 +96,7 @@
+     public final void flush() throws LuaException
+     {
+         checkOpen();
++        /*
+         try
+         {
+             // Technically this is not needed
+@@ -104,6 +105,7 @@
+         catch( IOException ignored )
+         {
+         }
++        */
+     }
+ 
+     public static class Seekable extends BinaryWritableHandle

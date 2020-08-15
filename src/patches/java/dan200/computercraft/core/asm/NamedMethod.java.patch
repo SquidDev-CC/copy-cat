@@ -1,0 +1,11 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\NamedMethod.java
++++ src\main\java\dan200\computercraft\core\asm\NamedMethod.java
+@@ -14,7 +14,7 @@
+     private final T method;
+     private final boolean nonYielding;
+ 
+-    NamedMethod( String name, T method, boolean nonYielding )
++    public NamedMethod( String name, T method, boolean nonYielding )
+     {
+         this.name = name;
+         this.method = method;

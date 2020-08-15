@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
 +++ src\main\java\dan200\computercraft\api\filesystem\IWritableMount.java
-@@ -5,15 +5,13 @@
+@@ -5,14 +5,12 @@
   */
  package dan200.computercraft.api.filesystem;
  
@@ -11,69 +11,8 @@
  import javax.annotation.Nonnull;
  import java.io.IOException;
  import java.io.OutputStream;
- import java.nio.channels.Channels;
 -import java.nio.channels.WritableByteChannel;
 +import cc.squiddev.cct.stub.WritableByteChannel;
  import java.util.OptionalLong;
  
  /**
-@@ -46,7 +44,7 @@
-      */
-     void delete( @Nonnull String path ) throws IOException;
- 
--    /**
-+    /*
-      * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
-      *
-      * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -54,9 +52,11 @@
-      * @throws IOException If the file could not be opened for writing.
-      * @deprecated Use {@link #openChannelForWrite(String)} instead.
-      */
-+    /*
-     @Nonnull
-     @Deprecated
-     OutputStream openForWrite( @Nonnull String path ) throws IOException;
-+    */
- 
-     /**
-      * Opens a file with a given path, and returns an {@link OutputStream} for writing to it.
-@@ -67,12 +67,9 @@
-      * @throws IOException If the file could not be opened for writing.
-      */
-     @Nonnull
--    default WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException
--    {
--        return Channels.newChannel( openForWrite( path ) );
--    }
-+    WritableByteChannel openChannelForWrite( @Nonnull String path ) throws IOException;
- 
--    /**
-+    /*
-      * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
-      *
-      * @param path A file path in normalised format, relative to the mount location. ie: "programs/myprogram".
-@@ -80,9 +77,11 @@
-      * @throws IOException If the file could not be opened for writing.
-      * @deprecated Use {@link #openChannelForAppend(String)} instead.
-      */
-+    /*
-     @Nonnull
-     @Deprecated
-     OutputStream openForAppend( @Nonnull String path ) throws IOException;
-+    */
- 
-     /**
-      * Opens a file with a given path, and returns an {@link OutputStream} for appending to it.
-@@ -93,10 +92,7 @@
-      * @throws IOException If the file could not be opened for writing.
-      */
-     @Nonnull
--    default WritableByteChannel openChannelForAppend( @Nonnull String path ) throws IOException
--    {
--        return Channels.newChannel( openForAppend( path ) );
--    }
-+    WritableByteChannel openChannelForAppend( @Nonnull String path ) throws IOException;
- 
-     /**
-      * Get the amount of free space on the mount, in bytes. You should decrease this value as the user writes to the

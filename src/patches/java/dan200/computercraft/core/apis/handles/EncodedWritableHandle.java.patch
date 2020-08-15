@@ -1,61 +1,42 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
 +++ src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
-@@ -13,23 +13,24 @@
+@@ -5,6 +5,7 @@
+  */
+ package dan200.computercraft.core.apis.handles;
+ 
++import cc.squiddev.cct.stub.WritableByteChannel;
+ import dan200.computercraft.api.lua.IArguments;
+ import dan200.computercraft.api.lua.LuaException;
+ import dan200.computercraft.api.lua.LuaFunction;
+@@ -14,12 +15,7 @@
+ import java.io.BufferedWriter;
  import java.io.Closeable;
  import java.io.IOException;
- import java.nio.channels.Channels;
+-import java.nio.channels.Channels;
 -import java.nio.channels.WritableByteChannel;
-+import java.io.OutputStreamWriter;
-+import java.io.Writer;
-+import cc.squiddev.cct.stub.WritableByteChannel;
- import java.nio.charset.Charset;
- import java.nio.charset.CharsetEncoder;
- import java.nio.charset.CodingErrorAction;
+-import java.nio.charset.Charset;
+-import java.nio.charset.CharsetEncoder;
+-import java.nio.charset.CodingErrorAction;
 -import java.nio.charset.StandardCharsets;
++import java.io.OutputStreamWriter;
  
- public class EncodedWritableHandle extends HandleGeneric
- {
--    private BufferedWriter m_writer;
-+    private Writer m_writer;
+ /**
+  * A file handle opened by {@link dan200.computercraft.core.apis.FSAPI#open} using the {@code "w"} or {@code "a"} modes.
+@@ -101,9 +97,10 @@
  
--    public EncodedWritableHandle( @Nonnull BufferedWriter writer, @Nonnull Closeable closable )
-+    public EncodedWritableHandle( @Nonnull Writer writer, @Nonnull Closeable closable )
-     {
-         super( closable );
-         m_writer = writer;
-     }
- 
--    public EncodedWritableHandle( @Nonnull BufferedWriter writer )
-+    public EncodedWritableHandle( @Nonnull Writer writer )
-     {
-         this( writer, writer );
-     }
-@@ -72,7 +73,7 @@
-                 try
-                 {
-                     m_writer.write( text, 0, text.length() );
--                    m_writer.newLine();
-+                    m_writer.write( '\n' );
-                     return null;
-                 }
-                 catch( IOException e )
-@@ -101,9 +102,9 @@
-     }
- 
- 
--    public static BufferedWriter openUtf8( WritableByteChannel channel )
-+    public static Writer openUtf8(WritableByteChannel channel )
+     public static BufferedWriter openUtf8( WritableByteChannel channel )
      {
 -        return open( channel, StandardCharsets.UTF_8 );
-+        return new OutputStreamWriter(channel.asOutputStream());
++        return new BufferedWriter(new OutputStreamWriter(channel.asOutputStream()));
      }
  
++    /*
      public static BufferedWriter open( WritableByteChannel channel, Charset charset )
-@@ -113,6 +114,6 @@
-         CharsetEncoder encoder = charset.newEncoder()
-             .onMalformedInput( CodingErrorAction.REPLACE )
+     {
+         // Create a charset encoder with the same properties as StreamEncoder does for
+@@ -113,4 +110,5 @@
              .onUnmappableCharacter( CodingErrorAction.REPLACE );
--        return new BufferedWriter( Channels.newWriter( channel, encoder, -1 ) );
-+        return new BufferedWriter( Channels.newWriter( null, encoder, -1 ) );
+         return new BufferedWriter( Channels.newWriter( channel, encoder, -1 ) );
      }
++    */
  }

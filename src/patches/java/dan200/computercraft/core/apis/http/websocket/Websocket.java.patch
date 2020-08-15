@@ -1,35 +1,33 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
 +++ src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
-@@ -5,14 +5,19 @@
-  */
- package dan200.computercraft.core.apis.http.websocket;
- 
-+import cc.squiddev.cct.js.WebsocketClient;
-+import cc.squiddev.cct.stub.Logger;
-+import org.teavm.jso.typedarrays.Int8Array;
-+import java.util.Map;
-+
- import com.google.common.base.Strings;
+@@ -9,11 +9,11 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.core.apis.IAPIEnvironment;
  import dan200.computercraft.core.apis.http.HTTPRequestException;
 -import dan200.computercraft.core.apis.http.NetworkUtils;
  import dan200.computercraft.core.apis.http.Resource;
  import dan200.computercraft.core.apis.http.ResourceGroup;
+ import dan200.computercraft.core.apis.http.options.Options;
  import dan200.computercraft.shared.util.IoUtil;
 +/*
  import io.netty.bootstrap.Bootstrap;
  import io.netty.channel.Channel;
  import io.netty.channel.ChannelFuture;
-@@ -28,6 +33,7 @@
+@@ -29,7 +29,13 @@
  import io.netty.handler.codec.http.websocketx.WebSocketVersion;
  import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
  import io.netty.handler.ssl.SslContext;
 +*/
  
++import cc.squiddev.cct.js.WebsocketClient;
++import dan200.computercraft.core.apis.http.options.Action;
++import org.teavm.jso.typedarrays.Int8Array;
++import java.util.Map;
++
  import java.lang.ref.WeakReference;
  import java.net.InetSocketAddress;
-@@ -51,16 +57,14 @@
+ import java.net.URI;
+@@ -52,16 +58,14 @@
      static final String CLOSE_EVENT = "websocket_closed";
      static final String MESSAGE_EVENT = "websocket_message";
  
@@ -48,14 +46,7 @@
      {
          super( limiter );
          this.environment = environment;
-@@ -110,14 +114,13 @@
-             throw new HTTPRequestException( "Invalid scheme '" + scheme + "'" );
-         }
- 
--        NetworkUtils.checkHost( uri.getHost() );
-         return uri;
-     }
- 
+@@ -117,7 +121,7 @@
      public void connect()
      {
          if( isClosed() ) return;
@@ -64,13 +55,13 @@
          checkClosed();
      }
  
-@@ -128,6 +131,25 @@
+@@ -128,6 +132,25 @@
  
          try
          {
 +            WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
 +            client.setBinaryType("arraybuffer");
-+            client.onOpen(e -> success(client));
++            client.onOpen(e -> success(client, Action.ALLOW.toPartial().toOptions()));
 +            client.onError(e -> ComputerCraft.log.error("Error " + e));
 +            client.setOnMessage(e -> {
 +                if (isClosed()) return;
@@ -83,14 +74,14 @@
 +                } else {
 +                    converted = e.getDataAsString();
 +                }
-+                environment.queueEvent(MESSAGE_EVENT, new Object[]{address, converted, true});
++                environment.queueEvent(MESSAGE_EVENT, address, converted, true);
 +            });
 +            client.onClose(e -> close(e.getCode(), e.getReason()));
 +            /*
              boolean ssl = uri.getScheme().equalsIgnoreCase( "wss" );
  
              InetSocketAddress socketAddress = NetworkUtils.getAddress( uri.getHost(), uri.getPort(), ssl );
-@@ -168,14 +190,11 @@
+@@ -169,14 +192,11 @@
                  .addListener( c -> {
                      if( !c.isSuccess() ) failure( c.cause().getMessage() );
                  } );
@@ -106,25 +97,16 @@
          catch( Exception e )
          {
              failure( "Could not connect" );
-@@ -183,7 +202,7 @@
+@@ -184,7 +204,7 @@
          }
      }
  
--    void success( Channel channel )
-+    void success( WebsocketClient channel )
+-    void success( Channel channel, Options options )
++    void success( WebsocketClient channel, Options options )
      {
          if( isClosed() ) return;
  
-@@ -205,7 +224,7 @@
-         {
-             environment.queueEvent( CLOSE_EVENT, new Object[] {
-                 address,
--                Strings.isNullOrEmpty( reason ) ? null : reason,
-+                reason == null || reason.isEmpty() ? null : reason,
-                 status < 0 ? null : status,
-             } );
-         }
-@@ -216,9 +235,6 @@
+@@ -215,9 +235,6 @@
      {
          super.dispose();
  

@@ -16,6 +16,11 @@ public final class Logger {
         System.err.println("[WARN] " + message);
     }
 
+    public void warn(String message, Object... args) {
+        warn(message + " " + Arrays.toString(args));
+        checkException(args);
+    }
+
     public void warn(String message, Throwable throwable) {
         System.err.println("[WARN] " + message);
         throwable.printStackTrace();
@@ -23,10 +28,22 @@ public final class Logger {
 
     public void error(String message, Object... args) {
         System.err.println("[ERROR] " + message + " " + Arrays.toString(args));
+        checkException(args);
     }
 
     public void error(String message, Throwable throwable) {
         System.err.println("[ERROR] " + message);
         throwable.printStackTrace();
+    }
+
+    public void debug(String message, Object... args) {
+        System.err.println("[DEBUG] " + message + " " + Arrays.toString(args));
+        checkException(args);
+    }
+
+    private static void checkException(Object[] args) {
+        if (args.length > 0 && args[args.length - 1] instanceof Throwable) {
+            ((Throwable) args[args.length - 1]).printStackTrace();
+        }
     }
 }

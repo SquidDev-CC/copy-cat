@@ -1,93 +1,38 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingField.java
 +++ src\main\java\dan200\computercraft\core\tracking\TrackingField.java
-@@ -5,12 +5,9 @@
-  */
- package dan200.computercraft.core.tracking;
- 
--import dan200.computercraft.shared.util.StringUtil;
--
+@@ -8,7 +8,7 @@
  import java.util.Collections;
  import java.util.HashMap;
  import java.util.Map;
 -import java.util.function.LongFunction;
++import java.util.function.Function;
  
  public final class TrackingField
  {
-@@ -18,31 +15,30 @@
- 
-     private static final Map<String, TrackingField> fields = new HashMap<>();
- 
--    public static final TrackingField TASKS = TrackingField.of( "tasks", "Tasks", x -> String.format( "%4d", x ) );
--    public static final TrackingField TOTAL_TIME = TrackingField.of( "total", "Total time", x -> String.format( "%7.1fms", x / 1e6 ) );
--    public static final TrackingField AVERAGE_TIME = TrackingField.of( "average", "Average time", x -> String.format( "%4.1fms", x / 1e6 ) );
--    public static final TrackingField MAX_TIME = TrackingField.of( "max", "Max time", x -> String.format( "%5.1fms", x / 1e6 ) );
-+    public static final TrackingField TASKS = TrackingField.of( "tasks", "Tasks" );
-+    public static final TrackingField TOTAL_TIME = TrackingField.of( "total", "Total time" );
-+    public static final TrackingField AVERAGE_TIME = TrackingField.of( "average", "Average time" );
-+    public static final TrackingField MAX_TIME = TrackingField.of( "max", "Max time" );
- 
--    public static final TrackingField SERVER_COUNT = TrackingField.of( "server_count", "Server task count", x -> String.format( "%4d", x ) );
--    public static final TrackingField SERVER_TIME = TrackingField.of( "server_time", "Server task time", x -> String.format( "%7.1fms", x / 1e6 ) );
-+    public static final TrackingField SERVER_COUNT = TrackingField.of( "server_count", "Server task count" );
-+    public static final TrackingField SERVER_TIME = TrackingField.of( "server_time", "Server task time" );
- 
--    public static final TrackingField PERIPHERAL_OPS = TrackingField.of( "peripheral", "Peripheral calls", TrackingField::formatDefault );
--    public static final TrackingField FS_OPS = TrackingField.of( "fs", "Filesystem operations", TrackingField::formatDefault );
--    public static final TrackingField TURTLE_OPS = TrackingField.of( "turtle", "Turtle operations", TrackingField::formatDefault );
-+    public static final TrackingField PERIPHERAL_OPS = TrackingField.of( "peripheral", "Peripheral calls" );
-+    public static final TrackingField FS_OPS = TrackingField.of( "fs", "Filesystem operations" );
-+    public static final TrackingField TURTLE_OPS = TrackingField.of( "turtle", "Turtle operations" );
- 
--    public static final TrackingField HTTP_REQUESTS = TrackingField.of( "http", "HTTP requests", TrackingField::formatDefault );
--    public static final TrackingField HTTP_UPLOAD = TrackingField.of( "http_upload", "HTTP upload", TrackingField::formatBytes );
--    public static final TrackingField HTTP_DOWNLOAD = TrackingField.of( "http_download", "HTTP download", TrackingField::formatBytes );
-+    public static final TrackingField HTTP_REQUESTS = TrackingField.of( "http", "HTTP requests" );
-+    public static final TrackingField HTTP_UPLOAD = TrackingField.of( "http_upload", "HTTP upload" );
-+    public static final TrackingField HTTP_DOWNLOAD = TrackingField.of( "http_download", "HTTP download" );
- 
--    public static final TrackingField WEBSOCKET_INCOMING = TrackingField.of( "websocket_incoming", "Websocket incoming", TrackingField::formatBytes );
--    public static final TrackingField WEBSOCKET_OUTGOING = TrackingField.of( "websocket_outgoing", "Websocket outgoing", TrackingField::formatBytes );
-+    public static final TrackingField WEBSOCKET_INCOMING = TrackingField.of( "websocket_incoming", "Websocket incoming" );
-+    public static final TrackingField WEBSOCKET_OUTGOING = TrackingField.of( "websocket_outgoing", "Websocket outgoing" );
- 
--    public static final TrackingField COROUTINES_CREATED = TrackingField.of( "coroutines_created", "Coroutines created", x -> String.format( "%4d", x ) );
--    public static final TrackingField COROUTINES_DISPOSED = TrackingField.of( "coroutines_dead", "Coroutines disposed", x -> String.format( "%4d", x ) );
-+    public static final TrackingField COROUTINES_CREATED = TrackingField.of( "coroutines_created", "Coroutines created" );
-+    public static final TrackingField COROUTINES_DISPOSED = TrackingField.of( "coroutines_dead", "Coroutines disposed" );
+@@ -38,7 +38,7 @@
  
      private final String id;
      private final String translationKey;
 -    private final LongFunction<String> format;
++    private final Function<Long, String> format;
  
      public String id()
      {
-@@ -57,24 +53,23 @@
-     @Deprecated
-     public String displayName()
-     {
--        return StringUtil.translate( translationKey() );
-+        return null;
+@@ -50,7 +50,7 @@
+         return translationKey;
      }
  
 -    private TrackingField( String id, LongFunction<String> format )
-+    private TrackingField( String id )
++    private TrackingField( String id, Function<Long, String> format )
      {
          this.id = id;
          translationKey = "tracking_field.computercraft." + id + ".name";
--        this.format = format;
+@@ -62,7 +62,7 @@
+         return format.apply( value );
      }
  
-     public String format( long value )
+-    public static TrackingField of( String id, LongFunction<String> format )
++    public static TrackingField of( String id, Function<Long, String> format )
      {
--        return format.apply( value );
-+        return Long.toString( value );
-     }
- 
--    public static TrackingField of( String id, String displayName, LongFunction<String> format )
-+    public static TrackingField of( String id, String displayName )
-     {
--        TrackingField field = new TrackingField( id, format );
-+        TrackingField field = new TrackingField( id );
+         TrackingField field = new TrackingField( id, format );
          fields.put( id, field );
-         return field;
-     }

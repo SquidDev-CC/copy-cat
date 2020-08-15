@@ -1,6 +1,6 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\Computer.java
 +++ src\main\java\dan200\computercraft\core\computer\Computer.java
-@@ -41,12 +41,11 @@
+@@ -39,12 +39,11 @@
      private final IComputerEnvironment m_environment;
      private final Terminal m_terminal;
      private final ComputerExecutor executor;
@@ -9,12 +9,12 @@
      // Additional state about the computer and its environment.
      private boolean m_blinking = false;
      private final Environment internalEnvironment = new Environment( this );
--    private AtomicBoolean externalOutputChanged = new AtomicBoolean();
+-    private final AtomicBoolean externalOutputChanged = new AtomicBoolean();
 +    private boolean externalOutputChanged = false;
  
      private boolean startRequested;
      private int m_ticksSinceStart = -1;
-@@ -58,7 +57,6 @@
+@@ -56,7 +55,6 @@
          m_terminal = terminal;
  
          executor = new ComputerExecutor( this );
@@ -22,7 +22,7 @@
      }
  
      IComputerEnvironment getComputerEnvironment()
-@@ -116,20 +114,22 @@
+@@ -114,20 +112,22 @@
          executor.queueEvent( event, args );
      }
  
@@ -47,7 +47,7 @@
      }
  
      public int getID()
-@@ -161,7 +161,7 @@
+@@ -159,7 +159,7 @@
          if( !Objects.equal( label, m_label ) )
          {
              m_label = label;
@@ -56,7 +56,7 @@
          }
      }
  
-@@ -186,7 +186,7 @@
+@@ -184,7 +184,7 @@
          internalEnvironment.tick();
  
          // Propagate the environment's output to the world.
@@ -65,7 +65,7 @@
  
          // Set output changed if the terminal has changed from blinking to not
          boolean blinking = m_terminal.getCursorBlink() &&
-@@ -195,18 +195,20 @@
+@@ -193,18 +193,20 @@
          if( blinking != m_blinking )
          {
              m_blinking = blinking;

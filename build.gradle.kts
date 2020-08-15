@@ -35,6 +35,11 @@ plugins {
     application
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 repositories {
     mavenCentral()
     maven("https://dl.bintray.com/konsoletyper/teavm")
@@ -46,6 +51,7 @@ dependencies {
     implementation("com.google.guava:guava:22.0")
     implementation("org.apache.commons:commons-lang3:3.6")
     implementation("it.unimi.dsi:fastutil:8.2.2")
+    implementation("org.ow2.asm:asm:8.0.1")
 
     implementation("org.teavm:teavm-jso:${project.properties["teavm_version"]}")
     implementation("org.teavm:teavm-jso-apis:${project.properties["teavm_version"]}")
@@ -298,7 +304,7 @@ tasks {
         description = "Cleans the modified sources"
 
         delete("src/main/java/dan200/computercraft/")
-        delete("src/main/resources/assets/computercraft")
+        delete("src/main/resources/data/computercraft")
         delete(fileTree("src/main/java/org/squiddev/cobalt/") { exclude(".editorconfig") })
     }
 
@@ -351,8 +357,8 @@ tasks {
         doLast {
             listOf(
                 fileTree("original/CC-Tweaked/src/main") {
-                    include("resources/assets/computercraft/lua/bios.lua")
-                    include("resources/assets/computercraft/lua/rom/**")
+                    include("resources/data/computercraft/lua/bios.lua")
+                    include("resources/data/computercraft/lua/rom/**")
 
                     // We need some stuff from the api and shared, but don't want to have to cope with
                     // adding Minecraft as a dependency. This gets a little ugly.
@@ -365,17 +371,25 @@ tasks {
 
                     // Core is pretty simple.
                     include("java/dan200/computercraft/core/**")
+                    // We exclude the actual asm generation stuff, but need some of the interfaces
+                    exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
+                    exclude("java/dan200/computercraft/core/asm/Generator.java")
+                    exclude("java/dan200/computercraft/core/asm/GenericSource.java")
+                    exclude("java/dan200/computercraft/core/asm/Reflect.java")
                     // We just exclude some FS stuff, as it's a bit of a faff to deal with.
                     exclude("java/dan200/computercraft/core/filesystem/ComboMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/EmptyMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/FileMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/SubMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/ResourceMount.java")
                     // Also exclude all the Netty-specific code
                     exclude("java/dan200/computercraft/core/apis/http/CheckUrl.java")
                     exclude("java/dan200/computercraft/core/apis/http/NetworkUtils.java")
                     exclude("java/dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
                     exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
+
+                    exclude("java/dan200/computercraft/core/apis/http/options/AddressRuleConfig.java")
 
                     include("java/dan200/computercraft/shared/util/Colour.java")
                     include("java/dan200/computercraft/shared/util/IoUtil.java")
@@ -427,7 +441,7 @@ tasks {
             // Generate Resources.java
             println("Making Resources.java")
             val builder = StringBuilder()
-            val resources = fileTree("original/CC-Tweaked/src/main/resources/assets/computercraft/lua/rom/")
+            val resources = fileTree("original/CC-Tweaked/src/main/resources/data/computercraft/lua/rom/")
             resources.forEach { builder.append("        \"").append(it.relativeTo(resources.dir).toString().replace('\\', '/')).append("\",\n") }
 
             val contents = File("src/main/java/cc/squiddev/cct/mount/Resources.java.txt").readText().replace("__FILES__", builder.toString())

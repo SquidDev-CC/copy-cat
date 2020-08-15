@@ -20,18 +20,21 @@
  	}
  
  	/**
-@@ -209,10 +203,6 @@
+@@ -209,13 +203,6 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
 -		private static final AtomicInteger coroutineCount = new AtomicInteger();
--		private static final Executor defaultCoroutineExecutor = Executors.newCachedThreadPool(command ->
--			new Thread(command, "Coroutine-" + coroutineCount.getAndIncrement()));
+-		private static final Executor defaultCoroutineExecutor = Executors.newCachedThreadPool(command -> {
+-			Thread thread = new Thread(command, "Coroutine-" + coroutineCount.getAndIncrement());
+-			thread.setDaemon(true);
+-			return thread;
+-		});
 -
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
  		private LuaTable stringMetatable;
-@@ -221,12 +211,11 @@
+@@ -224,12 +211,11 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
@@ -45,22 +48,11 @@
  
  		/**
  		 * Build a Lua state from this builder
-@@ -390,18 +379,5 @@
- 			this.timezone = zone;
+@@ -403,7 +389,6 @@
+ 		 */
+ 		public Builder coroutineExecutor(Executor coroutineExecutor) {
+ 			if (coroutineExecutor == null) throw new NullPointerException("coroutineExecutor cannot be null");
+-			this.coroutineExecutor = coroutineExecutor;
  			return this;
  		}
--
--
--		/**
--		 * Set the coroutine executor for this state.
--		 *
--		 * @param coroutineExecutor The new executor
--		 * @return This builder
--		 */
--		public Builder coroutineExecutor(Executor coroutineExecutor) {
--			if (coroutineExecutor == null) throw new NullPointerException("coroutineExecutor cannot be null");
--			this.coroutineExecutor = coroutineExecutor;
--			return this;
--		}
  	}
- }

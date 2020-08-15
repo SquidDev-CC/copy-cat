@@ -5,71 +5,44 @@
  package dan200.computercraft.core.apis;
  
 +import cc.squiddev.cct.stub.LuaDateTime;
+ import dan200.computercraft.api.lua.IArguments;
  import dan200.computercraft.api.lua.ILuaAPI;
- import dan200.computercraft.api.lua.ILuaContext;
  import dan200.computercraft.api.lua.LuaException;
-@@ -240,7 +241,7 @@
-                 if( value instanceof Map ) return new Object[] { LuaDateTime.fromTable( (Map<?, ?>) value ) };
+@@ -434,29 +435,24 @@
+     public final Object date( Optional<String> formatA, Optional<Long> timeA ) throws LuaException
+     {
+         String format = formatA.orElse( "%c" );
+-        long time = timeA.orElseGet( () -> Instant.now().getEpochSecond() );
++        long time = timeA.orElseGet( () -> Calendar.getInstance().getTimeInMillis() );
  
-                 String param = optString( args, 0, "ingame" );
--                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase() )
-                 {
-                     case "utc":
-                     {
-@@ -268,7 +269,7 @@
-             {
-                 // day
-                 String param = optString( args, 0, "ingame" );
--                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase() )
-                 {
-                     case "utc":
-                     {
-@@ -312,7 +313,7 @@
-             case 15: // epoch
-             {
-                 String param = optString( args, 0, "ingame" );
--                switch( param.toLowerCase( Locale.ROOT ) )
-+                switch( param.toLowerCase() )
-                 {
-                     case "utc":
-                     {
-@@ -339,29 +340,24 @@
-             case 16: // date
-             {
-                 String format = optString( args, 0, "%c" );
--                long time = optLong( args, 1, Instant.now().getEpochSecond() );
-+                long time = optLong( args, 1, Calendar.getInstance().getTimeInMillis() );
+-        Instant instant = Instant.ofEpochSecond( time );
+-        ZonedDateTime date;
+-        ZoneOffset offset;
++        Calendar instant;
+         if( format.startsWith( "!" ) )
+         {
+-            offset = ZoneOffset.UTC;
+-            date = ZonedDateTime.ofInstant( instant, offset );
++            instant = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
++            instant.setTimeInMillis(time);
+             format = format.substring( 1 );
+         }
+         else
+         {
+-            ZoneId id = ZoneId.systemDefault();
+-            offset = id.getRules().getOffset( instant );
+-            date = ZonedDateTime.ofInstant( instant, id );
++            instant = Calendar.getInstance();
++            instant.setTimeInMillis(time);
+         }
  
--                Instant instant = Instant.ofEpochSecond( time );
--                ZonedDateTime date;
--                ZoneOffset offset;
-+                Calendar instant;
-                 if( format.startsWith( "!" ) )
-                 {
--                    offset = ZoneOffset.UTC;
--                    date = ZonedDateTime.ofInstant( instant, offset );
-+                    instant = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-+                    instant.setTimeInMillis(time);
-                     format = format.substring( 1 );
-                 }
-                 else
-                 {
--                    ZoneId id = ZoneId.systemDefault();
--                    offset = id.getRules().getOffset( instant );
--                    date = ZonedDateTime.ofInstant( instant, id );
-+                    instant = Calendar.getInstance();
-+                    instant.setTimeInMillis(time);
-                 }
+-        if( format.equals( "*t" ) ) return LuaDateTime.toTable( date, offset, instant );
++        if( format.equals( "*t" ) ) return LuaDateTime.toTable( instant );
  
--                if( format.equals( "*t" ) ) return new Object[] { LuaDateTime.toTable( date, offset, instant ) };
-+                if( format.equals( "*t" ) ) return new Object[] { LuaDateTime.toTable( instant ) };
+-        DateTimeFormatterBuilder formatter = new DateTimeFormatterBuilder();
+-        LuaDateTime.format( formatter, format, offset );
+-        return formatter.toFormatter( Locale.ROOT ).format( date );
++        return instant.toString(); // TODO: Something!
+     }
  
--                DateTimeFormatterBuilder formatter = new DateTimeFormatterBuilder();
--                LuaDateTime.format( formatter, format, offset );
--                return new Object[] { formatter.toFormatter( Locale.ROOT ).format( date ) };
-+                return new Object[] { instant.toString() }; // TODO: Something!
-             }
-             default:
-                 return null;
+ }

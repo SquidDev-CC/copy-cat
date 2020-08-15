@@ -1,0 +1,10 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\api\peripheral\IPeripheral.java
++++ src\main\java\dan200\computercraft\api\peripheral\IPeripheral.java
+@@ -6,7 +6,6 @@
+ package dan200.computercraft.api.peripheral;
+ 
+ import dan200.computercraft.api.lua.LuaFunction;
+-import net.minecraftforge.common.capabilities.Capability;
+ 
+ import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;

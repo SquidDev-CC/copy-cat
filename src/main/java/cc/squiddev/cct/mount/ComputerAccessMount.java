@@ -42,14 +42,14 @@ public class ComputerAccessMount implements IWritableMount {
 
     @Nonnull
     @Override
-    public WritableByteChannel openChannelForWrite(@Nonnull String path) throws IOException {
+    public WritableByteChannel openForWrite(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.createFile(path).getOrThrow();
         return new Writer(entry);
     }
 
     @Nonnull
     @Override
-    public WritableByteChannel openChannelForAppend(@Nonnull String path) throws IOException {
+    public WritableByteChannel openForAppend(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.createFile(path).getOrThrow();
         return new Writer(entry, entry.getContents());
     }
@@ -86,7 +86,7 @@ public class ComputerAccessMount implements IWritableMount {
 
     @Nonnull
     @Override
-    public ReadableByteChannel openChannelForRead(@Nonnull String path) throws IOException {
+    public ReadableByteChannel openForRead(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
         if (entry == null || entry.isDirectory()) throw new FileOperationException("No such file");
         return new Int8ArrayByteChannel(entry.getContents());

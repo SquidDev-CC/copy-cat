@@ -4,24 +4,22 @@
  
  import dan200.computercraft.shared.util.Colour;
  import dan200.computercraft.shared.util.Palette;
--import net.minecraft.nbt.NBTTagCompound;
+-import net.minecraft.nbt.CompoundNBT;
 -import net.minecraft.network.PacketBuffer;
  
- public class Terminal
- {
-@@ -327,6 +325,7 @@
-         m_changed = false;
+ import javax.annotation.Nonnull;
+ 
+@@ -310,6 +308,7 @@
+         if( onChanged != null ) onChanged.run();
      }
  
 +    /*
      public synchronized void write( PacketBuffer buffer )
      {
          buffer.writeInt( m_cursorX );
-@@ -431,6 +430,7 @@
-         m_palette.readFromNBT( nbt );
-         setChanged();
+@@ -421,4 +420,5 @@
+         if( c >= 'a' && c <= 'f' ) return c - 'a' + 10;
+         return 15 - def.ordinal();
      }
 +    */
- 
-     public static int getColour( char c, Colour def )
-     {
+ }

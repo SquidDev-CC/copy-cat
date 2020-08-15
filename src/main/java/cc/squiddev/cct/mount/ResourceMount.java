@@ -3,7 +3,6 @@ package cc.squiddev.cct.mount;
 import cc.squiddev.cct.stub.ReadableByteChannel;
 import com.google.common.io.ByteStreams;
 import dan200.computercraft.api.filesystem.IMount;
-import dan200.computercraft.core.apis.handles.ArrayByteChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -108,7 +107,7 @@ public class ResourceMount implements IMount {
 
     @Nonnull
     @Override
-    public ReadableByteChannel openChannelForRead(@Nonnull String path) throws IOException {
+    public ReadableByteChannel openForRead(@Nonnull String path) throws IOException {
         FileEntry file = get(path);
         if (file != null && !file.isDirectory()) {
             byte[] contents = file.contents;

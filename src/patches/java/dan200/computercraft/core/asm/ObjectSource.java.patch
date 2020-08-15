@@ -1,0 +1,30 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\ObjectSource.java
++++ src\main\java\dan200\computercraft\core\asm\ObjectSource.java
+@@ -6,6 +6,8 @@
+ 
+ package dan200.computercraft.core.asm;
+ 
++import cc.squiddev.cct.asm.Generator;
++
+ import java.util.function.BiConsumer;
+ 
+ /**
+@@ -18,15 +20,15 @@
+ {
+     Iterable<Object> getExtra();
+ 
+-    static <T> void allMethods( Generator<T> generator, Object object, BiConsumer<Object, NamedMethod<T>> accept )
++    static void allMethods( Object object, BiConsumer<Object, NamedMethod<LuaMethod>> accept )
+     {
+-        for( NamedMethod<T> method : generator.getMethods( object.getClass() ) ) accept.accept( object, method );
++        for( NamedMethod<LuaMethod> method : Generator.getMethods(object.getClass()) ) accept.accept( object, method );
+ 
+         if( object instanceof ObjectSource )
+         {
+             for( Object extra : ((ObjectSource) object).getExtra() )
+             {
+-                for( NamedMethod<T> method : generator.getMethods( extra.getClass() ) ) accept.accept( extra, method );
++                for( NamedMethod<LuaMethod> method : Generator.getMethods(extra.getClass()) ) accept.accept( extra, method );
+             }
+         }
+     }

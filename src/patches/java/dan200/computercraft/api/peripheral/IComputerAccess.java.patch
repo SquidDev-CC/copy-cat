@@ -1,24 +1,17 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\api\peripheral\IComputerAccess.java
 +++ src\main\java\dan200\computercraft\api\peripheral\IComputerAccess.java
-@@ -5,12 +5,10 @@
+@@ -5,14 +5,12 @@
   */
  package dan200.computercraft.api.peripheral;
  
 -import dan200.computercraft.api.ComputerCraftAPI;
  import dan200.computercraft.api.filesystem.IMount;
  import dan200.computercraft.api.filesystem.IWritableMount;
+ import dan200.computercraft.api.lua.ILuaCallback;
  import dan200.computercraft.api.lua.ILuaContext;
  import dan200.computercraft.api.lua.ILuaTask;
+ import dan200.computercraft.api.lua.MethodResult;
 -import net.minecraft.world.World;
  
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;
-@@ -32,8 +30,6 @@
-      * @return The location on the computer's file system where you the mount mounted, or {@code null} if there was already a
-      * file in the desired location. Store this value if you wish to unmount the mount later.
-      * @throws RuntimeException If the peripheral has been detached.
--     * @see ComputerCraftAPI#createSaveDirMount(World, String, long)
--     * @see ComputerCraftAPI#createResourceMount(Class, String, String)
-      * @see #mount(String, IMount, String)
-      * @see #mountWritable(String, IWritableMount)
-      * @see #unmount(String)

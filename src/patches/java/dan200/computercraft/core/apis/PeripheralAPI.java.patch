@@ -1,0 +1,11 @@
+--- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\PeripheralAPI.java
++++ src\main\java\dan200\computercraft\core\apis\PeripheralAPI.java
+@@ -352,7 +352,7 @@
+             ? Objects.requireNonNull( ((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null" )
+             : LuaMethod.EMPTY_METHODS;
+ 
+-        List<NamedMethod<PeripheralMethod>> methods = PeripheralMethod.GENERATOR.getMethods( peripheral.getClass() );
++        List<NamedMethod<PeripheralMethod>> methods = Collections.emptyList();
+ 
+         Map<String, PeripheralMethod> methodMap = new HashMap<>( methods.size() + dynamicMethods.length );
+         for( int i = 0; i < dynamicMethods.length; i++ )

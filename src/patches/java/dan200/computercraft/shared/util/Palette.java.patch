@@ -4,7 +4,7 @@
   */
  package dan200.computercraft.shared.util;
  
--import net.minecraft.nbt.NBTTagCompound;
+-import net.minecraft.nbt.CompoundNBT;
 -import net.minecraft.network.PacketBuffer;
 -
  public class Palette
