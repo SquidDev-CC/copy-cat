@@ -6,7 +6,7 @@ module.exports = {
     es6: true
   },
   extends: [
-    'eslint:recommended',
+    "eslint:recommended",
   ],
   rules: {
     "semi": ["warn", "always"],
@@ -33,14 +33,14 @@ module.exports = {
     // The default TS config.
     {
       files: ["*.ts", "*.tsx"],
-      parser: '@typescript-eslint/parser',
+      parser: "@typescript-eslint/parser",
       parserOptions: { project: "tsconfig.json" },
       plugins: [
-        '@typescript-eslint',
+        "@typescript-eslint",
       ],
       extends: [
-        'plugin:@typescript-eslint/eslint-recommended',
-        'plugin:@typescript-eslint/recommended',
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
       ],
       rules: {
         "@typescript-eslint/member-delimiter-style": ["warn", {

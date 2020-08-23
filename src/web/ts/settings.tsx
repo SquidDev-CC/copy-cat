@@ -23,8 +23,8 @@ type PropertyTypes = {
 
 /** Additional properties for a specific type */
 type TypeExtensions = {
-  string: {},
-  boolean: {},
+  string: unknown,
+  boolean: unknown,
   int: { min: number, max: number },
   option: { choices: Array<{ key: string, value: string }> },
 };

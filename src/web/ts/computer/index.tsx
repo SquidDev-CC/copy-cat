@@ -1,6 +1,6 @@
 import { Semaphore, Terminal, TerminalData, save as saveBlob } from "@squid-dev/cc-web-term";
 import type JSZip from "jszip";
-import { Component, h } from "preact";
+import { Component, VNode, h } from "preact";
 import newZip from "../files/zip";
 import { Download } from "../font";
 import { ConfigFactory, start } from "../java";
@@ -129,11 +129,11 @@ fn()`);
     });
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     start(this.state.computer, this.props.computerSettings);
   }
 
-  public componentWillUnmount() {
+  public componentWillUnmount(): void {
     this.state.computer.shutdown();
     for (const [file, { model, monitor }] of this.state.openFiles) {
       if (model.resolved) model.text.dispose();
@@ -153,7 +153,7 @@ fn()`);
   public render(
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, activeFile, id, label, on, dragging }: ComputerState,
-  ) {
+  ): VNode<unknown> {
     return <div class={computerView}>
       <div class={computerSplit}>
         <div class={`${fileList} ${dragging ? draggingClass : ""}`}

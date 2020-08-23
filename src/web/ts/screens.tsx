@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { dialogueBox, errorView, infoDescription, infoView } from "./styles.css";
 
 const githubLink =
@@ -9,7 +9,7 @@ const githubLink =
     </p>
   </div>;
 
-export const UnknownError = ({ error }: { error: string }) =>
+export const UnknownError = ({ error }: { error: string }): VNode<unknown> =>
   <div class={infoDescription}>
     <div class={`${infoView} ${errorView}`}>
       <h2>An error occured</h2>
@@ -18,7 +18,7 @@ export const UnknownError = ({ error }: { error: string }) =>
     {githubLink}
   </div>;
 
-export const About = () => <div class={dialogueBox}>
+export const About = (): VNode<unknown> => <div class={dialogueBox}>
   <h2>About</h2>
   <p>
     Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/SquidDev-CC/CC-Tweaked"

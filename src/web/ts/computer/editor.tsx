@@ -1,4 +1,4 @@
-import { Component, h } from "preact";
+import { Component, ComponentChild, h } from "preact";
 import type { Settings } from "../settings";
 import type * as monaco from "../editor";
 import { editorPlaceholder, editorView } from "../styles.css";
@@ -20,7 +20,7 @@ export type LazyModel = Model | {
 
 let unique = 0;
 
-const modelFactory = (m: typeof monaco, out: {}, contents: string, name: string): Model => {
+const modelFactory = (m: typeof monaco, out: unknown, contents: string, name: string): Model => {
   unique++; // We keep a unique id to ensure the Uri is not repeated.
   const mode = name.endsWith(".lua") ? "luax" : undefined;
   const text = m.editor.createModel(contents, mode, m.Uri.file(`f${unique.toString(16)}/${name}`));
@@ -72,11 +72,11 @@ export type EditorProps = {
   doSave: (contents: string) => void,
 };
 
-export default class Editor extends Component<EditorProps, {}> {
+export default class Editor extends Component<EditorProps, unknown> {
   private editor?: monaco.editor.IStandaloneCodeEditor;
   private editorPromise?: Promise<void>;
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     window.addEventListener("resize", this.onResize);
 
     this.setupEditor();
@@ -126,7 +126,7 @@ export default class Editor extends Component<EditorProps, {}> {
     this.syncOptions();
   }
 
-  public componentWillUnmount() {
+  public componentWillUnmount(): void {
     window.removeEventListener("resize", this.onResize);
 
     if (!this.editor) return;
@@ -140,19 +140,19 @@ export default class Editor extends Component<EditorProps, {}> {
     this.editor.dispose();
   }
 
-  public componentWillUpdate() {
+  public componentWillUpdate(): void {
     if (!this.editor) return;
 
     // Save the view state back to the model
     forceModel(this.props.model).view = this.editor.saveViewState();
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(): void {
     if (!this.editor) return;
     this.syncOptions();
   }
 
-  private syncOptions() {
+  private syncOptions(): void {
     if (!this.editor) return;
 
     // No view patterns, alas.
@@ -175,7 +175,7 @@ export default class Editor extends Component<EditorProps, {}> {
     if (this.props.focused) this.editor.focus();
   }
 
-  public render() {
+  public render(): ComponentChild {
     return <div class={editorView}>
       {monacoVal ? undefined : <div class={editorPlaceholder}>Loading...</div>}
     </div>;

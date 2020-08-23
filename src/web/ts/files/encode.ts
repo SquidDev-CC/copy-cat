@@ -4,7 +4,7 @@ const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 const lookup = new Uint8Array(256);
 for (let i = 0; i < chars.length; i++) lookup[chars.charCodeAt(i)] = i;
 
-export const encode = (buffer: ArrayLike<number> | ArrayBufferLike) => {
+export const encode = (buffer: ArrayLike<number> | ArrayBufferLike): string => {
   const bytes = new Uint8Array(buffer);
   const len = bytes.length;
 

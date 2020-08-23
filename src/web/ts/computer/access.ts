@@ -5,13 +5,13 @@ import type { FileAttributes } from "../classes";
 
 const colours = "0123456789abcdef";
 
-export const splitName = (file: string) => {
+export const splitName = (file: string): [string, string] => {
   const lastIndex = file.lastIndexOf("/");
   if (lastIndex < 0) return ["", file];
   return [file.substring(0, lastIndex), file.substring(lastIndex + 1)];
 };
 
-export const joinName = (parent: string, child: string) => parent === "" ? child : `${parent}/${child}`;
+export const joinName = (parent: string, child: string): string => parent === "" ? child : `${parent}/${child}`;
 
 const empty = new Int8Array(0);
 const decoder = new TextDecoder("UTF-8", { fatal: false });
@@ -34,7 +34,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     this.attributes = attributes === null ? { modification: 0, creation: 0 } : attributes;
   }
 
-  public static create(persistance: ComputerPersistance, path: string, directory: boolean) {
+  public static create(persistance: ComputerPersistance, path: string, directory: boolean): FileSystemEntry {
     const now = Date.now();
     const instance = new FileSystemEntry(persistance, path, directory ? [] : null, directory ? null : empty, { creation: now, modification: now });
     instance.save();
@@ -195,7 +195,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
       `rgb(${(r * 0xFF) & 0xFF},${(g * 0xFF) & 0xFF},${(b * 0xFF) & 0xFF})`;
   }
 
-  public flushTerminal() {
+  public flushTerminal(): void {
     this.semaphore.signal();
   }
 

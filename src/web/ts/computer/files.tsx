@@ -1,4 +1,4 @@
-import { Component, VNode, h } from "preact";
+import { Component, ComponentChild, VNode, h } from "preact";
 import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { DownOpen, Lua, RightOpen, Text } from "../font";
@@ -68,12 +68,12 @@ type FileListState = {
 type ChildNode = { name: string, dir: boolean, node: VNode<unknown> };
 
 export class FileTree extends Component<FileListProperties, FileListState> {
-  public shouldComponentUpdate({ entry, depth, opened }: FileListProperties, { children }: FileListState) {
+  public shouldComponentUpdate({ entry, depth, opened }: FileListProperties, { children }: FileListState): boolean {
     return entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children ||
       opened !== this.props.opened;
   }
 
-  public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState) {
+  public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState): ComponentChild {
     // Handle the case when we may have been deleted.
     if (!entry.doesExist()) return "";
 
@@ -96,15 +96,15 @@ export class FileTree extends Component<FileListProperties, FileListState> {
     return <ul class={fileTree}>{entries.map(x => x.node)}</ul>;
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.props.entry.getSemaphore().attach(this.listener);
   }
 
-  public componentWillUnmount() {
+  public componentWillUnmount(): void {
     this.props.entry.getSemaphore().detach(this.listener);
   }
 
-  public componentDidUpdate({ entry }: FileListProperties) {
+  public componentDidUpdate({ entry }: FileListProperties): void {
     if (this.props.entry !== entry) {
       this.props.entry.getSemaphore().detach(this.listener);
       entry.getSemaphore().attach(this.listener);

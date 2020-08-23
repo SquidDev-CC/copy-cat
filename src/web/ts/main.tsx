@@ -16,8 +16,8 @@ type MainState = {
   dialogue?: (state: MainState) => JSX.Element,
 };
 
-class Main extends Component<{}, MainState> {
-  public constructor(props: {}, context: unknown) {
+class Main extends Component<unknown, MainState> {
+  public constructor(props: unknown, context: unknown) {
     super(props, context);
   }
 
@@ -61,7 +61,7 @@ class Main extends Component<{}, MainState> {
       // Add some fallbacks for previous versions.
       [termFontHd]: termFontHd, "term_font_hd.png": termFontHd,
       [termFont]: termFont, "term_font.png": termFont
-    }
+    };
     configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
       [
         { key: "standard", value: "Standard font" },
@@ -71,13 +71,13 @@ class Main extends Component<{}, MainState> {
     );
   }
 
-  public shouldComponentUpdate(_: {}, newState: MainState) {
+  public shouldComponentUpdate(_: unknown, newState: MainState) {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
   }
 
-  public render(_: {}, state: MainState) {
+  public render(_: unknown, state: MainState) {
     return <div class={container}>
       {state.currentVDom(state)}
       <div class={infoButtons}>
@@ -130,7 +130,7 @@ class Main extends Component<{}, MainState> {
   }
 }
 
-export default () => {
+export default (): void => {
   // Start the window!
   const page = document.getElementById("page") as HTMLElement;
   render(<Main />, page, page.lastElementChild || undefined);
