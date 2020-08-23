@@ -215,6 +215,7 @@ tasks {
         fun replaceTemplate(x: String) = x
             .replace("{{version}}", inputs.properties["hash"].toString())
             .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.20.0")
+            .replace("export {};", ""); // Yes, it's terrible.
 
         inputs.property("hash", {
             try {
