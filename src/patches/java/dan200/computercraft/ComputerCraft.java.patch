@@ -1,26 +1,14 @@
 --- original\CC-Tweaked\src\main\java\dan200\computercraft\ComputerCraft.java
 +++ src\main\java\dan200\computercraft\ComputerCraft.java
-@@ -5,10 +5,9 @@
+@@ -5,6 +5,7 @@
   */
  package dan200.computercraft;
  
--import dan200.computercraft.api.turtle.event.TurtleAction;
 +/*
+ import dan200.computercraft.api.turtle.event.TurtleAction;
  import dan200.computercraft.core.apis.http.options.Action;
  import dan200.computercraft.core.apis.http.options.AddressRule;
--import dan200.computercraft.core.asm.GenericSource;
- import dan200.computercraft.shared.Config;
- import dan200.computercraft.shared.Registry;
- import dan200.computercraft.shared.computer.core.ClientComputerRegistry;
-@@ -21,6 +20,7 @@
- import net.minecraftforge.fml.common.Mod;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
-+import dan200.computercraft.core.apis.http.websocket.Websocket;
- 
- import java.util.Collections;
- import java.util.EnumSet;
-@@ -29,8 +29,9 @@
+@@ -29,8 +30,10 @@
  import java.util.concurrent.TimeUnit;
  import java.util.stream.Collectors;
  import java.util.stream.Stream;
@@ -28,10 +16,11 @@
 +import cc.squiddev.cct.stub.Logger;
  
 -@Mod( ComputerCraft.MOD_ID )
++
  public final class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
-@@ -55,11 +56,12 @@
+@@ -56,11 +59,12 @@
      public static boolean commandRequireCreative = true;
  
      public static int computerThreads = 1;
@@ -46,7 +35,7 @@
      public static List<AddressRule> httpRules = Collections.unmodifiableList( Stream.concat(
          Stream.of( DEFAULT_HTTP_DENY )
              .map( x -> AddressRule.parse( x, Action.DENY.toPartial() ) )
-@@ -68,6 +70,7 @@
+@@ -69,6 +73,7 @@
              .map( x -> AddressRule.parse( x, Action.ALLOW.toPartial() ) )
              .filter( Objects::nonNull )
      ).collect( Collectors.toList() ) );
@@ -54,7 +43,7 @@
  
      public static int httpMaxRequests = 16;
      public static int httpMaxWebsockets = 4;
-@@ -78,7 +81,6 @@
+@@ -79,7 +84,6 @@
      public static int modemRangeDuringStorm = 64;
      public static int modemHighAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
@@ -62,7 +51,7 @@
      public static double monitorDistanceSq = 4096;
      public static long monitorBandwidth = 1_000_000;
  
-@@ -87,7 +89,6 @@
+@@ -88,7 +92,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -70,7 +59,7 @@
  
      public static boolean genericPeripheral = false;
  
-@@ -103,6 +104,14 @@
+@@ -104,6 +107,14 @@
      public static int monitorWidth = 8;
      public static int monitorHeight = 6;
  
@@ -85,7 +74,7 @@
      public static final class TurtleUpgrades
      {
          public static TurtleModem wirelessModemNormal;
-@@ -137,4 +146,5 @@
+@@ -138,4 +149,5 @@
          Registry.setup();
          GenericSource.setup( () -> ServiceUtil.loadServicesForge( GenericSource.class ) );
      }
