@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Copy Cat</title>
+    <link rel="stylesheet" href="https://copy-cat.squiddev.cc/main.css" />
+    <style>
+      .container {
+        width: 80%;
+        margin: 20px auto;
+      }
+      #embed-computer {
+        margin: 20px 0px;
+        height: 420px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at
+        neque elementum, luctus arcu quis, varius urna. Sed faucibus vel justo
+        quis ultricies. Morbi varius nisl nisl, a lobortis mauris imperdiet at.
+        Suspendisse vitae dictum ipsum, eu tincidunt turpis. Suspendisse sit
+        amet justo nibh. Donec accumsan fringilla tortor, eu pellentesque arcu
+        laoreet vitae. Cras eu posuere lacus, nec scelerisque lacus. Morbi
+        placerat augue et lorem ornare, convallis pulvinar ligula commodo.
+        Pellentesque eu suscipit metus, eu sagittis elit. Donec eget lorem eget
+        neque suscipit convallis a tempor dui. Nunc consequat mi vel mauris
+        aliquam, vitae fringilla nisi ornare. Pellentesque habitant morbi
+        tristique senectus et netus et malesuada fames ac turpis egestas. In hac
+        habitasse platea dictumst. Vivamus sit amet volutpat nunc. Cras in sem
+        at mi pellentesque pretium.
+      </p>
+      <p>
+        Mauris elit lectus, eleifend non mollis elementum, sagittis at nulla.
+        Praesent in mauris magna. Duis hendrerit dolor vel porttitor luctus.
+        Nulla purus sem, iaculis at erat commodo, bibendum imperdiet nunc. Nulla
+        id nisl ultrices, rhoncus purus quis, volutpat urna. Proin sed sapien
+        blandit, cursus nisi eu, auctor elit. Pellentesque eu felis sem. Mauris
+        sit amet euismod dui. Sed sit amet ante lacus.
+      </p>
+      <div id="embed-computer"></div>
+      <p>
+        Etiam lobortis, purus vel sollicitudin ullamcorper, neque dolor
+        tristique lacus, eget condimentum nunc lacus non enim. Nam lectus felis,
+        aliquam eu vulputate vulputate, commodo eget nulla. Sed at enim in sem
+        aliquet commodo. Nam ornare metus non orci accumsan dapibus. Quisque at
+        nisi massa. Cras tristique tempus est in malesuada. Curabitur quis
+        maximus dui, non finibus neque. Nam malesuada nulla in risus mattis, a
+        laoreet dui sodales. Sed nec urna felis. Donec ultrices enim non nulla
+        blandit imperdiet. Proin facilisis placerat euismod. Fusce pulvinar
+        imperdiet tellus, ac faucibus libero. Integer est purus, condimentum
+        quis ante quis, sagittis hendrerit mauris. Sed eget ex non ante lobortis
+        dapibus sollicitudin in erat. Vivamus ornare nibh et urna gravida
+        dignissim. Fusce vitae maximus enim, quis euismod eros.
+      </p>
+      <p>
+        Phasellus non lorem commodo, interdum lorem eu, tempus libero. Quisque
+        suscipit commodo ligula quis suscipit. Phasellus eu enim quis odio
+        vulputate porttitor. Nulla tincidunt lacus eu cursus gravida. Ut velit
+        leo, tempus ac pretium eu, aliquet vitae elit. Donec accumsan magna in
+        velit placerat porta. Integer auctor tempor velit commodo accumsan.
+        Donec blandit felis sed felis ornare fermentum. Mauris egestas mauris ac
+        purus scelerisque, et consectetur neque commodo. Vestibulum ut quam
+        tempus, finibus quam nec, tincidunt libero.
+      </p>
+      <p>
+        Mauris in convallis dolor, quis cursus turpis. Pellentesque eu ultricies
+        nisi. Integer laoreet, risus eget blandit ultrices, sapien nisl aliquam
+        ipsum, ac volutpat nisl felis sit amet dolor. Suspendisse maximus lorem
+        eu dui facilisis aliquam. Duis eget erat orci. Morbi facilisis in est
+        vel elementum. Sed non iaculis tellus. Vestibulum porttitor aliquam
+        nibh, nec iaculis felis feugiat non. Pellentesque habitant morbi
+        tristique senectus et netus et malesuada fames ac turpis egestas. Nulla
+        malesuada, risus vestibulum ullamcorper finibus, augue tortor imperdiet
+        justo, eu elementum enim lorem malesuada mauris. Pellentesque laoreet ex
+        magna, vitae fermentum dolor vulputate dictum. Donec viverra est in nisi
+        facilisis, ac placerat lectus volutpat. Aliquam eu mauris lacinia velit
+        congue dignissim id quis elit. Quisque pretium imperdiet elit vel
+        gravida. Nullam pharetra varius faucibus.
+      </p>
+      <p>
+        Pellentesque sollicitudin ante lorem, et efficitur nunc scelerisque a.
+        Vestibulum venenatis, magna gravida lacinia finibus, dolor sapien
+        placerat ex, eget porta lacus eros a nisi. Aenean posuere, odio ut
+        facilisis mattis, turpis justo convallis justo, ac imperdiet turpis nunc
+        non arcu. Fusce quis ex ut dui tincidunt fringilla id non lectus.
+        Suspendisse nisi velit, viverra in est sed, scelerisque vulputate quam.
+        Nunc nec enim varius, egestas magna in, posuere ex. Vestibulum commodo
+        et nisl eget consectetur. Sed eleifend massa id congue laoreet.
+        Vestibulum non ullamcorper lorem. Ut eget feugiat diam, congue mollis
+        purus.
+      </p>
+    </div>
+
+    <script type="text/javascript" src="https://copy-cat.squiddev.cc/require.js"></script>
+    <script>
+      require.config({ paths: { copycat: "https://copy-cat.squiddev.cc/" } });
+      require(["copycat/embed"], setup => setup(document.getElementById("embed-computer"), {
+        id: undefined, // Specify an integer (for instance, 0) to persist files.
+        files: {
+          "startup.lua": "print('Running startup.lua')\n",
+        },
+      }));
+    </script>
+  </body>
+</html>

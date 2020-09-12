@@ -7,7 +7,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import url from "@rollup/plugin-url";
 
 export default {
-  input: "build/javascript/main.js",
+  input: ["build/javascript/main.js", "build/javascript/embed.js"],
   output: {
     dir: "build/rollup/",
     format: "amd",
@@ -25,7 +25,7 @@ export default {
     }),
 
     postcss({
-      extract: true,
+      extract: "build/rollup/main.css",
       namedExports: name => name.replace(/-([a-z])/g, (_, x) => x.toUpperCase()),
       modules: true,
     }),

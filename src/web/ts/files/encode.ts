@@ -25,7 +25,7 @@ export const encode = (buffer: ArrayLike<number> | ArrayBufferLike): string => {
   return base64;
 };
 
-export const decode =  (base64: string): ArrayBuffer => {
+export const decode = (base64: string): ArrayBuffer => {
   let bufferLength = base64.length * 0.75;
   const len = base64.length;
 

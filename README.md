@@ -25,6 +25,30 @@ And yes, this disclaimer was longer than the actual description.
 
 ![Editing a file](img/editor.png "Editing a file")
 
+## Embedding
+If you've got a project you wish to demonstrate, copy-cat can be embedded within
+a page.
+
+**Important:** Due to limitations with how the emulator is implemented, only one computer can
+be embedded at once.
+
+```html
+<!-- The div to embed your computer. Can be placed anywhere within the page. -->
+<div id="embed-computer"></div>
+
+<!-- Any requirejs-compatible loader (https://requirejs.org/) will work. -->
+<script type="text/javascript" src="https://copy-cat.squiddev.cc/require.js"></script>
+
+<script>
+  // Tell requirejs to load copycat/* from the website.
+  require.config({ paths: { copycat: "https://copy-cat.squiddev.cc/" } });
+  // Find our #embed-computer element and inject a computer terminal into it.
+  require(["copycat/embed"], setup => setup(document.getElementById("embed-computer")));
+</script>
+```
+
+The setup function also accepts several arguments, which are demonstrated in [this example](src/web/example/index.html).
+
 ## Build it yourself
 Due to the nature of this project, Copy Cat has a rather strange build setup. We
 take sources of [Cobalt][cobalt] and [CC: Tweaked][cct], modify them to work in
