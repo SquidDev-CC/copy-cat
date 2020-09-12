@@ -26,11 +26,11 @@ And yes, this disclaimer was longer than the actual description.
 ![Editing a file](img/editor.png "Editing a file")
 
 ## Embedding
-If you've got a project you wish to demonstrate, copy-cat can be embedded within
-a page.
+It's possible to embed copy-cat within another website. This may be useful if
+you want to show off your programs on their own site.
 
-**Important:** Due to limitations with how the emulator is implemented, only one computer can
-be embedded at once.
+**Important:** Due to limitations with how the emulator is implemented, only one
+computer can be embedded at once.
 
 ```html
 <!-- The div to embed your computer. Can be placed anywhere within the page. -->
@@ -47,7 +47,8 @@ be embedded at once.
 </script>
 ```
 
-The setup function also accepts several arguments, which are demonstrated in [this example](src/web/example/index.html).
+The setup function also accepts several arguments, which are demonstrated in
+[this example](src/web/example/index.html).
 
 ## Build it yourself
 Due to the nature of this project, Copy Cat has a rather strange build setup. We
