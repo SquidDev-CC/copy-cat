@@ -1,7 +1,7 @@
 import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
-import type { ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, QueueEventHandler, Result } from "../java";
+import { ConfigFactory, ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, Result, start } from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
-import type { FileAttributes } from "../classes";
+import type { ComputerCallbacks, FileAttributes } from "../classes";
 
 const colours = "0123456789abcdef";
 
@@ -123,12 +123,8 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   private label: string | null;
   private readonly filesystem: Map<string, FileSystemEntry> = new Map<string, FileSystemEntry>();
 
-  private queueEventHandler?: QueueEventHandler;
-  private turnOnHandler?: () => void;
-  private shutdownHandler?: () => void;
-  private rebootHander?: () => void;
+  private handlers?: ComputerCallbacks;
   private removed: boolean = false;
-  private removeHandler?: () => void;
 
   public constructor(
     persistance: ComputerPersistance, terminal: TerminalData, semaphore: Semaphore,
@@ -267,29 +263,23 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
     }
   }
 
-  public onEvent(listener: QueueEventHandler): void {
-    this.queueEventHandler = listener;
-  }
+  public start(config: ConfigFactory, options?: { width?: number, height?: number, label?: string }): void {
+    start(this, config)
+      .then(computer => {
+        this.handlers = computer;
+        if (this.removed) computer.dispose();
 
-  public onShutdown(handler: () => void): void {
-    this.shutdownHandler = handler;
-  }
+        const { width, height, label } = options || {};
+        if (typeof width === "number" && typeof height === "number") computer.resize(width, height);
 
-  public onTurnOn(handler: () => void): void {
-    this.turnOnHandler = handler;
-  }
-
-  public onReboot(handler: () => void): void {
-    this.rebootHander = handler;
-  }
-
-  public onRemoved(handler: () => void): void {
-    this.removeHandler = handler;
-    if (this.removed) handler();
+        if (typeof this.label === "string") computer.setLabel(this.label);
+        else if (typeof label === "string") computer.setLabel(label);
+      })
+      .catch(e => console.error("Cannot start computer", e));
   }
 
   public queueEvent(event: string, args: LuaValue[]): void {
-    if (this.queueEventHandler !== undefined) this.queueEventHandler(event, args.map(x => JSON.stringify(x)));
+    if (this.handlers !== undefined) this.handlers.event(event, args.map(x => JSON.stringify(x)));
   }
 
   public keyDown(key: KeyCode, repeat: boolean): void {
@@ -303,19 +293,19 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public turnOn(): void {
-    this.turnOnHandler?.();
+    if (this.handlers) this.handlers?.turnOn();
   }
 
   public shutdown(): void {
-    this.shutdownHandler?.();
+    if (this.handlers) this.handlers?.shutdown();
   }
 
   public reboot(): void {
-    this.rebootHander?.();
+    if (this.handlers) this.handlers?.reboot();
   }
 
   public dispose(): void {
     this.removed = true;
-    this.removeHandler?.();
+    if (this.handlers) this.handlers?.dispose();
   }
 }

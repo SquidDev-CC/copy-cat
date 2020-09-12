@@ -1,4 +1,4 @@
-import type { ComputerAccess, ConfigGroup, Callbacks as ICallbacks } from "./classes";
+import type { ComputerAccess, ComputerCallbacks, ConfigGroup, Callbacks as ICallbacks } from "./classes";
 export type { ComputerAccess, FileSystemEntry, QueueEventHandler, Result, ConfigGroup as IConfigGroup } from "./classes";
 
 import "setimmediate";
@@ -6,16 +6,16 @@ import "setimmediate";
 export type ConfigFactory = (name: string, description: string | null) => ConfigGroup;
 
 let loaded = false;
-let doAddComputer: ((computer: ComputerAccess) => void) | null = null;
+let doAddComputer: ((computer: ComputerAccess) => ComputerCallbacks) | null = null;
 
-export class Callbacks implements ICallbacks {
+class Callbacks implements ICallbacks {
   public readonly config: ConfigFactory;
 
   public constructor(config: ConfigFactory) {
     this.config = config;
   }
 
-  public setup(addComputer: (computer: ComputerAccess) => void): void {
+  public setup(addComputer: (computer: ComputerAccess) => ComputerCallbacks): void {
     doAddComputer = addComputer;
   }
 
@@ -29,26 +29,21 @@ export class Callbacks implements ICallbacks {
   }
 }
 
-export const start = (computer: ComputerAccess, config: ConfigFactory): void => {
+export const start = async (computer: ComputerAccess, config: ConfigFactory): Promise<ComputerCallbacks> => {
   if (loaded) {
-    if (doAddComputer) doAddComputer(computer);
-    return;
+    if (!doAddComputer) throw new Error("Failed to load computer (see previous errors for a possible reason");
+    return doAddComputer(computer);
   }
 
-  import("./classes")
-    .then(x => {
-      if (loaded) {
-        if (doAddComputer) doAddComputer(computer);
-        return;
-      }
+  const classes = await import("./classes");
+  if (loaded) {
+    if (!doAddComputer) throw new Error("Failed to load computer (see previous errors for a possible reason");
+    return doAddComputer(computer);
+  }
 
-      loaded = true;
-      x.default(new Callbacks(config));
-      if (!doAddComputer) {
-        console.error("Callbacks.setup was never called");
-      } else {
-        doAddComputer(computer);
-      }
-    })
-    .catch(x => console.error("Cannot load classes", x));
+  loaded = true;
+  classes.default(new Callbacks(config));
+  if (!doAddComputer) throw new Error("Callbacks.setup was never called");
+
+  return doAddComputer(computer);
 };

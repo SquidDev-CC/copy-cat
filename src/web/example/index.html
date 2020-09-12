@@ -99,21 +99,31 @@
 
     <script type="text/javascript" src="https://copy-cat.squiddev.cc/require.js"></script>
     <script>
-      require.config({ paths: { copycat: "https://copy-cat.squiddev.cc/" } });
+      require.config({ paths: { copycat: "http://localhost:8080/build/web/" } });
       require(["copycat/embed"], setup => {
         // Basic example
         setup(document.getElementById("computer-1"));
 
         // More complete example.
         setup(document.getElementById("computer-2"), {
-          id: 0, // Specify a computer id to persist files.
+          // Specify a computer id to persist files. This does not determine the computer ID - that is always 0.
+          persistId: 0,
+
           // Either true/false, or a path to a custom font file.
           hdFont: "https://copy-cat.squiddev.cc/term_font_hd-0506b6efe5f7feae.png",
+
           // A map of files to their contents. The values may be ArrayBuffers,
           // ArrayBuffer views (such as UInt8Array) or plain strings.
           files: {
             "startup.lua": "print('Running startup.lua')\n",
           },
+
+          // Specify the terminals's dimensions.
+          width: 80,
+          height: 30,
+
+          // Provide a custom label
+          label: "My computer",
         });
       });
     </script>

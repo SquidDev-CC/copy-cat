@@ -17,7 +17,7 @@ public class Callbacks {
     @JSFunctor
     @FunctionalInterface
     public interface Setup extends JSObject {
-        void addComputer(ComputerAccess computer);
+        ComputerCallbacks addComputer(ComputerAccess computer);
     }
 
     /**

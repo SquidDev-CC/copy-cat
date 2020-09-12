@@ -1,7 +1,5 @@
 package cc.squiddev.cct.js;
 
-import cc.squiddev.cct.js.Callbacks.Callback;
-import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.JSProperty;
 
@@ -13,14 +11,6 @@ import java.io.IOException;
  * Controls a specific computer on the Javascript side. See {@code computer/callbacks.ts}.
  */
 public interface ComputerAccess extends JSObject {
-    /**
-     * Get the computer's label.
-     *
-     * @return The current label, or {@code null} if not set.
-     */
-    @Nullable
-    String getLabel();
-
     /**
      * Set this computer's current state
      *
@@ -67,41 +57,6 @@ public interface ComputerAccess extends JSObject {
     void flushTerminal();
 
     /**
-     * Set the callback used when an event is received.
-     *
-     * @param handler The event handler
-     */
-    void onEvent(@Nonnull QueueEventHandler handler);
-
-    /**
-     * Set the callback used when the computer must be shut down
-     *
-     * @param handler The event handler
-     */
-    void onShutdown(@Nonnull Callback handler);
-
-    /**
-     * Set the callback used when the computer must be turned on
-     *
-     * @param handler The event handler
-     */
-    void onTurnOn(@Nonnull Callback handler);
-
-    /**
-     * Set the callback used when the computer must be restarted
-     *
-     * @param handler The event handler
-     */
-    void onReboot(@Nonnull Callback handler);
-
-    /**
-     * Set the callback used when the computer must be disposed.
-     *
-     * @param handler The event handler
-     */
-    void onRemoved(@Nonnull Callback handler);
-
-    /**
      * Find a file system entry with the given name.
      *
      * @param path The path to find
@@ -134,12 +89,6 @@ public interface ComputerAccess extends JSObject {
      * @param path The path to delete
      */
     void deleteEntry(@Nonnull String path);
-
-    @JSFunctor
-    @FunctionalInterface
-    interface QueueEventHandler extends JSObject {
-        void queueEvent(String event, String[] args);
-    }
 
     /**
      * A naive Either type, instead of wrangling JS/Java exceptions.

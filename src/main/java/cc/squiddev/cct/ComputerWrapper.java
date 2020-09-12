@@ -1,6 +1,7 @@
 package cc.squiddev.cct;
 
 import cc.squiddev.cct.js.ComputerAccess;
+import cc.squiddev.cct.js.ComputerCallbacks;
 import cc.squiddev.cct.js.JsonParse;
 import cc.squiddev.cct.mount.ComputerAccessMount;
 import cc.squiddev.cct.mount.ResourceMount;
@@ -13,28 +14,24 @@ import dan200.computercraft.core.computer.IComputerEnvironment;
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.util.Palette;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.InputStream;
 
 import static dan200.computercraft.ComputerCraft.computerTermHeight;
 import static dan200.computercraft.ComputerCraft.computerTermWidth;
 
-public class ComputerWrapper implements IComputerEnvironment {
+public class ComputerWrapper implements IComputerEnvironment, ComputerCallbacks {
     private final TerminalMonitor terminalMonitor = new TerminalMonitor();
     private final Terminal terminal = new Terminal(computerTermWidth, computerTermHeight, terminalMonitor);
     private final Computer computer;
     private final ComputerAccess computerAccess;
     private boolean disposed = false;
+    private boolean customSize;
 
     public ComputerWrapper(ComputerAccess computerAccess) {
         this.computerAccess = computerAccess;
         this.computer = new Computer(this, terminal, 0);
-
-        computer.setLabel(computerAccess.getLabel());
-        computerAccess.onEvent((e, args) -> computer.queueEvent(e, JsonParse.parseValues(args)));
-        computerAccess.onTurnOn(computer::turnOn);
-        computerAccess.onReboot(computer::reboot);
-        computerAccess.onShutdown(computer::shutdown);
-        computerAccess.onRemoved(() -> disposed = true);
 
         if (!disposed) computer.turnOn();
     }
@@ -57,7 +54,7 @@ public class ComputerWrapper implements IComputerEnvironment {
             computerAccess.setState(computer.getLabel(), computer.isOn());
         }
 
-        if (terminal.getWidth() != computerTermWidth || terminal.getHeight() != computerTermHeight) {
+        if (!customSize && (terminal.getWidth() != computerTermWidth || terminal.getHeight() != computerTermHeight)) {
             terminal.resize(computerTermWidth, computerTermHeight);
             computer.queueEvent("term_resize", null);
         }
@@ -109,11 +106,13 @@ public class ComputerWrapper implements IComputerEnvironment {
         return 0;
     }
 
+    @Nonnull
     @Override
     public String getHostString() {
         return "ComputerCraft " + ComputerCraft.getVersion() + " (copy-cat)";
     }
 
+    @Nonnull
     @Override
     public String getUserAgent() {
         return ComputerCraft.MOD_ID + "/" + ComputerCraft.getVersion();
@@ -137,5 +136,44 @@ public class ComputerWrapper implements IComputerEnvironment {
     @Override
     public InputStream createResourceFile(String domain, String subPath) {
         return ComputerCraft.class.getClassLoader().getResourceAsStream("data/" + domain + "/" + subPath);
+    }
+
+    @Override
+    public void setLabel(@Nullable String label) {
+        computer.setLabel(label);
+    }
+
+    @Override
+    public void event(@Nonnull String event, String[] args) {
+        computer.queueEvent(event, JsonParse.parseValues(args));
+    }
+
+    @Override
+    public void shutdown() {
+        computer.shutdown();
+    }
+
+    @Override
+    public void turnOn() {
+        computer.turnOn();
+    }
+
+    @Override
+    public void reboot() {
+        computer.reboot();
+    }
+
+    @Override
+    public void dispose() {
+        disposed = true;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        customSize = true;
+        if (terminal.getWidth() != width || terminal.getHeight() != height) {
+            terminal.resize(width, height);
+            computer.queueEvent("term_resize", null);
+        }
     }
 }

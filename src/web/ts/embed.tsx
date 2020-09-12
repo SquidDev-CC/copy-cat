@@ -5,14 +5,15 @@ import { ComputerAccess } from "./computer/access";
 import { ComputerPersistance, StoragePersistence, VoidPersistence } from "./computer/persist";
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
-import { start } from "./java";
 import requirejs from "require";
 
 type MainProps = {
-  id: number,
   font: string,
   persistence: ComputerPersistance,
   files: { [filename: string]: string | ArrayBuffer },
+  label?: string,
+  width?: number,
+  height?: number,
 }
 
 type MainState = {
@@ -61,24 +62,27 @@ class Main extends Component<MainProps, MainState> {
   }
 
   public componentDidMount(): void {
-    start(this.state.computer, () => emptyGroup);
+    this.state.computer.start(() => emptyGroup, this.props);
   }
 
-  public render({ id, font }: MainProps, { computer, terminal, terminalChanged, label, on }: MainState) {
+  public render({ font }: MainProps, { computer, terminal, terminalChanged, label, on }: MainState) {
     return <Terminal terminal={terminal} changed={terminalChanged} focused={true} computer={computer}
       font={font}
-      id={id} label={label} on={on} />;
+      id={0} label={label} on={on} />;
   }
 }
 
 export default (element: HTMLElement, options?: {
-  id?: number,
+  persistId?: number,
+  label?: string,
+  width?: number,
+  height?: number,
   hdFont?: boolean | string,
   files?: { [filename: string]: string | ArrayBuffer },
 }): void => {
-  const { id, hdFont, files } = options || {};
+  const { persistId, hdFont, files } = options || {};
 
-  const persistence = id === undefined ? new VoidPersistence() : new StoragePersistence(id);
+  const persistence = persistId === undefined ? new VoidPersistence() : new StoragePersistence(persistId);
   const font = typeof hdFont === "string" ? hdFont :
     // We need to do some terrible path hackery to get this to resolve relative to the
     // current script (and thus copy-cat.squiddev.ccc).
@@ -86,5 +90,5 @@ export default (element: HTMLElement, options?: {
     // "./termFont_xxx.png", and then resolve.
     requirejs.toUrl("./" + (hdFont === undefined || hdFont ? termFontHd : termFont));
 
-  render(<Main id={id || 0} persistence={persistence} font={font} files={files || {}} />, element);
+  render(<Main persistence={persistence} font={font} files={files || {}} {...options} />, element);
 };

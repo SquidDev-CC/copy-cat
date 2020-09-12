@@ -3,7 +3,7 @@ import type JSZip from "jszip";
 import { Component, VNode, h } from "preact";
 import newZip from "../files/zip";
 import { Download } from "../font";
-import { ConfigFactory, start } from "../java";
+import type { ConfigFactory } from "../java";
 import type { Settings } from "../settings";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import Editor, { LazyModel, createModel } from "./editor";
@@ -130,7 +130,7 @@ fn()`);
   }
 
   public componentDidMount(): void {
-    start(this.state.computer, this.props.computerSettings);
+    this.state.computer.start(this.props.computerSettings);
   }
 
   public componentWillUnmount(): void {

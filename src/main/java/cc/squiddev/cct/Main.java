@@ -21,6 +21,7 @@ public class Main {
         Callbacks.setup(access -> {
             ComputerWrapper wrapper = new ComputerWrapper(access);
             computers.add(wrapper);
+            return wrapper;
         });
 
         Callbacks.setInterval(() -> {

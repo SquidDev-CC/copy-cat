@@ -64,13 +64,6 @@ export interface FileSystemEntry {
  */
 export interface ComputerAccess {
   /**
-   * Get the computer's label.
-   *
-   * @return The current label, or {@code null} if not set.
-   */
-  getLabel(): string | null;
-
-  /**
    * Set this computer's current state
    *
    * @param label This computer's label
@@ -145,41 +138,48 @@ export interface ComputerAccess {
    * @param path The path to delete
    */
   deleteEntry(path: string): void;
+}
+
+export interface ComputerCallbacks {
+  /**
+     * Set the computer's label.
+     *
+     * @param label The computer's label.
+     */
+  setLabel(label: string | null): void;
 
   /**
-   * Set the callback used when an event is received.
-   *
-   * @param handler The event handler
+   * Queue an event on the computer.
    */
-  onEvent(listener: QueueEventHandler): void;
+  event(event: string, args: string[] | null): void;
 
   /**
-   * Set the callback used when the computer must be shut down
-   *
-   * @param handler The event handler
+   * Shut the computer down.
    */
-  onShutdown(handler: () => void): void;
+  shutdown(): void;
 
   /**
-   * Set the callback used when the computer must be turned on
-   *
-   * @param handler The event handler
+   * Turn the computer on.
    */
-  onTurnOn(handler: () => void): void;
+  turnOn(): void;
 
   /**
-   * Set the callback used when the computer must be restarted
-   *
-   * @param handler The event handler
+   * Reboot the computer.
    */
-  onReboot(handler: () => void): void;
+  reboot(): void;
 
   /**
-   * Set the callback used when the computer must be removed.
-   *
-   * @param handler The event handler
+   * Dispose of this computer, marking it as no longer running.
    */
-  onRemoved(handler: () => void): void;
+  dispose(): void;
+
+  /**
+   * Set the width and height of the computer. If not given, this will be synced with the
+   *
+   * @param width  The computer's width
+   * @param height The computer's height.
+   */
+  resize(width: number, height: number): void;
 }
 
 export interface ConfigGroup {
@@ -225,7 +225,7 @@ export interface Callbacks {
    *
    * @param addComputer A computer to add a new computer.
    */
-  setup(addComputer: (computer: ComputerAccess) => void): void;
+  setup(addComputer: (computer: ComputerAccess) => ComputerCallbacks): void;
 
   /**
 * Get or create a config group
