@@ -4,37 +4,38 @@ import cc.squiddev.cct.js.Callbacks;
 import cc.squiddev.cct.js.Callbacks.Callback;
 import dan200.computercraft.core.computer.ComputerExecutor;
 
+import java.util.ArrayDeque;
+
 /**
  * We've no threads in JS land, so we create a fake version which just executes
  * all the work a computer can do.
  */
 public class ComputerThread {
-    private static ComputerExecutor lastExecutor;
+    private static final ArrayDeque<ComputerExecutor> executors = new ArrayDeque<>();
     private static final Callback CALLBACK = ComputerThread::workOnce;
 
     public static void queue(ComputerExecutor executor) {
         if (executor.onComputerQueue) throw new IllegalStateException("Cannot queue already queued executor");
-        lastExecutor = executor;
         executor.onComputerQueue = true;
-        Callbacks.setImmediate(CALLBACK);
+
+        if (executors.isEmpty()) Callbacks.setImmediate(CALLBACK);
+        executors.add(executor);
     }
 
     private static void workOnce() {
-        if (lastExecutor == null) throw new IllegalStateException("Working, but executor is null");
-        if (!lastExecutor.onComputerQueue) throw new IllegalArgumentException("Working but not on queue");
+        ComputerExecutor executor = executors.poll();
+        if (executor == null) throw new IllegalStateException("Working, but executor is null");
+        if (!executor.onComputerQueue) throw new IllegalArgumentException("Working but not on queue");
 
-        lastExecutor.beforeWork();
+        executor.beforeWork();
         try {
-            lastExecutor.work();
+            executor.work();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (lastExecutor.afterWork()) {
-            Callbacks.setImmediate(CALLBACK);
-        } else {
-            lastExecutor = null;
-        }
+        if (executor.afterWork()) executors.push(executor);
+        if (!executors.isEmpty()) Callbacks.setImmediate(CALLBACK);
     }
 
     public static boolean hasPendingWork() {

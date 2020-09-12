@@ -135,7 +135,7 @@ tasks {
 
                 // Export a simple function which sets the callbacks and then boots the VM
                 writer.write("export default callbacks => {\n")
-                writer.write("  window.callbacks = callbacks;\n")
+                writer.write("  window.copycatCallbacks = callbacks;\n")
                 writer.write("  main();\n");
                 writer.write("};\n");
             }

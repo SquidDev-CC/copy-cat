@@ -173,6 +173,13 @@ export interface ComputerAccess {
    * @param handler The event handler
    */
   onReboot(handler: () => void): void;
+
+  /**
+   * Set the callback used when the computer must be removed.
+   *
+   * @param handler The event handler
+   */
+  onRemoved(handler: () => void): void;
 }
 
 export interface ConfigGroup {
@@ -216,9 +223,9 @@ export interface Callbacks {
   /**
    * Get the current callback instance
    *
-   * @return The callback instance
+   * @param addComputer A computer to add a new computer.
    */
-  getComputer(): ComputerAccess;
+  setup(addComputer: (computer: ComputerAccess) => void): void;
 
   /**
 * Get or create a config group

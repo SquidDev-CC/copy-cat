@@ -6,6 +6,7 @@ import { ComputerPersistance, StoragePersistence, VoidPersistence } from "./comp
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
 import { start } from "./java";
+import requirejs from "require";
 
 type MainProps = {
   id: number,
@@ -26,7 +27,7 @@ const emptyGroup: ConfigGroup = {
   addString: () => { },
   addBoolean: () => { },
   addInt: () => { },
-}
+};
 
 class Main extends Component<MainProps, MainState> {
   public constructor(props: MainProps, context: unknown) {
@@ -78,9 +79,12 @@ export default (element: HTMLElement, options?: {
   const { id, hdFont, files } = options || {};
 
   const persistence = id === undefined ? new VoidPersistence() : new StoragePersistence(id);
-  const font = typeof hdFont === "string"
-    ? hdFont
-    : (hdFont === undefined || hdFont ? termFontHd : termFont);
+  const font = typeof hdFont === "string" ? hdFont :
+    // We need to do some terrible path hackery to get this to resolve relative to the
+    // current script (and thus copy-cat.squiddev.ccc).
+    // termFont{Hd,} will be of the form "termFont_xxx.png" - we convert it to
+    // "./termFont_xxx.png", and then resolve.
+    requirejs.toUrl("./" + (hdFont === undefined || hdFont ? termFontHd : termFont));
 
   render(<Main id={id || 0} persistence={persistence} font={font} files={files || {}} />, element);
 };

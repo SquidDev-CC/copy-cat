@@ -29,9 +29,6 @@ And yes, this disclaimer was longer than the actual description.
 It's possible to embed copy-cat within another website. This may be useful if
 you want to show off your programs on their own site.
 
-**Important:** Due to limitations with how the emulator is implemented, only one
-computer can be embedded at once.
-
 ```html
 <!-- The div to embed your computer. Can be placed anywhere within the page. -->
 <div id="embed-computer"></div>

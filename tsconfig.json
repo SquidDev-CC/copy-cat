@@ -25,7 +25,8 @@
     "forceConsistentCasingInFileNames": true,
 
     "paths": {
-      "jszip": [ "src/web/typings/jszip.d.ts" ]
+      "jszip": [ "src/web/typings/jszip.d.ts" ],
+      "require": [ "src/web/typings/require.d.ts" ],
     }
   },
   "include": [

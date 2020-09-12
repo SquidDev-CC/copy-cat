@@ -127,6 +127,8 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   private turnOnHandler?: () => void;
   private shutdownHandler?: () => void;
   private rebootHander?: () => void;
+  private removed: boolean = false;
+  private removeHandler?: () => void;
 
   public constructor(
     persistance: ComputerPersistance, terminal: TerminalData, semaphore: Semaphore,
@@ -281,6 +283,11 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
     this.rebootHander = handler;
   }
 
+  public onRemoved(handler: () => void): void {
+    this.removeHandler = handler;
+    if (this.removed) handler();
+  }
+
   public queueEvent(event: string, args: LuaValue[]): void {
     if (this.queueEventHandler !== undefined) this.queueEventHandler(event, args.map(x => JSON.stringify(x)));
   }
@@ -296,14 +303,19 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public turnOn(): void {
-    if (this.turnOnHandler !== undefined) this.turnOnHandler();
+    this.turnOnHandler?.();
   }
 
   public shutdown(): void {
-    if (this.shutdownHandler !== undefined) this.shutdownHandler();
+    this.shutdownHandler?.();
   }
 
   public reboot(): void {
-    if (this.rebootHander !== undefined) this.rebootHander();
+    this.rebootHander?.();
+  }
+
+  public dispose(): void {
+    this.removed = true;
+    this.removeHandler?.();
   }
 }

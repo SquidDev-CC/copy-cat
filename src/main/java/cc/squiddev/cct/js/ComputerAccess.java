@@ -95,6 +95,13 @@ public interface ComputerAccess extends JSObject {
     void onReboot(@Nonnull Callback handler);
 
     /**
+     * Set the callback used when the computer must be disposed.
+     *
+     * @param handler The event handler
+     */
+    void onRemoved(@Nonnull Callback handler);
+
+    /**
      * Find a file system entry with the given name.
      *
      * @param path The path to find

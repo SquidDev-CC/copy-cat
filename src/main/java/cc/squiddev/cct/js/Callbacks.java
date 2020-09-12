@@ -14,13 +14,19 @@ public class Callbacks {
         void run();
     }
 
+    @JSFunctor
+    @FunctionalInterface
+    public interface Setup extends JSObject {
+        void addComputer(ComputerAccess computer);
+    }
+
     /**
      * Get the current callback instance
      *
-     * @return The callback instance
+     * @param setup The setup function.
      */
-    @JSBody(script = "return callbacks.getComputer();")
-    public static native ComputerAccess computer();
+    @JSBody(params = {"setup"}, script = "return copycatCallbacks.setup(setup);")
+    public static native void setup(Setup setup);
 
     /**
      * Get or create a config group
@@ -29,12 +35,12 @@ public class Callbacks {
      * @param description A short description of this group
      * @return The constructed config group
      */
-    @JSBody(params = {"name", "description"}, script = "return callbacks.config(name, description);")
+    @JSBody(params = {"name", "description"}, script = "return copycatCallbacks.config(name, description);")
     public static native ConfigGroup config(@Nonnull String name, @Nullable String description);
 
-    @JSBody(params = {"callback", "delay"}, script = "callbacks.setInterval(callback, delay);")
+    @JSBody(params = {"callback", "delay"}, script = "copycatCallbacks.setInterval(callback, delay);")
     public static native void setInterval(Callback callback, int delay);
 
-    @JSBody(params = {"callback"}, script = "callbacks.setImmediate(callback);")
+    @JSBody(params = {"callback"}, script = "copycatCallbacks.setImmediate(callback);")
     public static native void setImmediate(Callback callback);
 }

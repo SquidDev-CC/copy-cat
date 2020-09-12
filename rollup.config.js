@@ -17,7 +17,7 @@ export default {
     preferConst: true,
   },
   context: "window",
-  external: ["monaco-editor"],
+  external: ["monaco-editor", "require"],
 
   plugins: [
     replace({

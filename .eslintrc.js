@@ -55,7 +55,7 @@ module.exports = {
           ignoreProperties: true,
         }],
         "@typescript-eslint/no-empty-function": ["warn", {
-          allow: ["methods"],
+          allow: ["methods", "arrowFunctions"],
         }],
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-non-null-assertion": "off",

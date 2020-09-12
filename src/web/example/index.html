@@ -11,7 +11,7 @@
         width: 80%;
         margin: 20px auto;
       }
-      #embed-computer {
+      .embed-computer {
         margin: 20px 0px;
         height: 420px;
       }
@@ -42,7 +42,7 @@
         blandit, cursus nisi eu, auctor elit. Pellentesque eu felis sem. Mauris
         sit amet euismod dui. Sed sit amet ante lacus.
       </p>
-      <div id="embed-computer"></div>
+      <div id="computer-1" class="embed-computer"></div>
       <p>
         Etiam lobortis, purus vel sollicitudin ullamcorper, neque dolor
         tristique lacus, eget condimentum nunc lacus non enim. Nam lectus felis,
@@ -57,6 +57,7 @@
         dapibus sollicitudin in erat. Vivamus ornare nibh et urna gravida
         dignissim. Fusce vitae maximus enim, quis euismod eros.
       </p>
+      <div id="computer-2" class="embed-computer"></div>
       <p>
         Phasellus non lorem commodo, interdum lorem eu, tempus libero. Quisque
         suscipit commodo ligula quis suscipit. Phasellus eu enim quis odio
@@ -99,12 +100,22 @@
     <script type="text/javascript" src="https://copy-cat.squiddev.cc/require.js"></script>
     <script>
       require.config({ paths: { copycat: "https://copy-cat.squiddev.cc/" } });
-      require(["copycat/embed"], setup => setup(document.getElementById("embed-computer"), {
-        id: undefined, // Specify an integer (for instance, 0) to persist files.
-        files: {
-          "startup.lua": "print('Running startup.lua')\n",
-        },
-      }));
+      require(["copycat/embed"], setup => {
+        // Basic example
+        setup(document.getElementById("computer-1"));
+
+        // More complete example.
+        setup(document.getElementById("computer-2"), {
+          id: 0, // Specify a computer id to persist files.
+          // Either true/false, or a path to a custom font file.
+          hdFont: "https://copy-cat.squiddev.cc/term_font_hd-0506b6efe5f7feae.png",
+          // A map of files to their contents. The values may be ArrayBuffers,
+          // ArrayBuffer views (such as UInt8Array) or plain strings.
+          files: {
+            "startup.lua": "print('Running startup.lua')\n",
+          },
+        });
+      });
     </script>
   </body>
 </html>
