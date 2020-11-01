@@ -8,7 +8,7 @@
  import dan200.computercraft.api.turtle.event.TurtleAction;
  import dan200.computercraft.core.apis.http.options.Action;
  import dan200.computercraft.core.apis.http.options.AddressRule;
-@@ -29,8 +30,10 @@
+@@ -29,8 +30,9 @@
  import java.util.concurrent.TimeUnit;
  import java.util.stream.Collectors;
  import java.util.stream.Stream;
@@ -16,11 +16,10 @@
 +import cc.squiddev.cct.stub.Logger;
  
 -@Mod( ComputerCraft.MOD_ID )
-+
  public final class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
-@@ -56,11 +59,12 @@
+@@ -56,11 +58,12 @@
      public static boolean commandRequireCreative = true;
  
      public static int computerThreads = 1;
@@ -34,16 +33,16 @@
 +    /*
      public static List<AddressRule> httpRules = Collections.unmodifiableList( Stream.concat(
          Stream.of( DEFAULT_HTTP_DENY )
-             .map( x -> AddressRule.parse( x, Action.DENY.toPartial() ) )
-@@ -69,6 +73,7 @@
-             .map( x -> AddressRule.parse( x, Action.ALLOW.toPartial() ) )
+             .map( x -> AddressRule.parse( x, null, Action.DENY.toPartial() ) )
+@@ -69,6 +72,7 @@
+             .map( x -> AddressRule.parse( x, null, Action.ALLOW.toPartial() ) )
              .filter( Objects::nonNull )
      ).collect( Collectors.toList() ) );
 +    */
  
      public static int httpMaxRequests = 16;
      public static int httpMaxWebsockets = 4;
-@@ -79,7 +84,6 @@
+@@ -79,7 +83,6 @@
      public static int modemRangeDuringStorm = 64;
      public static int modemHighAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
@@ -51,20 +50,20 @@
      public static double monitorDistanceSq = 4096;
      public static long monitorBandwidth = 1_000_000;
  
-@@ -88,7 +92,6 @@
+@@ -88,7 +91,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
 -    public static EnumSet<TurtleAction> turtleDisabledActions = EnumSet.noneOf( TurtleAction.class );
  
-     public static boolean genericPeripheral = false;
- 
-@@ -104,6 +107,14 @@
+     public static int computerTermWidth = 51;
+     public static int computerTermHeight = 19;
+@@ -102,6 +104,14 @@
      public static int monitorWidth = 8;
      public static int monitorHeight = 6;
  
 +    public static final Logger log = Logger.INSTANCE;
-+    static final String VERSION = "1.92.0";
++    static final String VERSION = "1.93.1";
 +
 +    public static String getVersion() {
 +        return VERSION;
@@ -74,7 +73,7 @@
      public static final class TurtleUpgrades
      {
          public static TurtleModem wirelessModemNormal;
-@@ -138,4 +149,5 @@
+@@ -136,4 +146,5 @@
          Registry.setup();
          GenericSource.setup( () -> ServiceUtil.loadServicesForge( GenericSource.class ) );
      }

@@ -13,25 +13,16 @@
  import io.netty.bootstrap.Bootstrap;
  import io.netty.buffer.ByteBuf;
  import io.netty.buffer.Unpooled;
-@@ -27,15 +25,12 @@
+@@ -27,6 +25,8 @@
  import io.netty.handler.ssl.SslContext;
  import io.netty.handler.timeout.ReadTimeoutException;
  import io.netty.handler.timeout.ReadTimeoutHandler;
 +*/
 +import cc.squiddev.cct.http.HttpHelpers;
  
--import java.net.InetSocketAddress;
+ import java.net.InetSocketAddress;
  import java.net.URI;
- import java.net.URISyntaxException;
--import java.nio.charset.StandardCharsets;
--import java.util.Locale;
- import java.util.Map;
--import java.util.concurrent.Future;
--import java.util.concurrent.TimeUnit;
- import java.util.concurrent.atomic.AtomicInteger;
- 
- /**
-@@ -48,43 +43,42 @@
+@@ -48,43 +48,42 @@
  
      private static final int MAX_REDIRECTS = 16;
  
@@ -86,15 +77,7 @@
      }
  
      public IAPIEnvironment environment()
-@@ -114,27 +108,30 @@
-         if( url.getScheme() == null ) throw new HTTPRequestException( "Must specify http or https" );
-         if( url.getHost() == null ) throw new HTTPRequestException( "URL malformed" );
- 
--        String scheme = url.getScheme().toLowerCase( Locale.ROOT );
-+        String scheme = url.getScheme().toLowerCase();
-         if( !scheme.equalsIgnoreCase( "http" ) && !scheme.equalsIgnoreCase( "https" ) )
-         {
-             throw new HTTPRequestException( "Invalid protocol '" + scheme + "'" );
+@@ -121,20 +120,23 @@
          }
      }
  
@@ -119,9 +102,9 @@
 +
 +            /*
              boolean ssl = uri.getScheme().equalsIgnoreCase( "https" );
-             InetSocketAddress socketAddress = NetworkUtils.getAddress( uri.getHost(), uri.getPort(), ssl );
+             InetSocketAddress socketAddress = NetworkUtils.getAddress( uri, ssl );
              Options options = NetworkUtils.getOptions( uri.getHost(), socketAddress );
-@@ -192,14 +189,11 @@
+@@ -192,14 +194,11 @@
                  .addListener( c -> {
                      if( !c.isSuccess() ) failure( c.cause() );
                  } );
@@ -137,7 +120,7 @@
          catch( Exception e )
          {
              failure( "Could not connect" );
-@@ -207,7 +201,7 @@
+@@ -207,7 +206,7 @@
          }
      }
  
@@ -146,7 +129,7 @@
      {
          if( tryClose() ) environment.queueEvent( FAILURE_EVENT, address, message );
      }
-@@ -219,6 +213,7 @@
+@@ -219,6 +218,7 @@
          {
              message = cause.getMessage();
          }
@@ -154,7 +137,7 @@
          else if( cause instanceof TooLongFrameException )
          {
              message = "Response is too large";
-@@ -227,6 +222,7 @@
+@@ -227,6 +227,7 @@
          {
              message = "Timed out";
          }
@@ -162,7 +145,7 @@
          else
          {
              message = "Could not connect";
-@@ -235,12 +231,12 @@
+@@ -235,12 +236,12 @@
          failure( message );
      }
  
@@ -177,7 +160,7 @@
      {
          if( tryClose() ) environment.queueEvent( SUCCESS_EVENT, address, object );
      }
-@@ -249,16 +245,12 @@
+@@ -249,16 +250,12 @@
      protected void dispose()
      {
          super.dispose();
@@ -196,7 +179,7 @@
          {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -266,12 +258,12 @@
+@@ -266,12 +263,12 @@
          return size;
      }
  
