@@ -99,13 +99,13 @@
 
     <script type="text/javascript" src="https://copy-cat.squiddev.cc/require.js"></script>
     <script>
-      require.config({ paths: { copycat: "http://localhost:8080/build/web/" } });
+      require.config({ paths: { copycat: "https://copy-cat.squiddev.cc/" } });
       require(["copycat/embed"], setup => {
         // Basic example
         setup(document.getElementById("computer-1"));
 
         // More complete example.
-        setup(document.getElementById("computer-2"), {
+        const computer = setup(document.getElementById("computer-2"), {
           // Specify a computer id to persist files. This does not determine the computer ID - that is always 0.
           persistId: 0,
 
@@ -115,7 +115,7 @@
           // A map of files to their contents. The values may be ArrayBuffers,
           // ArrayBuffer views (such as UInt8Array) or plain strings.
           files: {
-            "startup.lua": "print('Running startup.lua')\n",
+            "startup.lua": "print('Running startup.lua.') print(os.pullEvent('from_js'))\n",
           },
 
           // Specify the terminals's dimensions.
@@ -125,6 +125,9 @@
           // Provide a custom label
           label: "My computer",
         });
+
+        // See /src/web/ts/computer/access.ts for available methods.
+        setTimeout(async () => (await computer).queueEvent("from_js", ["Got event from JS"]), 5000);
       });
     </script>
   </body>
