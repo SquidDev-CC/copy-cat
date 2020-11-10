@@ -1,15 +1,19 @@
-import builtins from "rollup-plugin-node-builtins";
-import commonjs from "@rollup/plugin-commonjs";
+import path from "path";
+import { promises as fs } from "fs";
+
 import license from "rollup-plugin-license";
 import postcss from "rollup-plugin-postcss";
 import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
+import typescript from "@rollup/plugin-typescript";
 import url from "@rollup/plugin-url";
 
+const out = "build/rollup";
+
 export default {
-  input: ["build/javascript/main.js", "build/javascript/embed.js"],
+  input: ["src/web/ts/main.tsx", "src/web/ts/embed.tsx", "src/web/ts/loader.ts"],
   output: {
-    dir: "build/rollup/",
+    dir: out,
     format: "amd",
     paths: {
       "monaco-editor": "vs/editor/editor.main",
@@ -17,7 +21,7 @@ export default {
     preferConst: true,
   },
   context: "window",
-  external: ["monaco-editor", "require"],
+  external: ["monaco-editor", "require", "jszip"],
 
   plugins: [
     replace({
@@ -25,8 +29,7 @@ export default {
     }),
 
     postcss({
-      extract: "build/rollup/main.css",
-      namedExports: name => name.replace(/-([a-z])/g, (_, x) => x.toUpperCase()),
+      namedExports: true,
       modules: true,
     }),
     url({
@@ -35,9 +38,9 @@ export default {
       include: ["**/*.worker.js", "**/*.png"],
     }),
 
-    builtins(),
+    typescript(),
     resolve({ browser: true, }),
-    commonjs(),
+    // commonjs(),
 
     license({
       banner:
@@ -47,7 +50,21 @@ export default {
 
 @license
   `,
-      thirdParty: { output: "build/rollup/dependencies.txt" },
+      thirdParty: { output: `${out}/dependencies.txt` },
     }),
+
+    {
+      name: "copy-cat",
+      writeBundle: async () => {
+        await Promise.all([
+          fs.copyFile("node_modules/requirejs/require.js", `${out}/require.js`),
+          fs.copyFile("node_modules/jszip/dist/jszip.js", `${out}/jszip.js`)
+        ]);
+      },
+      resolveId: async (source) => {
+        if (source !== "./classes") return null;
+        return path.resolve("build/javascript/classes.js");
+      },
+    },
   ],
 };

@@ -55,7 +55,7 @@ const createZip = async (computer: ComputerAccess) => {
       if (path !== "") zip.folder(path);
       for (const child of entry.getChildren()) queue.push(joinName(path, child));
     } else {
-      zip.file(path, entry.getContents());
+      zip.file(path, entry.getContents().buffer);
     }
   }
 

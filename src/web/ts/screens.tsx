@@ -1,5 +1,5 @@
 import { VNode, h } from "preact";
-import { dialogueBox, errorView, infoDescription, infoView } from "./styles.css";
+import { dialogueBox, errorView, infoDescription } from "./styles.css";
 
 const githubLink =
   <div class={infoDescription}>
@@ -11,7 +11,7 @@ const githubLink =
 
 export const UnknownError = ({ error }: { error: string }): VNode<unknown> =>
   <div class={infoDescription}>
-    <div class={`${infoView} ${errorView}`}>
+    <div class={`infoView ${errorView}`}>
       <h2>An error occured</h2>
       <pre>{error}</pre>
     </div>

@@ -6,8 +6,5 @@ import type JSZip from "jszip";
  * Yes, it's horrible, but it's needed.
  */
 export default async (): Promise<JSZip> => {
-  const globalObj = window as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  if (!globalObj.global) globalObj.global = globalObj;
-
   return new (await import("jszip")).default();
 };

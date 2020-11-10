@@ -20,5 +20,4 @@ requirejs.config({
     `)}`,
 } as monaco.Environment;
 
-/* tslint:disable:no-var-requires */
-require(["./main"], (main: () => void) => main());
+requirejs(["./main"], (main: () => void) => main());

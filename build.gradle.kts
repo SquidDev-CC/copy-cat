@@ -163,40 +163,12 @@ tasks {
         commandLine(mkCommand("npm run --silent prepare:setup"))
     }
 
-    val compileTypescript by registering(Exec::class) {
-        group = "build"
-        description = "Converts TypeScript code to Javascript"
-
-        dependsOn(genCssTypes)
-        inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
-        inputs.file("package.json").withPropertyName("package.json")
-        inputs.file("tsconfig.json").withPropertyName("TypeScript config")
-
-        outputs.dir("$buildDir/javascript").withPropertyName("output")
-
-        commandLine(mkCommand("npm run --silent prepare:tsc"))
-    }
-
-    val copyCss by registering(Copy::class) {
-        group = "build"
-        description = "Copies CSS files into the rollup directory."
-
-        inputs.file("src/web/ts/styles.css").withPropertyName("styles.css")
-        outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
-
-        from("src/web/ts") {
-            include("styles.css")
-        }
-
-        into("$buildDir/javascript/")
-    }
-
     val rollup by registering(Exec::class) {
         group = "build"
         description = "Combines multiple Javascript files into one"
 
-        dependsOn(bundleTeaVM, compileTypescript, copyCss)
-        inputs.files(fileTree("$buildDir/javascript")).withPropertyName("sources")
+        dependsOn(bundleTeaVM, genCssTypes)
+        inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
         inputs.file("package.json").withPropertyName("package.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
@@ -214,7 +186,7 @@ tasks {
         /** Replace various template strings within our files. */
         fun replaceTemplate(x: String) = x
             .replace("{{version}}", inputs.properties["hash"].toString())
-            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.20.0")
+            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.21.2")
             .replace("export {};", ""); // Yes, it's terrible.
 
         inputs.property("hash", {
@@ -228,14 +200,11 @@ tasks {
         })
 
         from("$buildDir/rollup");
-        from("node_modules/requirejs/require.js");
-
-        from("$buildDir/javascript/loader.js") {
+        from("$buildDir/rollup/loader.js") {
             filter { replaceTemplate(it) }
         }
 
         from("src/web/public") {
-            include("*.html")
             filter { replaceTemplate(it) }
         }
 

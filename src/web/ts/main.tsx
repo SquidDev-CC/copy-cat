@@ -3,7 +3,7 @@ import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
-import { actionButton, container, dialogueOverlay, infoButtons } from "./styles.css";
+import { actionButton, dialogueOverlay, infoButtons } from "./styles.css";
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
 
@@ -78,7 +78,7 @@ class Main extends Component<unknown, MainState> {
   }
 
   public render(_: unknown, state: MainState) {
-    return <div class={container}>
+    return <div class="container">
       {state.currentVDom(state)}
       <div class={infoButtons}>
         <button class={actionButton} title="Configure how the emulator behaves" type="button"

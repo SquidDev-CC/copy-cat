@@ -10,8 +10,7 @@ const css = postcss.parse(contents, { from: "src/web/ts/styles.css" });
 const rules = new Set();
 css.walkRules(rule => selector.astSync(rule.selector).walkClasses(x => rules.add(x.value)));
 
-const rename = name => name.replace(/-([a-z])/g, (_, x) => x.toUpperCase());
-const out = Array.from(rules).map(x => `export const ${rename(x)} : string;\n`).join("");
+const out = Array.from(rules).map(x => `export const ${x} : string;\n`).join("");
 fs.writeFileSync("src/web/ts/styles.css.d.ts", out);
 
 fs.copyFileSync(".gitignore", ".eslintignore");

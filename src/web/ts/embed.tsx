@@ -83,7 +83,7 @@ class Computer extends Component<MainProps, MainState> {
     this.state.computer.dispose();
   }
 
-  public render({}: MainProps, { font, computer, terminal, terminalChanged, label, on }: MainState) {
+  public render(_: MainProps, { font, computer, terminal, terminalChanged, label, on }: MainState) {
     return <Terminal terminal={terminal} changed={terminalChanged} focused={true} computer={computer}
       font={font}
       id={0} label={label} on={on} />;

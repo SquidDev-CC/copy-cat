@@ -1,82 +1,44 @@
-body {
-  line-height: 1.3em;
-  color: #444;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+.actionButton {
+  composes: actionButton from "@squid-dev/cc-web-term/dist/styles.css";
 }
 
-html, body, :global(.container), .container {
-  height: 100vh;
-  width: 100%;
-  margin: 0px;
-  padding: 0px;
-  border: none;
+.infoDescription {
+  padding: 5px 10px;
 }
 
-pre, code {
-  font-family: "Consolas", "Courier New", monospace;
-  background-color: #f5f5f5;
-}
-
-pre {
-  padding: 10px;
-  overflow-x: scroll;
-}
-
-.action-button {
-  composes: action-button from "@squid-dev/cc-web-term/dist/styles.css";
-}
-
-.tiny-text {
+.tinyText {
   font-weight: 200;
   font-size: 0.8em;
   color: #555;
 }
 
-:global .info-container {
-  position: relative;
-  top: 80px;
-  margin: 0px auto;
-  max-width: 800px;
-}
-
-:global(.info-view), .info-description {
-  padding: 5px 10px;
-}
-
-.info-view {
-  font-size: 1.5em;
-  line-height: 1.3em;
-
-  border: 3px solid #eee;
-}
-
-.error-view {
+.errorView {
     background-color: #ffb6b6;
     color: #670000;
 }
 
-.term-line:before {
+.termLine:before {
   content: "> ";
 }
 
-.computer-view {
+.computerView {
   height: 100%;
 }
 
-.computer-split {
+.computerSplit {
   height: 100%;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
 }
 
-.terminal-view, .editor-view {
+.terminalView, .editorView {
   flex-grow: 1;
   flex-shrink: 1;
   overflow: hidden;
 }
 
-.file-list {
+.fileList {
   position: relative;
 
   flex-basis: 200px;
@@ -88,23 +50,23 @@ pre {
   scrollbar-width: thin;
 }
 
-.file-tree {
+.fileTree {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.file-entry-head { padding: 5px 15px; cursor: pointer; }
+.fileEntryHead { padding: 5px 15px; cursor: pointer; }
 
-.file-computer-control { position: relative; }
+.fileComputerControl { position: relative; }
 
-.file-computer {
+.fileComputer {
   padding: 10px 15px;
   font-size: 1.3em;
   cursor: pointer;
 }
 
-.file-computer-actions {
+.fileComputerActions {
   position: absolute;
   left: 0; right: 0; top: 0; bottom: 0;
   pointer-events: none;
@@ -113,7 +75,7 @@ pre {
   align-items: center;
 }
 
-.file-computer-actions .action-button {
+.fileComputerActions .actionButton {
   pointer-events: all;
   width: 2em;
   height: 2em;
@@ -121,28 +83,28 @@ pre {
   text-align: center;
 }
 
-.file-computer-actions .action-button:hover { background: rgba(0, 0, 0, 0.1); }
+.fileComputerActions .actionButton:hover { background: rgba(0, 0, 0, 0.1); }
 
-.file-entry-head:hover, .file-computer:hover { background: #ddd; }
-.file-entry-head.active, .file-computer.active,
-.file-entry-head.active:hover, .file-computer.active:hover { background: #ccc; }
+.fileEntryHead:hover, .fileComputer:hover { background: #ddd; }
+.fileEntryHead.active, .fileComputer.active,
+.fileEntryHead.active:hover, .fileComputer.active:hover { background: #ccc; }
 
-.file-entry-name {
+.fileEntryName {
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.file-entry-icon {
+.fileEntryIcon {
   display: inline-block;
   width: 1em;
   padding: 0 5px;
 }
 
-.file-drop-marker {
+.fileDropMarker {
   display: none;
 }
 
-.file-list.dragging .file-drop-marker {
+.fileList.dragging .fileDropMarker {
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -154,7 +116,7 @@ pre {
   pointer-events: none;
 }
 
-.file-drop-marker > span {
+.fileDropMarker > span {
   color: white;
   font-size: 2em;
   padding: 10px;
@@ -162,28 +124,28 @@ pre {
   line-height: 1em;
 }
 
-.editor-placeholder {
+.editorPlaceholder {
   font-size: 3em;
   color: #aaa;
   text-align: center;
   margin: 1em;
 }
 
-.info-buttons {
+.infoButtons {
     position: fixed;
     bottom: 5px;
     left: 5px;
     z-index: 50;
 }
 
-.info-buttons > button {
+.infoButtons > button {
   opacity: 0.6;
   padding: 0 3px;
 }
 
-.info-buttons > button:hover { opacity: 1; }
+.infoButtons > button:hover { opacity: 1; }
 
-.dialogue-overlay {
+.dialogueOverlay {
   position: fixed;
   top: 0px;
   bottom: 0px;
@@ -195,7 +157,7 @@ pre {
   background: rgba(0, 0, 0, 0.7);
 }
 
-.dialogue-box {
+.dialogueBox {
   position: relative;
   top: 5vh;
   margin: 0px auto;
@@ -209,35 +171,35 @@ pre {
   background: white;
 }
 
-.form-group {
+.formGroup {
   display: flex;
   flex-wrap: wrap;
 }
 
-.form-group > label {
+.formGroup > label {
   flex-basis: 50%;
   padding: 10px;
   box-sizing: border-box;
   font-weight: 500;
 }
 
-.form-group .tiny-text {
+.formGroup .tinyText {
   overflow-wrap: anywhere;
   margin: 0px;
 }
 
-.form-group input[type="text"], .form-group input[type="number"], .form-group select {
+.formGroup input[type="text"], .formGroup input[type="number"], .formGroup select {
   margin-top: 2px;
   display: block;
   width: 100%;
 }
 
-.form-group input[type="checkbox"] {
+.formGroup input[type="checkbox"] {
   margin: 0px 5px 0px 0px;
 }
 
 @media(max-width: 800px) {
-  .form-group > label {
+  .formGroup > label {
     flex-basis: 100%;
   }
 }
