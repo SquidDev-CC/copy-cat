@@ -101,8 +101,8 @@ tasks {
                 tool.targetDirectory = dir
                 tool.setTargetFileName("classes.js")
                 tool.mainClass = application.mainClassName
-                tool.setObfuscated(false)
-                tool.optimizationLevel = TeaVMOptimizationLevel.SIMPLE
+                tool.setObfuscated(true)
+                tool.optimizationLevel = TeaVMOptimizationLevel.ADVANCED
                 tool.log = log
                 tool.targetType = TeaVMTargetType.JAVASCRIPT
 
