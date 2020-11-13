@@ -99,10 +99,10 @@ tasks {
                 val tool = TeaVMTool()
                 tool.classLoader = classloader
                 tool.targetDirectory = dir
-                tool.targetFileName = "classes.js"
+                tool.setTargetFileName("classes.js")
                 tool.mainClass = application.mainClassName
-                tool.isMinifying = true
-                tool.optimizationLevel = TeaVMOptimizationLevel.ADVANCED
+                tool.setObfuscated(false)
+                tool.optimizationLevel = TeaVMOptimizationLevel.SIMPLE
                 tool.log = log
                 tool.targetType = TeaVMTargetType.JAVASCRIPT
 
