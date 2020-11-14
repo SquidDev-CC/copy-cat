@@ -185,9 +185,7 @@ tasks {
 
         /** Replace various template strings within our files. */
         fun replaceTemplate(x: String) = x
-            .replace("{{version}}", inputs.properties["hash"].toString())
-            .replace("{{monaco}}", "https://cdn.jsdelivr.net/npm/monaco-editor@0.21.2")
-            .replace("export {};", ""); // Yes, it's terrible.
+            .replace("{{version}}", inputs.properties["hash"].toString());
 
         inputs.property("hash", {
             try {
@@ -200,9 +198,6 @@ tasks {
         })
 
         from("$buildDir/rollup");
-        from("$buildDir/rollup/loader.js") {
-            filter { replaceTemplate(it) }
-        }
 
         from("src/web/public") {
             filter { replaceTemplate(it) }

@@ -11,7 +11,7 @@ import url from "@rollup/plugin-url";
 const out = "build/rollup";
 
 export default {
-  input: ["src/web/ts/main.tsx", "src/web/ts/embed.tsx", "src/web/ts/loader.ts"],
+  input: ["src/web/ts/main.tsx", "src/web/ts/embed.tsx"],
   output: {
     dir: out,
     format: "amd",
@@ -26,6 +26,7 @@ export default {
   plugins: [
     replace({
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.21.2",
     }),
 
     postcss({
@@ -55,13 +56,13 @@ export default {
 
     {
       name: "copy-cat",
-      writeBundle: async () => {
+      async writeBundle () {
         await Promise.all([
           fs.copyFile("node_modules/requirejs/require.js", `${out}/require.js`),
           fs.copyFile("node_modules/jszip/dist/jszip.js", `${out}/jszip.js`)
         ]);
       },
-      resolveId: async (source) => {
+      async resolveId (source) {
         if (source !== "./classes") return null;
         return path.resolve("build/javascript/classes.js");
       },

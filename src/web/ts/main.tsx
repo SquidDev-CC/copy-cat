@@ -1,11 +1,12 @@
+import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
+import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
+import type * as monaco from "monaco-editor";
 import { Component, JSX, h, render } from "preact";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
 import { actionButton, dialogueOverlay, infoButtons } from "./styles.css";
-import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
-import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
 
 type MainState = {
   settings: Settings,
@@ -130,8 +131,20 @@ class Main extends Component<unknown, MainState> {
   }
 }
 
-export default (): void => {
+{
+  requirejs.config({ paths: { vs: "__monaco__/min/vs" } });
+
+  (window as any).MonacoEnvironment = { // eslint-disable-line @typescript-eslint/no-explicit-any
+    getWorkerUrl: (_workerId: string, _label: string) =>
+      `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+      self.MonacoEnvironment = {
+        baseUrl: "__monaco__/min/"
+      };
+      importScripts("__monaco__/min/vs/base/worker/workerMain.js");
+    `)}`,
+  } as monaco.Environment;
+
   // Start the window!
   const page = document.getElementById("page") as HTMLElement;
   render(<Main />, page, page.lastElementChild || undefined);
-};
+}
