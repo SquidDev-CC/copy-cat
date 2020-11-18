@@ -379,8 +379,7 @@ tasks {
                     val relativeFile = originalFile.relativeTo(original)
                     val modifiedFile = modified.resolve(relativeFile)
                     val patchFile = File(patches, "$relativeFile.patch")
-
-                    modifiedFile.parentFile.mkdirs()
+                    projectDir.resolve(modifiedFile.parentFile).mkdirs()
                     if (patchFile.exists()) {
                         println("Patching $relativeFile")
                         val patch = UnifiedDiffUtils.parseUnifiedDiff(patchFile.readLines())
