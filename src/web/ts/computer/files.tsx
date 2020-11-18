@@ -28,8 +28,8 @@ const getIcon = (name: string, directory: boolean, expanded: boolean) => {
 };
 
 class FileEntry extends Component<FileEntryProperties, FileEntryState> {
-  public shouldComponentUpdate({ entry, depth, opened }: FileEntryProperties, { expanded }: FileEntryState) {
-    return entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
+  public shouldComponentUpdate({ entry, depth, opened, settings }: FileEntryProperties, { expanded }: FileEntryState) {
+    return settings.darkMode !== this.props.settings.darkMode || entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
       expanded !== this.state.expanded;
   }
 
@@ -70,8 +70,8 @@ type FileListState = {
 type ChildNode = { name: string, dir: boolean, node: VNode<unknown> };
 
 export class FileTree extends Component<FileListProperties, FileListState> {
-  public shouldComponentUpdate({ entry, depth, opened }: FileListProperties, { children }: FileListState): boolean {
-    return entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children ||
+  public shouldComponentUpdate({ entry, depth, opened, settings }: FileListProperties, { children }: FileListState): boolean {
+    return settings.darkMode !== this.props.settings.darkMode || entry !== this.props.entry || depth !== this.props.depth || children !== this.state.children ||
       opened !== this.props.opened;
   }
 
