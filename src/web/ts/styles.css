@@ -270,6 +270,7 @@
 .formGroup input[type="text"],
 .formGroup input[type="number"],
 .formGroup select {
+  background-color: rgb(236, 236, 236);
   margin-top: 2px;
   display: block;
   width: 100%;
@@ -291,8 +292,6 @@
 }
 
 .formGroupDark input[type="checkbox"] {
-  background-color: rgb(48, 48, 48);
-  color: rgb(228, 228, 228);
   border-style: none;
   padding: 6px;
   border-radius: 4px;
@@ -307,4 +306,8 @@
 .codeBlockDark {
   background-color: rgb(58, 58, 58);
   color: rgb(202, 202, 202);
+}
+
+.fontDarkMode {
+  color: rgb(224, 224, 224) !important;
 }
