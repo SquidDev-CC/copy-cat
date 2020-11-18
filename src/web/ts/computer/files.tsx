@@ -41,7 +41,7 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
     return <li>
       <div class={clsx(fileEntryHead, {[active]: opened === path, [fileEntryHeadDark]: darkMode})} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
-        <span class={fileEntryIcon}>
+        <span class={clsx(fileEntryIcon)}>
           {getIcon(name, entry.isDirectory(), expanded || false)}
         </span>
         <span class={fileEntryName}>{name}</span>

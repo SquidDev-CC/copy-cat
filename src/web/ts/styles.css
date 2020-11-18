@@ -39,6 +39,12 @@
   overflow: hidden;
 }
 
+.editorViewDark,
+.terminalViewDark {
+  background: rgb(36, 36, 36);
+  color: rgb(236, 236, 236)
+}
+
 .fileList {
   position: relative;
   flex-basis: 200px;
@@ -51,9 +57,8 @@
 }
 
 .fileListDark {
-  background-color: #1e1e1e;
+  background-color: #202020;
   color: rgb(248, 248, 248);
-  border-right: 1px solid rgb(119, 119, 119);
 }
 
 .fileTree {
@@ -91,7 +96,7 @@
   color: rgb(248, 248, 248);
 }
 
-.fileEntryHead:hover,
+.fileEntryHeadDark:hover,
 .fileComputerDark:hover {
   background-color: #3b3b3b !important;
 }
@@ -149,6 +154,7 @@
   padding: 0 5px;
 }
 
+
 .fileDropMarker {
   display: none;
 }
@@ -183,6 +189,12 @@
   margin: 1em;
 }
 
+.editorPlaceholderDark {
+  background: rgb(20, 20, 20);
+  color: rgb(214, 212, 212);
+
+}
+
 .infoButtons {
   position: fixed;
   bottom: 5px;
@@ -211,6 +223,7 @@
   background: rgba(0, 0, 0, 0.7);
 }
 
+
 .dialogueBox {
   position: relative;
   top: 5vh;
@@ -221,8 +234,12 @@
   max-width: 800px;
   max-height: 90vh;
   overflow-y: scroll;
-
   background: white;
+}
+
+.dialogueBoxDark {
+  background: #202020;
+  color: rgb(240, 240, 240);
 }
 
 .formGroup {
@@ -240,6 +257,10 @@
 .formGroup .tinyText {
   overflow-wrap: anywhere;
   margin: 0px;
+}
+
+.formGroupDark .tinyTextDark {
+  color: rgb(231, 231, 231);
 }
 
 .formGroup input[type="text"],

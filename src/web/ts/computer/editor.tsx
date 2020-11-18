@@ -1,7 +1,8 @@
 import { Component, ComponentChild, h } from "preact";
 import type { Settings } from "../settings";
 import type * as monaco from "../editor";
-import { editorPlaceholder, editorView } from "../styles.css";
+import { editorPlaceholder, editorPlaceholderDark, editorView, editorViewDark } from "../styles.css";
+import clsx from "clsx";
 
 let monacoVal: typeof monaco | null = null;
 
@@ -174,10 +175,12 @@ export default class Editor extends Component<EditorProps, unknown> {
 
     if (this.props.focused) this.editor.focus();
   }
-
   public render(): ComponentChild {
-    return <div class={editorView}>
-      {monacoVal ? undefined : <div class={editorPlaceholder}>Loading...</div>}
+    const {darkMode} = this.props.settings;
+    return <div class={clsx(editorView, {[editorViewDark]: darkMode})}>
+      {monacoVal ? 
+        undefined : 
+        <div class={clsx(editorPlaceholder, {[editorPlaceholderDark]: darkMode})}>Loading...</div>}
     </div>;
   }
 

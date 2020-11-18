@@ -11,7 +11,8 @@ import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
   actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer, fileComputerDark,
-  fileComputerActions, fileComputerControl, fileComputerControlDark, fileDropMarker, fileList, fileListDark, terminalView, 
+  fileComputerActions, fileComputerControl, fileComputerControlDark, fileDropMarker, fileList, fileListDark, 
+  terminalView, terminalViewDark 
 } from "../styles.css";
 import clsx from "clsx";
 
@@ -179,7 +180,7 @@ fn()`);
           </div>
         </div>
         {activeFile == null
-          ? <div class={terminalView}>
+          ? <div class={clsx(terminalView, {[terminalViewDark]: darkMode})}>
             <Terminal terminal={terminal} changed={terminalChanged} focused={focused} computer={computer}
               font={settings.terminalFont}
               id={id} label={label} on={on} />

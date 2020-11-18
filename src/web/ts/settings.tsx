@@ -1,7 +1,9 @@
+import clsx from "clsx";
 import { JSX, h } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import type { ConfigGroup as IConfigGroup } from "./classes";
 import * as storage from "./storage";
-import { dialogueBox, formGroup, tinyText } from "./styles.css";
+import { dialogueBox, dialogueBoxDark, formGroup, tinyText, tinyTextDark } from "./styles.css";
 
 export type Settings = {
   // Editor Settings
@@ -153,12 +155,32 @@ export type SettingsProperties = {
   configGroups: ConfigGroup[],
 };
 
-export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element =>
-  <div class={dialogueBox}>
+export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element => {
+  const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    for(const g of configGroups){
+      for(const property of g.properties){
+        if(property.id === "editor.dark") {
+          // I have no idea how this works
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const p = store.get<"boolean">(property);
+          // eslint-disable-next-line no-console
+          setDarkMode(p);
+          
+        }
+      }
+    }
+  });
+  
+  if(darkMode === undefined) return <div></div>;
+
+  return <div class={clsx(dialogueBox, {[dialogueBoxDark]: darkMode})}>
     <h2>Settings</h2>
     {configGroups.map(({ name, description, properties }) => [
       <h3>{name}</h3>,
-      description ? <p class={tinyText}>{description}</p> : null,
+      description ? <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{description}</p> : null,
       <div class={formGroup}>
         {properties.map(property => {
           switch (property.type) {
@@ -167,21 +189,21 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 {property.name}
                 <input type="text" value={store.get(property)}
                   onChange={getUpdater(store, property, getString)}></input>
-                <p class={tinyText}>{property.description}</p>
+                <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{property.description}</p>
               </label>;
             case "int":
               return <label>
                 {property.name}
                 <input type="number" value={store.get(property)} min={property.min} max={property.max} step={1}
                   onChange={getUpdater(store, property, getNumber)}></input>
-                <p class={tinyText}>{property.description}</p>
+                <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{property.description}</p>
               </label>;
             case "boolean":
               return <label>
                 <input type="checkbox" checked={store.get(property)}
                   onInput={getUpdater(store, property, getBool)}></input>
                 {property.name}
-                <p class={tinyText}>{property.description}</p>
+                <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{property.description}</p>
               </label>;
             case "option":
               return <label>
@@ -189,10 +211,10 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 <select value={store.get(property)} onInput={getUpdater(store, property, getOption(property.def, property.choices))}>
                   {property.choices.map(({ key, value }) => <option value={key}>{value}</option>)}
                 </select>
-                <p class={tinyText}>{property.description}</p>
+                <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{property.description}</p>
               </label>;
           }
         })}
       </div>,
-    ])}
-  </div>;
+    ])};
+  </div>}

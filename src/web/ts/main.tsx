@@ -1,5 +1,6 @@
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
+import clsx from "clsx";
 import type * as monaco from "monaco-editor";
 import { Component, JSX, h, render } from "preact";
 import { Computer } from "./computer";
@@ -93,7 +94,7 @@ class Main extends Component<unknown, MainState> {
       </div>
       {
         state.dialogue ?
-          <div class={dialogueOverlay} onClick={this.closeDialogueClick}>
+          <div class={clsx(dialogueOverlay)} onClick={this.closeDialogueClick}>
             {state.dialogue(state)}
           </div> : ""
       }
