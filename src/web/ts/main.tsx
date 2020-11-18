@@ -25,7 +25,7 @@ class Main extends Component<unknown, MainState> {
   public componentWillMount() {
     const settingStorage = new SettingStore();
 
-    const configEditor = new ConfigGroup("Editor", "Configure the built-in eidtor", settingStorage);
+    const configEditor = new ConfigGroup("Editor", "Configure the built-in editor", settingStorage);
     const configTerminal = new ConfigGroup("Terminal", "Configure the terminal display", settingStorage);
     const configGroups = [configEditor, configTerminal];
 
