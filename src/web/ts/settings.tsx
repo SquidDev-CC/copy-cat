@@ -3,7 +3,7 @@ import { JSX, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import type { ConfigGroup as IConfigGroup } from "./classes";
 import * as storage from "./storage";
-import { dialogueBox, dialogueBoxDark, formGroup, tinyText, tinyTextDark } from "./styles.css";
+import { dialogueBox, dialogueBoxDark, formGroup, formGroupDark, tinyText, tinyTextDark } from "./styles.css";
 
 export type Settings = {
   // Editor Settings
@@ -155,7 +155,7 @@ export type SettingsProperties = {
   configGroups: ConfigGroup[],
 };
 
-export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element => {
+export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element | null => {
   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
@@ -174,14 +174,14 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
     }
   });
   
-  if(darkMode === undefined) return <div></div>;
+  if(darkMode === undefined) return null;
 
   return <div class={clsx(dialogueBox, {[dialogueBoxDark]: darkMode})}>
     <h2>Settings</h2>
     {configGroups.map(({ name, description, properties }) => [
       <h3>{name}</h3>,
       description ? <p class={clsx(tinyText, {[tinyTextDark]: darkMode})}>{description}</p> : null,
-      <div class={formGroup}>
+      <div class={clsx(formGroup, {[formGroupDark]: darkMode})}>
         {properties.map(property => {
           switch (property.type) {
             case "string":

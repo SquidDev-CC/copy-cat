@@ -242,6 +242,10 @@
   color: rgb(240, 240, 240);
 }
 
+.dialogueBoxDark a{
+  color: #DEDE6C;
+}
+
 .formGroup {
   display: flex;
   flex-wrap: wrap;
@@ -260,7 +264,7 @@
 }
 
 .formGroupDark .tinyTextDark {
-  color: rgb(231, 231, 231);
+  color: rgb(231, 231, 231) !important;
 }
 
 .formGroup input[type="text"],
@@ -269,14 +273,38 @@
   margin-top: 2px;
   display: block;
   width: 100%;
+  border-style: none;
+  padding: 6px;
+  border-radius: 4px;
 }
 
 .formGroup input[type="checkbox"] {
   margin: 0px 5px 0px 0px;
 }
 
+.formGroupDark input[type="text"],
+.formGroupDark input[type="number"],
+.formGroupDark select {
+  background-color: rgb(48, 48, 48);
+  color: rgb(228, 228, 228);
+  border-style: none;
+}
+
+.formGroupDark input[type="checkbox"] {
+  background-color: rgb(48, 48, 48);
+  color: rgb(228, 228, 228);
+  border-style: none;
+  padding: 6px;
+  border-radius: 4px;
+}
+
 @media (max-width: 800px) {
   .formGroup > label {
     flex-basis: 100%;
   }
+}
+
+.codeBlockDark {
+  background-color: rgb(58, 58, 58);
+  color: rgb(202, 202, 202);
 }

@@ -52,7 +52,7 @@ class Main extends Component<unknown, MainState> {
     );
 
     configEditor.addBoolean("editor.dark", "Dark mode", state.settings.darkMode,
-      "Only the editor currently, sorry.",
+      "Enables dark mode.",
       x => this.setState(s => ({ settings: { ...s.settings, darkMode: x } })),
     );
 
@@ -88,7 +88,7 @@ class Main extends Component<unknown, MainState> {
           <Cog />
         </button>
         <button class={actionButton} title="Find out more about the emulator" type="button"
-          onClick={() => this.setState({ dialogue: () => <About /> })}>
+          onClick={() => this.setState({ dialogue: () => <About settings={state.settings} /> })}>
           <Info />
         </button>
       </div>
