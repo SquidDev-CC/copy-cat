@@ -13,8 +13,8 @@
 }
 
 .errorView {
-    background-color: #ffb6b6;
-    color: #670000;
+  background-color: #ffb6b6;
+  color: #670000;
 }
 
 .termLine:before {
@@ -32,7 +32,8 @@
   justify-content: space-between;
 }
 
-.terminalView, .editorView {
+.terminalView,
+.editorView {
   flex-grow: 1;
   flex-shrink: 1;
   overflow: hidden;
@@ -40,7 +41,6 @@
 
 .fileList {
   position: relative;
-
   flex-basis: 200px;
   max-width: 200px;
   background-color: #eee;
@@ -50,15 +50,35 @@
   scrollbar-width: thin;
 }
 
+.fileListDark {
+  background-color: #1e1e1e;
+  color: rgb(248, 248, 248);
+  border-right: 1px solid rgb(119, 119, 119);
+}
+
 .fileTree {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.fileEntryHead { padding: 5px 15px; cursor: pointer; }
+.fileEntryHead {
+  padding: 5px 15px;
+  cursor: pointer;
+}
 
-.fileComputerControl { position: relative; }
+.fileEntryHeadDark {
+  background-color: #292929;
+}
+
+.fileComputerControl {
+  position: relative;
+}
+
+.fileComputerControlDark {
+  background-color: #292929;
+  color: rgb(248, 248, 248);
+}
 
 .fileComputer {
   padding: 10px 15px;
@@ -66,9 +86,22 @@
   cursor: pointer;
 }
 
+.fileComputerDark {
+  background-color: #292929;
+  color: rgb(248, 248, 248);
+}
+
+.fileEntryHead:hover,
+.fileComputerDark:hover {
+  background-color: #3b3b3b !important;
+}
+
 .fileComputerActions {
   position: absolute;
-  left: 0; right: 0; top: 0; bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   pointer-events: none;
   display: flex;
   justify-content: flex-end;
@@ -83,11 +116,27 @@
   text-align: center;
 }
 
-.fileComputerActions .actionButton:hover { background: rgba(0, 0, 0, 0.1); }
+.fileComputerActions .actionButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
 
-.fileEntryHead:hover, .fileComputer:hover { background: #ddd; }
-.fileEntryHead.active, .fileComputer.active,
-.fileEntryHead.active:hover, .fileComputer.active:hover { background: #ccc; }
+.fileEntryHead:hover,
+.fileComputer:hover {
+  background: #ddd;
+}
+.fileEntryHead.active,
+.fileComputer.active,
+.fileEntryHead.active:hover,
+.fileComputer.active:hover {
+  background: #ccc;
+}
+
+.fileEntryHeadDark.active,
+.fileComputerDark.active,
+.fileEntryHeadDark.active:hover,
+.fileComputerDark.active:hover {
+  background-color: #3b3b3b !important;
+}
 
 .fileEntryName {
   text-overflow: ellipsis;
@@ -106,7 +155,10 @@
 
 .fileList.dragging .fileDropMarker {
   position: absolute;
-  top: 0; bottom: 0; left: 0; right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
@@ -132,10 +184,10 @@
 }
 
 .infoButtons {
-    position: fixed;
-    bottom: 5px;
-    left: 5px;
-    z-index: 50;
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  z-index: 50;
 }
 
 .infoButtons > button {
@@ -143,7 +195,9 @@
   padding: 0 3px;
 }
 
-.infoButtons > button:hover { opacity: 1; }
+.infoButtons > button:hover {
+  opacity: 1;
+}
 
 .dialogueOverlay {
   position: fixed;
@@ -188,7 +242,9 @@
   margin: 0px;
 }
 
-.formGroup input[type="text"], .formGroup input[type="number"], .formGroup select {
+.formGroup input[type="text"],
+.formGroup input[type="number"],
+.formGroup select {
   margin-top: 2px;
   display: block;
   width: 100%;
@@ -198,7 +254,7 @@
   margin: 0px 5px 0px 0px;
 }
 
-@media(max-width: 800px) {
+@media (max-width: 800px) {
   .formGroup > label {
     flex-basis: 100%;
   }

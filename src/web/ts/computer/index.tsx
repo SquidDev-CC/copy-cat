@@ -10,9 +10,10 @@ import Editor, { LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
-  actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer,
-  fileComputerActions, fileComputerControl, fileDropMarker, fileList, terminalView
+  actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer, fileComputerDark,
+  fileComputerActions, fileComputerControl, fileComputerControlDark, fileDropMarker, fileList, fileListDark, terminalView, 
 } from "../styles.css";
+import clsx from "clsx";
 
 export type ComputerProps = {
   focused: boolean,
@@ -83,7 +84,6 @@ const isSimpleZip = (zip: JSZip, name: string) => {
 export class Computer extends Component<ComputerProps, ComputerState> {
   public constructor(props: ComputerProps, context: unknown) {
     super(props, context);
-
     const terminal = new TerminalData();
     const terminalChanged = new Semaphore();
     const computer = new ComputerAccess(
@@ -154,12 +154,13 @@ fn()`);
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, activeFile, id, label, on, dragging }: ComputerState,
   ): VNode<unknown> {
+    const {darkMode} = settings;
     return <div class={computerView}>
       <div class={computerSplit}>
-        <div class={`${fileList} ${dragging ? draggingClass : ""}`}
+        <div class={clsx(fileList, {[draggingClass]: dragging, [fileListDark]: darkMode})}
           onDragOver={this.startDrag} onDragLeave={this.stopDrag} onDrop={this.dropFile}>
-          <div class={fileComputerControl}>
-            <div class={`${fileComputer} ${activeFile == null ? active : ""}`} onClick={this.openComputer}>
+          <div class={clsx(fileComputerControl, {[fileComputerControlDark]: darkMode})}>
+            <div class={clsx(fileComputer, {[active]: activeFile, [fileComputerDark]: darkMode})} onClick={this.openComputer}>
               {id ? `Computer #${id}` : "Computer"}
             </div>
             <div class={fileComputerActions}>
@@ -170,7 +171,7 @@ fn()`);
             </div>
           </div>
 
-          <FileTree computer={computer} entry={computer.getEntry("")!} path=""
+          <FileTree computer={computer} settings={settings} entry={computer.getEntry("")!} path=""
             opened={activeFile === null ? null : activeFile.path} open={this.openFile} />
 
           <div class={fileDropMarker}>

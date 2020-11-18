@@ -1,17 +1,18 @@
 import { Component, ComponentChild, VNode, h } from "preact";
-import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
+import { active, fileEntryHead, fileEntryHeadDark, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { DownOpen, Lua, RightOpen, Text } from "../font";
+import clsx from "clsx";
+import type { ComputerProps } from ".";
 
 export type Opener = (path: string, entry: FileSystemEntry) => void;
 
-type FileEntryProperties = {
+type FileEntryProperties = Pick<ComputerProps, "settings"> & {
   computer: ComputerAccess,
   entry: FileSystemEntry,
   name: string,
   path: string,
   depth: number,
-
   opened: string | null,
   open: Opener,
 };
@@ -33,11 +34,12 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
   }
 
   public render(
-    { computer, entry, name, path, depth, opened, open }: FileEntryProperties,
+    { computer, entry, name, path, depth, opened, open, settings }: FileEntryProperties,
     { expanded }: FileEntryState,
   ) {
+    const {darkMode} = settings;
     return <li>
-      <div class={`${fileEntryHead} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
+      <div class={clsx(fileEntryHead, {[active]: opened === path, [fileEntryHeadDark]: darkMode})} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
         <span class={fileEntryIcon}>
           {getIcon(name, entry.isDirectory(), expanded || false)}
@@ -45,13 +47,13 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
         <span class={fileEntryName}>{name}</span>
       </div>
       {expanded
-        ? <FileTree computer={computer} entry={entry} path={path} depth={depth} opened={opened} open={open} />
+        ? <FileTree computer={computer} settings={settings} entry={entry} path={path} depth={depth} opened={opened} open={open} />
         : null}
     </li>;
   }
 }
 
-export type FileListProperties = {
+export type FileListProperties = Pick<ComputerProps, "settings"> & {
   computer: ComputerAccess,
   entry: FileSystemEntry,
   path: string,
@@ -73,17 +75,16 @@ export class FileTree extends Component<FileListProperties, FileListState> {
       opened !== this.props.opened;
   }
 
-  public render({ computer, entry, path, depth, opened, open }: FileListProperties, { children }: FileListState): ComponentChild {
+  public render({ computer, entry, path, depth, opened, open, settings }: FileListProperties, { children }: FileListState): ComponentChild {
     // Handle the case when we may have been deleted.
     if (!entry.doesExist()) return "";
-
     // Gather all children, and then sort them.
     const entries: ChildNode[] = (children || entry.getChildren()).map(childName => {
       const childPath = joinName(path, childName);
       const child = computer.getEntry(childPath)!;
       return {
         name: childName, dir: child.isDirectory(),
-        node: <FileEntry computer={computer} entry={child} path={childPath} name={childName}
+        node: <FileEntry computer={computer} settings={settings} entry={child} path={childPath} name={childName}
           depth={depth === undefined ? 0 : depth + 1} opened={opened} open={open} />,
       };
     });
