@@ -1,3 +1,55 @@
+html {
+  --color-dark-1: #1E1E1E;
+  --color-dark-2: #202020;
+  --color-dark-3: #303030;
+  --color-dark-4: #3b3b3b;
+  --color-dark-5: #555555;
+  --color-light-1: #f8f8f8;
+  --color-light-2: #eeeeee;
+  --color-light-3: #e7e7e7;
+  --color-light-4: #dddddd;
+  --color-light-5: #ececec;
+  --color-yellow-1: #DEDE6C;
+}
+
+body {
+  --text-color: var(--color-light-2);
+  --text-accent: var(--color-light-4);
+  --bg-color: var(--color-dark-1);
+  --bg-file-tree: var(--color-dark-2);
+  --bg-file-tree-item: var(--color-dark-3);
+  --bg-file-tree-item-highlight: var(--color-dark-4);
+}
+
+body.darkTheme {
+  --text-color: var(--color-light-2);
+  --text-accent: var(--color-light-4);
+  --bg-color: var(--color-dark-1);
+  --bg-file-tree: var(--color-dark-2);
+  --bg-file-tree-item: var(--color-dark-3);
+  --bg-file-tree-item-highlight: var(--color-dark-4);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --text-color: var(--color-light-2);
+    --text-accent: var(--color-light-4);
+    --bg-color: var(--color-dark-1);
+    --bg-file-tree: var(--color-dark-2);
+    --bg-file-tree-item: var(--color-dark-3);
+    --bg-file-tree-item-highlight: var(--color-dark-4);
+
+  }
+  body.lightTheme {
+    --text-color: var(--color-dark-2);
+    --text-accent: var(--color-dark-5);
+    --bg-color: var(--color-light-2);
+    --bg-file-tree: var(--color-light-3);
+    --bg-file-tree-item: var(--color-light-3);
+    --bg-file-tree-item-highlight: var(--color-light-5);
+  }
+}
+
 .actionButton {
   composes: actionButton from "@squid-dev/cc-web-term/dist/styles.css";
 }
@@ -41,8 +93,8 @@
 
 .editorViewDark,
 .terminalViewDark {
-  background: rgb(36, 36, 36);
-  color: rgb(236, 236, 236)
+  background: #1E1E1E;
+  color: #ececec
 }
 
 .fileList {
@@ -82,7 +134,7 @@
 
 .fileComputerControlDark {
   background-color: #292929;
-  color: rgb(248, 248, 248);
+  color: #f8f8f8;
 }
 
 .fileComputer {
@@ -93,7 +145,7 @@
 
 .fileComputerDark {
   background-color: #292929;
-  color: rgb(248, 248, 248);
+  color: #f8f8f8;
 }
 
 .fileEntryHeadDark:hover,
@@ -127,7 +179,7 @@
 
 .fileEntryHead:hover,
 .fileComputer:hover {
-  background: #ddd;
+  background: #dddddd;
 }
 .fileEntryHead.active,
 .fileComputer.active,
@@ -264,7 +316,7 @@
 }
 
 .formGroupDark .tinyTextDark {
-  color: rgb(231, 231, 231) !important;
+  color: #e7e7e7 !important;
 }
 
 .formGroup input[type="text"],
@@ -286,7 +338,7 @@
 .formGroupDark input[type="text"],
 .formGroupDark input[type="number"],
 .formGroupDark select {
-  background-color: rgb(48, 48, 48);
+  background-color: #303030;
   color: rgb(228, 228, 228);
   border-style: none;
 }
@@ -309,5 +361,5 @@
 }
 
 .fontDarkMode {
-  color: rgb(224, 224, 224) !important;
+  color: #e0e0e0 !important;
 }
