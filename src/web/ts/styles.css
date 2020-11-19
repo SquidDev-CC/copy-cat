@@ -1,52 +1,57 @@
 html {
   --color-dark-1: #1E1E1E;
   --color-dark-2: #202020;
-  --color-dark-3: #303030;
+  --color-dark-3: #292929;
   --color-dark-4: #3b3b3b;
   --color-dark-5: #555555;
-  --color-light-1: #f8f8f8;
+  --color-light-1: #ffffff;
   --color-light-2: #eeeeee;
   --color-light-3: #e7e7e7;
   --color-light-4: #dddddd;
-  --color-light-5: #ececec;
+  --color-light-5: #cccccc;
   --color-yellow-1: #DEDE6C;
 }
 
-body {
-  --text-color: var(--color-light-2);
-  --text-accent: var(--color-light-4);
-  --bg-color: var(--color-dark-1);
-  --bg-file-tree: var(--color-dark-2);
-  --bg-file-tree-item: var(--color-dark-3);
-  --bg-file-tree-item-highlight: var(--color-dark-4);
+.lightTheme {
+  --text-color: var(--color-dark-2);
+  --text-accent: var(--color-dark-5);
+  --bg-color: var(--color-light-1);
+  --bg-file-tree: var(--color-light-2);
+  --bg-file-tree-item: var(--color-light-3);
+  --bg-file-tree-item-highlight: var(--color-light-4);
+  --bg-file-tree-item-highlight-active: var(--color-light-5);
+  --link-color: rgb(3, 197, 197);
+  --bg-dialogue: var(--color-light-2);
+  --bg-input: var(--color-light-4);
+  --bg-code-block: var(--color-light-5);
 }
 
-body.darkTheme {
+.darkTheme {
   --text-color: var(--color-light-2);
   --text-accent: var(--color-light-4);
   --bg-color: var(--color-dark-1);
   --bg-file-tree: var(--color-dark-2);
   --bg-file-tree-item: var(--color-dark-3);
   --bg-file-tree-item-highlight: var(--color-dark-4);
+  --bg-file-tree-item-highlight-active: var(--color-dark-5);
+  --link-color: var(--color-yellow-1);
+  --bg-dialogue: var(--color-dark-2);
+  --bg-input: var(--color-dark-5);
+  --bg-code-block: var(--color-dark-5);
 }
 
 @media (prefers-color-scheme: dark) {
-  body {
+  body.lightTheme {
     --text-color: var(--color-light-2);
     --text-accent: var(--color-light-4);
     --bg-color: var(--color-dark-1);
     --bg-file-tree: var(--color-dark-2);
     --bg-file-tree-item: var(--color-dark-3);
     --bg-file-tree-item-highlight: var(--color-dark-4);
-
-  }
-  body.lightTheme {
-    --text-color: var(--color-dark-2);
-    --text-accent: var(--color-dark-5);
-    --bg-color: var(--color-light-2);
-    --bg-file-tree: var(--color-light-3);
-    --bg-file-tree-item: var(--color-light-3);
-    --bg-file-tree-item-highlight: var(--color-light-5);
+    --bg-file-tree-item-highlight-active: var(--color-dark-5);
+    --link-color: var(--color-yellow-1);
+    --bg-dialogue: var(--color-dark-2);
+    --bg-input: var(--color-dark-5);
   }
 }
 
@@ -61,7 +66,7 @@ body.darkTheme {
 .tinyText {
   font-weight: 200;
   font-size: 0.8em;
-  color: #555;
+  color: var(--text-accent);
 }
 
 .errorView {
@@ -89,28 +94,21 @@ body.darkTheme {
   flex-grow: 1;
   flex-shrink: 1;
   overflow: hidden;
+  background: var(--bg-color);
+  color: var(--text-color)
 }
 
-.editorViewDark,
-.terminalViewDark {
-  background: #1E1E1E;
-  color: #ececec
-}
 
 .fileList {
   position: relative;
   flex-basis: 200px;
   max-width: 200px;
-  background-color: #eee;
+  background-color: var(--bg-file-tree);
+  color: var(--text-color);
   font-size: 0.8em;
   line-height: 1.4em;
   overflow-y: auto;
   scrollbar-width: thin;
-}
-
-.fileListDark {
-  background-color: #202020;
-  color: rgb(248, 248, 248);
 }
 
 .fileTree {
@@ -122,36 +120,25 @@ body.darkTheme {
 .fileEntryHead {
   padding: 5px 15px;
   cursor: pointer;
+  background-color: var(--bg-file-tree-item);
 }
 
-.fileEntryHeadDark {
-  background-color: #292929;
-}
 
 .fileComputerControl {
   position: relative;
-}
-
-.fileComputerControlDark {
-  background-color: #292929;
-  color: #f8f8f8;
+  background-color: var(--bg-file-tree-item);
+  color: var(--text-color);
 }
 
 .fileComputer {
   padding: 10px 15px;
   font-size: 1.3em;
   cursor: pointer;
+  background-color: var(--bg-file-tree-item);
+  color: var(--text-color);
 }
 
-.fileComputerDark {
-  background-color: #292929;
-  color: #f8f8f8;
-}
 
-.fileEntryHeadDark:hover,
-.fileComputerDark:hover {
-  background-color: #3b3b3b !important;
-}
 
 .fileComputerActions {
   position: absolute;
@@ -179,21 +166,15 @@ body.darkTheme {
 
 .fileEntryHead:hover,
 .fileComputer:hover {
-  background: #dddddd;
+  background: var(--bg-file-tree-item-highlight);
 }
 .fileEntryHead.active,
 .fileComputer.active,
 .fileEntryHead.active:hover,
 .fileComputer.active:hover {
-  background: #ccc;
+  background: var(--bg-file-tree-item-highlight-active);
 }
 
-.fileEntryHeadDark.active,
-.fileComputerDark.active,
-.fileEntryHeadDark.active:hover,
-.fileComputerDark.active:hover {
-  background-color: #3b3b3b !important;
-}
 
 .fileEntryName {
   text-overflow: ellipsis;
@@ -241,11 +222,6 @@ body.darkTheme {
   margin: 1em;
 }
 
-.editorPlaceholderDark {
-  background: rgb(20, 20, 20);
-  color: rgb(214, 212, 212);
-
-}
 
 .infoButtons {
   position: fixed;
@@ -286,16 +262,13 @@ body.darkTheme {
   max-width: 800px;
   max-height: 90vh;
   overflow-y: scroll;
-  background: white;
+  background: var(--bg-dialogue);
+  color: var(--text-color);
 }
 
-.dialogueBoxDark {
-  background: #202020;
-  color: rgb(240, 240, 240);
-}
 
-.dialogueBoxDark a{
-  color: #DEDE6C;
+.dialogueBox a {
+  color: var(--link-color);
 }
 
 .formGroup {
@@ -313,16 +286,15 @@ body.darkTheme {
 .formGroup .tinyText {
   overflow-wrap: anywhere;
   margin: 0px;
+  color: var(--text-accent);
 }
 
-.formGroupDark .tinyTextDark {
-  color: #e7e7e7 !important;
-}
 
 .formGroup input[type="text"],
 .formGroup input[type="number"],
 .formGroup select {
-  background-color: rgb(236, 236, 236);
+  background-color: var(--bg-input);
+  color: var(--text-color);
   margin-top: 2px;
   display: block;
   width: 100%;
@@ -335,31 +307,19 @@ body.darkTheme {
   margin: 0px 5px 0px 0px;
 }
 
-.formGroupDark input[type="text"],
-.formGroupDark input[type="number"],
-.formGroupDark select {
-  background-color: #303030;
-  color: rgb(228, 228, 228);
-  border-style: none;
-}
-
-.formGroupDark input[type="checkbox"] {
-  border-style: none;
-  padding: 6px;
-  border-radius: 4px;
-}
-
 @media (max-width: 800px) {
   .formGroup > label {
     flex-basis: 100%;
   }
 }
 
-.codeBlockDark {
-  background-color: rgb(58, 58, 58);
-  color: rgb(202, 202, 202);
+.codeBlock {
+  background-color: var(--bg-code-block);
+  color: var(--text-color);
+  border-radius: 5px;
 }
 
-.fontDarkMode {
-  color: #e0e0e0 !important;
+
+h1, h2, h3, p {
+  color: var(--text-color);
 }

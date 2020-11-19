@@ -7,7 +7,7 @@ import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
-import { actionButton, dialogueOverlay, infoButtons } from "./styles.css";
+import { actionButton, dialogueOverlay, infoButtons, darkTheme, lightTheme } from "./styles.css";
 
 type MainState = {
   settings: Settings,
@@ -53,7 +53,9 @@ class Main extends Component<unknown, MainState> {
 
     configEditor.addBoolean("editor.dark", "Dark mode", state.settings.darkMode,
       "Enables dark mode.",
-      x => this.setState(s => ({ settings: { ...s.settings, darkMode: x } })),
+      x => {
+        this.setState(s => ({ settings: { ...s.settings, darkMode: x } }));
+      },
     );
 
     const fonts: { [font: string]: string } = {
@@ -80,7 +82,7 @@ class Main extends Component<unknown, MainState> {
   }
 
   public render(_: unknown, state: MainState) {
-    return <div class="container">
+    return <div class={clsx("container", {[darkTheme]: state.settings.darkMode, [lightTheme]: !state.settings.darkMode})}>
       {state.currentVDom(state)}
       <div class={infoButtons}>
         <button class={actionButton} title="Configure how the emulator behaves" type="button"

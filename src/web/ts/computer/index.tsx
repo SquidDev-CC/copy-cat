@@ -10,9 +10,9 @@ import Editor, { LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
-  actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer, fileComputerDark,
-  fileComputerActions, fileComputerControl, fileComputerControlDark, fileDropMarker, fileList, fileListDark, 
-  terminalView, terminalViewDark 
+  actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer,
+  fileComputerActions, fileComputerControl, fileDropMarker, fileList, 
+  terminalView, 
 } from "../styles.css";
 import clsx from "clsx";
 
@@ -155,13 +155,12 @@ fn()`);
     { settings, focused }: ComputerProps,
     { terminal, terminalChanged, computer, activeFile, id, label, on, dragging }: ComputerState,
   ): VNode<unknown> {
-    const {darkMode} = settings;
     return <div class={computerView}>
       <div class={computerSplit}>
-        <div class={clsx(fileList, {[draggingClass]: dragging, [fileListDark]: darkMode})}
+        <div class={clsx(fileList, {[draggingClass]: dragging})}
           onDragOver={this.startDrag} onDragLeave={this.stopDrag} onDrop={this.dropFile}>
-          <div class={clsx(fileComputerControl, {[fileComputerControlDark]: darkMode})}>
-            <div class={clsx(fileComputer, {[active]: activeFile, [fileComputerDark]: darkMode})} onClick={this.openComputer}>
+          <div class={clsx(fileComputerControl)}>
+            <div class={clsx(fileComputer, {[active]: activeFile})} onClick={this.openComputer}>
               {id ? `Computer #${id}` : "Computer"}
             </div>
             <div class={fileComputerActions}>
@@ -180,7 +179,7 @@ fn()`);
           </div>
         </div>
         {activeFile == null
-          ? <div class={clsx(terminalView, {[terminalViewDark]: darkMode})}>
+          ? <div class={clsx(terminalView)}>
             <Terminal terminal={terminal} changed={terminalChanged} focused={focused} computer={computer}
               font={settings.terminalFont}
               id={id} label={label} on={on} />

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { VNode, h } from "preact";
 import type { Settings } from "./settings";
-import { dialogueBox, dialogueBoxDark, errorView, infoDescription, codeBlockDark } from "./styles.css";
+import { dialogueBox, errorView, infoDescription, codeBlock } from "./styles.css";
 
 const githubLink =
   <div class={infoDescription}>
@@ -20,9 +20,8 @@ export const UnknownError = ({ error }: { error: string }): VNode<unknown> =>
     {githubLink}
   </div>;
 
-export const About = ({settings}: {settings: Settings}): VNode<unknown> => {
-  const {darkMode} = settings
-  return <div class={clsx(dialogueBox, {[dialogueBoxDark]: darkMode})}>
+export const About = (_props: {settings: Settings}): VNode<unknown> => {
+  return <div class={clsx(dialogueBox)}>
     <h2>About</h2>
     <p>
       Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/SquidDev-CC/CC-Tweaked"
@@ -81,7 +80,7 @@ export const About = ({settings}: {settings: Settings}): VNode<unknown> => {
       </li>
     </ul>
 
-    <pre class={clsx({[codeBlockDark]: darkMode})}>
+    <pre class={clsx(codeBlock)}>
       {
         `This product includes software developed by Alexey Andreev (http://teavm.org).
 

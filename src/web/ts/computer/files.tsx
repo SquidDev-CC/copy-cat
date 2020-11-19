@@ -1,5 +1,5 @@
 import { Component, ComponentChild, VNode, h } from "preact";
-import { active, fileEntryHead, fileEntryHeadDark, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
+import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { DownOpen, Lua, RightOpen, Text } from "../font";
 import clsx from "clsx";
@@ -28,8 +28,8 @@ const getIcon = (name: string, directory: boolean, expanded: boolean) => {
 };
 
 class FileEntry extends Component<FileEntryProperties, FileEntryState> {
-  public shouldComponentUpdate({ entry, depth, opened, settings }: FileEntryProperties, { expanded }: FileEntryState) {
-    return settings.darkMode !== this.props.settings.darkMode || entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
+  public shouldComponentUpdate({ entry, depth, opened }: FileEntryProperties, { expanded }: FileEntryState) {
+    return entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
       expanded !== this.state.expanded;
   }
 
@@ -37,9 +37,8 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
     { computer, entry, name, path, depth, opened, open, settings }: FileEntryProperties,
     { expanded }: FileEntryState,
   ) {
-    const {darkMode} = settings;
     return <li>
-      <div class={clsx(fileEntryHead, {[active]: opened === path, [fileEntryHeadDark]: darkMode})} style={`padding-left: ${depth}em`}
+      <div class={clsx(fileEntryHead, {[active]: opened === path})} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
         <span class={clsx(fileEntryIcon)}>
           {getIcon(name, entry.isDirectory(), expanded || false)}
