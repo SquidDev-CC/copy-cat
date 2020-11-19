@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { JSX, h } from "preact";
 import type { ConfigGroup as IConfigGroup } from "./classes";
 import * as storage from "./storage";
@@ -154,13 +153,13 @@ export type SettingsProperties = {
   configGroups: ConfigGroup[],
 };
 
-export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element | null => {
-  return <div class={clsx(dialogueBox)}>
+export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element =>
+  <div class={dialogueBox}>
     <h2>Settings</h2>
     {configGroups.map(({ name, description, properties }) => [
       <h3>{name}</h3>,
-      description ? <p class={clsx(tinyText)}>{description}</p> : null,
-      <div class={clsx(formGroup)}>
+      description ? <p class={tinyText}>{description}</p> : null,
+      <div class={formGroup}>
         {properties.map(property => {
           switch (property.type) {
             case "string":
@@ -168,21 +167,21 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 {property.name}
                 <input type="text" value={store.get(property)}
                   onChange={getUpdater(store, property, getString)}></input>
-                <p class={clsx(tinyText)}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "int":
               return <label>
                 {property.name}
                 <input type="number" value={store.get(property)} min={property.min} max={property.max} step={1}
                   onChange={getUpdater(store, property, getNumber)}></input>
-                <p class={clsx(tinyText)}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "boolean":
               return <label>
                 <input type="checkbox" checked={store.get(property)}
                   onInput={getUpdater(store, property, getBool)}></input>
                 {property.name}
-                <p class={clsx(tinyText)}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
             case "option":
               return <label>
@@ -190,10 +189,10 @@ export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Eleme
                 <select value={store.get(property)} onInput={getUpdater(store, property, getOption(property.def, property.choices))}>
                   {property.choices.map(({ key, value }) => <option value={key}>{value}</option>)}
                 </select>
-                <p class={clsx(tinyText)}>{property.description}</p>
+                <p class={tinyText}>{property.description}</p>
               </label>;
           }
         })}
       </div>,
     ])}
-  </div>}
+  </div>;

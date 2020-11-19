@@ -11,10 +11,8 @@ import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
   actionButton, active, computerSplit, computerView, dragging as draggingClass, fileComputer,
-  fileComputerActions, fileComputerControl, fileDropMarker, fileList, 
-  terminalView, 
+  fileComputerActions, fileComputerControl, fileDropMarker, fileList, terminalView
 } from "../styles.css";
-import clsx from "clsx";
 
 export type ComputerProps = {
   focused: boolean,
@@ -85,6 +83,7 @@ const isSimpleZip = (zip: JSZip, name: string) => {
 export class Computer extends Component<ComputerProps, ComputerState> {
   public constructor(props: ComputerProps, context: unknown) {
     super(props, context);
+
     const terminal = new TerminalData();
     const terminalChanged = new Semaphore();
     const computer = new ComputerAccess(
@@ -157,10 +156,10 @@ fn()`);
   ): VNode<unknown> {
     return <div class={computerView}>
       <div class={computerSplit}>
-        <div class={clsx(fileList, {[draggingClass]: dragging})}
+        <div class={`${fileList} ${dragging ? draggingClass : ""}`}
           onDragOver={this.startDrag} onDragLeave={this.stopDrag} onDrop={this.dropFile}>
-          <div class={clsx(fileComputerControl)}>
-            <div class={clsx(fileComputer, {[active]: activeFile})} onClick={this.openComputer}>
+          <div class={fileComputerControl}>
+            <div class={`${fileComputer} ${activeFile == null ? active : ""}`} onClick={this.openComputer}>
               {id ? `Computer #${id}` : "Computer"}
             </div>
             <div class={fileComputerActions}>
@@ -171,7 +170,7 @@ fn()`);
             </div>
           </div>
 
-          <FileTree computer={computer} settings={settings} entry={computer.getEntry("")!} path=""
+          <FileTree computer={computer} entry={computer.getEntry("")!} path=""
             opened={activeFile === null ? null : activeFile.path} open={this.openFile} />
 
           <div class={fileDropMarker}>
@@ -179,7 +178,7 @@ fn()`);
           </div>
         </div>
         {activeFile == null
-          ? <div class={clsx(terminalView)}>
+          ? <div class={terminalView}>
             <Terminal terminal={terminal} changed={terminalChanged} focused={focused} computer={computer}
               font={settings.terminalFont}
               id={id} label={label} on={on} />

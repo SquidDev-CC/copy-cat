@@ -7,7 +7,7 @@ import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
-import { actionButton, dialogueOverlay, infoButtons, darkTheme, lightTheme } from "./styles.css";
+import { actionButton, darkTheme, dialogueOverlay, infoButtons, lightTheme } from "./styles.css";
 
 type MainState = {
   settings: Settings,
@@ -90,13 +90,13 @@ class Main extends Component<unknown, MainState> {
           <Cog />
         </button>
         <button class={actionButton} title="Find out more about the emulator" type="button"
-          onClick={() => this.setState({ dialogue: () => <About settings={state.settings} /> })}>
+          onClick={() => this.setState({ dialogue: () => <About /> })}>
           <Info />
         </button>
       </div>
       {
         state.dialogue ?
-          <div class={clsx(dialogueOverlay)} onClick={this.closeDialogueClick}>
+          <div class={dialogueOverlay} onClick={this.closeDialogueClick}>
             {state.dialogue(state)}
           </div> : ""
       }
