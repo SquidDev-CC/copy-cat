@@ -66,7 +66,7 @@ class Main extends Component<unknown, MainState> {
       [termFontHd]: termFontHd, "term_font_hd.png": termFontHd,
       [termFont]: termFont, "term_font.png": termFont
     };
-    configTerminal.addOption("terminal.font", "Font", state.settings.terminalFont,
+    configTerminal.addOption("terminal.font", "Font", "standard",
       [
         { key: "standard", value: "Standard font" },
         { key: "hd", value: "High-definition font" },

@@ -12,5 +12,3 @@ css.walkRules(rule => selector.astSync(rule.selector).walkClasses(x => rules.add
 
 const out = Array.from(rules).map(x => `export const ${x} : string;\n`).join("");
 fs.writeFileSync("src/web/ts/styles.css.d.ts", out);
-
-fs.copyFileSync(".gitignore", ".eslintignore");

@@ -2,28 +2,15 @@ import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.teavm.tooling.TeaVMProblemRenderer
-import org.teavm.tooling.TeaVMTargetType
-import org.teavm.tooling.TeaVMTool
-import org.teavm.tooling.TeaVMToolLog
-import org.teavm.tooling.sources.DirectorySourceFileProvider
-import org.teavm.tooling.sources.JarSourceFileProvider
-import org.teavm.vm.TeaVMOptimizationLevel
 import java.net.URLClassLoader
 import java.util.Properties
 
 buildscript {
     repositories {
         mavenCentral()
-        maven("https://dl.bintray.com/konsoletyper/teavm")
     }
 
     dependencies {
-        // TeaVM and tooling
-        classpath("org.teavm:teavm-core:${project.properties["teavm_version"]}")
-        classpath("org.teavm:teavm-tooling:${project.properties["teavm_version"]}")
-        classpath("commons-io:commons-io:2.6")
-
         // Misc buildscript stuff
         classpath("io.github.java-diff-utils:java-diff-utils:4.0")
         classpath("org.ajoberstar.grgit:grgit-gradle:3.0.0")
@@ -36,13 +23,18 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 repositories {
     mavenCentral()
     maven("https://dl.bintray.com/konsoletyper/teavm")
+}
+
+val teavmCli by configurations.creating {
+    extendsFrom(configurations.runtime.get())
 }
 
 dependencies {
@@ -57,14 +49,16 @@ dependencies {
     implementation("org.teavm:teavm-jso-apis:${project.properties["teavm_version"]}")
     implementation("org.teavm:teavm-platform:${project.properties["teavm_version"]}")
     implementation("org.teavm:teavm-classlib:${project.properties["teavm_version"]}")
+
+    teavmCli("org.teavm:teavm-cli:${project.properties["teavm_version"]}")
 }
 
 application {
-    mainClassName = "cc.squiddev.cct.Main"
+    mainClass.set("cc.squiddev.cct.Main")
 }
 
 tasks {
-    val compileTeaVM by registering {
+    val compileTeaVM by registering(JavaExec::class) {
         group = "build"
         description = "Converts Java code to Javascript using TeaVM"
 
@@ -73,52 +67,12 @@ tasks {
         val dir = File(buildDir, "teaVM")
         outputs.file(File(dir, "classes.js")).withPropertyName("output")
 
-        doLast {
-            val log = object : TeaVMToolLog {
-                override fun info(text: String?) = project.logger.info(text)
-                override fun debug(text: String?) = project.logger.debug(text)
-                override fun warning(text: String?) = project.logger.warn(text)
-                override fun error(text: String?) = project.logger.error(text)
-                override fun info(text: String?, e: Throwable?) = project.logger.info(text)
-                override fun debug(text: String?, e: Throwable?) = project.logger.debug(text, e)
-                override fun warning(text: String?, e: Throwable?) = project.logger.warn(text, e)
-                override fun error(text: String?, e: Throwable?) = project.logger.error(text, e)
-            }
-
-            fun getSource(f: File) = if (f.isFile && f.absolutePath.endsWith(".jar")) {
-                JarSourceFileProvider(f)
-            } else {
-                DirectorySourceFileProvider(f)
-            }
-
-            val runtime = project.configurations.getByName("runtimeClasspath")
-            val dependencies = runtime.resolve().map { it.toURI().toURL() }
-            val artifacts = runtime.allArtifacts.files.map { it.toURI().toURL() }
-
-            URLClassLoader((dependencies + artifacts).toTypedArray(), log.javaClass.classLoader).use { classloader ->
-                val tool = TeaVMTool()
-                tool.classLoader = classloader
-                tool.targetDirectory = dir
-                tool.setTargetFileName("classes.js")
-                tool.mainClass = application.mainClassName
-                tool.setObfuscated(true)
-                tool.optimizationLevel = TeaVMOptimizationLevel.ADVANCED
-                tool.log = log
-                tool.targetType = TeaVMTargetType.JAVASCRIPT
-
-                project.convention
-                    .getPlugin(JavaPluginConvention::class.java)
-                    .sourceSets
-                    .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                    .allSource
-                    .forEach { tool.addSourceFileProvider(getSource(it)) }
-
-                tool.generate()
-
-                TeaVMProblemRenderer.describeProblems(tool.getDependencyInfo().getCallGraph(), tool.getProblemProvider(), log)
-                if (tool.problemProvider.severeProblems.isNotEmpty()) throw IllegalStateException("Build failed")
-            }
-        }
+        classpath = teavmCli + sourceSets.main.get().runtimeClasspath
+        main = "org.teavm.cli.TeaVMRunner"
+        args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        })
     }
 
     val bundleTeaVM by registering {
@@ -126,12 +80,12 @@ tasks {
         description = "Converts the TeaVM file into a AMD module"
 
         dependsOn(compileTeaVM)
-        inputs.file(File("$buildDir/teaVM/classes.js")).withPropertyName("input")
-        outputs.file(File("$buildDir/javascript/classes.js")).withPropertyName("output")
+        inputs.file(File(buildDir, "teaVM/classes.js")).withPropertyName("input")
+        outputs.file(File(buildDir, "javascript/classes.js")).withPropertyName("output")
 
         doLast {
-            File("$buildDir/javascript/classes.js").bufferedWriter().use { writer ->
-                File("$buildDir/teaVM/classes.js").reader().use { it.copyTo(writer) }
+            File(buildDir, "javascript/classes.js").bufferedWriter().use { writer ->
+                File(buildDir, "teaVM/classes.js").reader().use { it.copyTo(writer) }
 
                 // Export a simple function which sets the callbacks and then boots the VM
                 writer.write("export default callbacks => {\n")
@@ -169,7 +123,7 @@ tasks {
 
         dependsOn(bundleTeaVM, genCssTypes)
         inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
-        inputs.file("package.json").withPropertyName("package.json")
+        inputs.file("package-lock.json").withPropertyName("package-lock.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
         outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
@@ -189,7 +143,7 @@ tasks {
 
         inputs.property("hash", {
             try {
-                FileRepositoryBuilder().setWorkTree(File(".")).build()
+                FileRepositoryBuilder().setWorkTree(projectDir).build()
                     .use { it.resolve("HEAD").name() }
             } catch (e: Exception) {
                 project.logger.warn("Cannot get current commit ($e)")
@@ -216,7 +170,7 @@ tasks {
 
         inputs.files(js).withPropertyName("js")
         inputs.files(css).withPropertyName("css")
-        inputs.file("package.json").withPropertyName("package.json")
+        inputs.file("package-lock.json").withPropertyName("package-lock.json")
         outputs.files(fileTree(dest))
         dependsOn(website)
 
@@ -283,9 +237,9 @@ tasks {
                 Pair("CC-Tweaked", "dan200/computercraft"),
                 Pair("Cobalt", "org/squiddev/cobalt")
             ).forEach { (project, packageName) ->
-                val patches = File("src/patches/java/$packageName")
-                val modified = File("src/main/java/$packageName")
-                val original = File("original/$project/src/main/java/$packageName")
+                val patches = File(projectDir, "src/patches/java/$packageName")
+                val modified = File(projectDir, "src/main/java/$packageName")
+                val original = File(projectDir, "original/$project/src/main/java/$packageName")
                 if (!modified.isDirectory) throw IllegalArgumentException("$modified is not a directory or does not exist")
                 if (!original.isDirectory) throw IllegalArgumentException("$original is not a directory or does not exist")
 
@@ -367,8 +321,8 @@ tasks {
                     include("java/**")
                 }
             ).forEach { files ->
-                val patches = File("src/patches/")
-                val modified = File("src/main/")
+                val patches = File(projectDir, "src/patches/")
+                val modified = File(projectDir, "src/main/")
                 val original = files.dir
 
                 // We load CC:T's properties and use them to substitute in the mod version
@@ -379,7 +333,6 @@ tasks {
                     val relativeFile = originalFile.relativeTo(original)
                     val modifiedFile = modified.resolve(relativeFile)
                     val patchFile = File(patches, "$relativeFile.patch")
-
                     modifiedFile.parentFile.mkdirs()
                     if (patchFile.exists()) {
                         println("Patching $relativeFile")
@@ -409,8 +362,8 @@ tasks {
             val resources = fileTree("original/CC-Tweaked/src/main/resources/data/computercraft/lua/rom/")
             resources.forEach { builder.append("        \"").append(it.relativeTo(resources.dir).toString().replace('\\', '/')).append("\",\n") }
 
-            val contents = File("src/main/java/cc/squiddev/cct/mount/Resources.java.txt").readText().replace("__FILES__", builder.toString())
-            File("src/main/java/cc/squiddev/cct/mount/Resources.java").writeText(contents)
+            val contents = File(projectDir, "src/main/java/cc/squiddev/cct/mount/Resources.java.txt").readText().replace("__FILES__", builder.toString())
+            File(projectDir, "src/main/java/cc/squiddev/cct/mount/Resources.java").writeText(contents)
 
         }
     }
