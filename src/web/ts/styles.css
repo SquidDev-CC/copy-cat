@@ -14,16 +14,17 @@ html {
 
 .lightTheme {
   --text-color: var(--color-dark-2);
-  --text-accent: var(--color-dark-5);
+  --text-accent: var(--color-dark-4);
   --bg-color: var(--color-light-1);
   --bg-file-tree: var(--color-light-2);
   --bg-file-tree-item: var(--color-light-3);
   --bg-file-tree-item-highlight: var(--color-light-4);
   --bg-file-tree-item-highlight-active: var(--color-light-5);
   --link-color: rgb(3, 197, 197);
-  --bg-dialogue: var(--color-light-2);
+  --bg-dialogue: var(--color-light-1);
   --bg-input: var(--color-light-4);
   --bg-code-block: var(--color-light-5);
+  --bg-button: var(--color-dark-1);
 }
 
 .darkTheme {
@@ -38,6 +39,7 @@ html {
   --bg-dialogue: var(--color-dark-2);
   --bg-input: var(--color-dark-5);
   --bg-code-block: var(--color-dark-5);
+  --bg-button: var(--color-light-1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,6 +54,7 @@ html {
     --link-color: var(--color-yellow-1);
     --bg-dialogue: var(--color-dark-2);
     --bg-input: var(--color-dark-5);
+    --bg-button: var(--color-dark-1);
   }
 }
 
@@ -59,12 +62,17 @@ html {
   composes: actionButton from "@squid-dev/cc-web-term/dist/styles.css";
 }
 
+.iconFont {
+  composes: iconFont from "@squid-dev/cc-web-term/dist/styles.css";
+  fill: var(--bg-button);
+}
+
 .infoDescription {
   padding: 5px 10px;
 }
 
 .tinyText {
-  font-weight: 200;
+  font-weight: 300;
   font-size: 0.8em;
   color: var(--text-accent);
 }
