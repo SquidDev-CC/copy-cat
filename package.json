@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@squid-dev/cc-web-term": "^1.2.0",
+    "clsx": "^1.1.1",
     "jszip": "^3.5.0",
     "monaco-editor": "^0.21.2",
     "preact": "^10.5.7",

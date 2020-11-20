@@ -1,5 +1,70 @@
+html {
+  --color-dark-1: #1E1E1E;
+  --color-dark-2: #202020;
+  --color-dark-3: #292929;
+  --color-dark-4: #3b3b3b;
+  --color-dark-5: #555555;
+  --color-light-1: #ffffff;
+  --color-light-2: #eeeeee;
+  --color-light-3: #e7e7e7;
+  --color-light-4: #dddddd;
+  --color-light-5: #cccccc;
+  --color-yellow-1: #DEDE6C;
+}
+
+.lightTheme {
+  --text-color: var(--color-dark-2);
+  --text-accent: var(--color-dark-4);
+  --bg-color: var(--color-light-1);
+  --bg-file-tree: var(--color-light-2);
+  --bg-file-tree-item: var(--color-light-3);
+  --bg-file-tree-item-highlight: var(--color-light-4);
+  --bg-file-tree-item-highlight-active: var(--color-light-5);
+  --link-color: rgb(3, 197, 197);
+  --bg-dialogue: var(--color-light-1);
+  --bg-input: var(--color-light-4);
+  --bg-code-block: var(--color-light-5);
+  --bg-button: var(--color-dark-1);
+}
+
+.darkTheme {
+  --text-color: var(--color-light-2);
+  --text-accent: var(--color-light-4);
+  --bg-color: var(--color-dark-1);
+  --bg-file-tree: var(--color-dark-2);
+  --bg-file-tree-item: var(--color-dark-3);
+  --bg-file-tree-item-highlight: var(--color-dark-4);
+  --bg-file-tree-item-highlight-active: var(--color-dark-5);
+  --link-color: var(--color-yellow-1);
+  --bg-dialogue: var(--color-dark-2);
+  --bg-input: var(--color-dark-5);
+  --bg-code-block: var(--color-dark-5);
+  --bg-button: var(--color-light-1);
+}
+
+@media (prefers-color-scheme: dark) {
+  body.lightTheme {
+    --text-color: var(--color-light-2);
+    --text-accent: var(--color-light-4);
+    --bg-color: var(--color-dark-1);
+    --bg-file-tree: var(--color-dark-2);
+    --bg-file-tree-item: var(--color-dark-3);
+    --bg-file-tree-item-highlight: var(--color-dark-4);
+    --bg-file-tree-item-highlight-active: var(--color-dark-5);
+    --link-color: var(--color-yellow-1);
+    --bg-dialogue: var(--color-dark-2);
+    --bg-input: var(--color-dark-5);
+    --bg-button: var(--color-dark-1);
+  }
+}
+
 .actionButton {
   composes: actionButton from "@squid-dev/cc-web-term/dist/styles.css";
+}
+
+.iconFont {
+  composes: iconFont from "@squid-dev/cc-web-term/dist/styles.css";
+  fill: var(--bg-button);
 }
 
 .infoDescription {
@@ -7,14 +72,14 @@
 }
 
 .tinyText {
-  font-weight: 200;
+  font-weight: 300;
   font-size: 0.8em;
-  color: #555;
+  color: var(--text-accent);
 }
 
 .errorView {
-    background-color: #ffb6b6;
-    color: #670000;
+  background-color: #ffb6b6;
+  color: #670000;
 }
 
 .termLine:before {
@@ -32,18 +97,22 @@
   justify-content: space-between;
 }
 
-.terminalView, .editorView {
+.terminalView,
+.editorView {
   flex-grow: 1;
   flex-shrink: 1;
   overflow: hidden;
+  background: var(--bg-color);
+  color: var(--text-color)
 }
+
 
 .fileList {
   position: relative;
-
   flex-basis: 200px;
   max-width: 200px;
-  background-color: #eee;
+  background-color: var(--bg-file-tree);
+  color: var(--text-color);
   font-size: 0.8em;
   line-height: 1.4em;
   overflow-y: auto;
@@ -56,19 +125,35 @@
   padding: 0;
 }
 
-.fileEntryHead { padding: 5px 15px; cursor: pointer; }
+.fileEntryHead {
+  padding: 5px 15px;
+  cursor: pointer;
+  background-color: var(--bg-file-tree-item);
+}
 
-.fileComputerControl { position: relative; }
+
+.fileComputerControl {
+  position: relative;
+  background-color: var(--bg-file-tree-item);
+  color: var(--text-color);
+}
 
 .fileComputer {
   padding: 10px 15px;
   font-size: 1.3em;
   cursor: pointer;
+  background-color: var(--bg-file-tree-item);
+  color: var(--text-color);
 }
+
+
 
 .fileComputerActions {
   position: absolute;
-  left: 0; right: 0; top: 0; bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   pointer-events: none;
   display: flex;
   justify-content: flex-end;
@@ -83,11 +168,21 @@
   text-align: center;
 }
 
-.fileComputerActions .actionButton:hover { background: rgba(0, 0, 0, 0.1); }
+.fileComputerActions .actionButton:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
 
-.fileEntryHead:hover, .fileComputer:hover { background: #ddd; }
-.fileEntryHead.active, .fileComputer.active,
-.fileEntryHead.active:hover, .fileComputer.active:hover { background: #ccc; }
+.fileEntryHead:hover,
+.fileComputer:hover {
+  background: var(--bg-file-tree-item-highlight);
+}
+.fileEntryHead.active,
+.fileComputer.active,
+.fileEntryHead.active:hover,
+.fileComputer.active:hover {
+  background: var(--bg-file-tree-item-highlight-active);
+}
+
 
 .fileEntryName {
   text-overflow: ellipsis;
@@ -100,13 +195,17 @@
   padding: 0 5px;
 }
 
+
 .fileDropMarker {
   display: none;
 }
 
 .fileList.dragging .fileDropMarker {
   position: absolute;
-  top: 0; bottom: 0; left: 0; right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
@@ -131,11 +230,12 @@
   margin: 1em;
 }
 
+
 .infoButtons {
-    position: fixed;
-    bottom: 5px;
-    left: 5px;
-    z-index: 50;
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  z-index: 50;
 }
 
 .infoButtons > button {
@@ -143,7 +243,9 @@
   padding: 0 3px;
 }
 
-.infoButtons > button:hover { opacity: 1; }
+.infoButtons > button:hover {
+  opacity: 1;
+}
 
 .dialogueOverlay {
   position: fixed;
@@ -157,6 +259,7 @@
   background: rgba(0, 0, 0, 0.7);
 }
 
+
 .dialogueBox {
   position: relative;
   top: 5vh;
@@ -167,8 +270,13 @@
   max-width: 800px;
   max-height: 90vh;
   overflow-y: scroll;
+  background: var(--bg-dialogue);
+  color: var(--text-color);
+}
 
-  background: white;
+
+.dialogueBox a {
+  color: var(--link-color);
 }
 
 .formGroup {
@@ -186,20 +294,40 @@
 .formGroup .tinyText {
   overflow-wrap: anywhere;
   margin: 0px;
+  color: var(--text-accent);
 }
 
-.formGroup input[type="text"], .formGroup input[type="number"], .formGroup select {
+
+.formGroup input[type="text"],
+.formGroup input[type="number"],
+.formGroup select {
+  background-color: var(--bg-input);
+  color: var(--text-color);
   margin-top: 2px;
   display: block;
   width: 100%;
+  border-style: none;
+  padding: 6px;
+  border-radius: 4px;
 }
 
 .formGroup input[type="checkbox"] {
   margin: 0px 5px 0px 0px;
 }
 
-@media(max-width: 800px) {
+@media (max-width: 800px) {
   .formGroup > label {
     flex-basis: 100%;
   }
+}
+
+.codeBlock {
+  background-color: var(--bg-code-block);
+  color: var(--text-color);
+  border-radius: 5px;
+}
+
+
+h1, h2, h3, p {
+  color: var(--text-color);
 }
