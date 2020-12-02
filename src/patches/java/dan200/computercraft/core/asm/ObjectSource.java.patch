@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\ObjectSource.java
-+++ src\main\java\dan200\computercraft\core\asm\ObjectSource.java
+--- ObjectSource.java
++++ ObjectSource.java
 @@ -6,6 +6,8 @@
  
  package dan200.computercraft.core.asm;

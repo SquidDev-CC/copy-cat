@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\ComputerThread.java
-+++ src\main\java\dan200\computercraft\core\computer\ComputerThread.java
+--- ComputerThread.java
++++ ComputerThread.java
 @@ -294,7 +294,7 @@
      private static void afterWork( TaskRunner runner, ComputerExecutor executor )
      {

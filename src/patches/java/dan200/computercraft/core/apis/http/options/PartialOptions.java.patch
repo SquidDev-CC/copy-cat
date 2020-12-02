@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\options\PartialOptions.java
-+++ src\main\java\dan200\computercraft\core\apis\http\options\PartialOptions.java
+--- PartialOptions.java
++++ PartialOptions.java
 @@ -30,7 +30,7 @@
      }
  

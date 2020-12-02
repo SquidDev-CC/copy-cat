@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\terminal\Terminal.java
-+++ src\main\java\dan200\computercraft\core\terminal\Terminal.java
+--- Terminal.java
++++ Terminal.java
 @@ -7,8 +7,6 @@
  
  import dan200.computercraft.shared.util.Colour;

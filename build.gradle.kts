@@ -251,8 +251,9 @@ tasks {
                         val originalFile = original.resolve(relativeFile)
                         val originalContents = originalFile.readLines()
 
+                        val filename = relativeFile.name
                         val diff = DiffUtils.diff(originalContents, modifiedFile.readLines())
-                        val patch = UnifiedDiffUtils.generateUnifiedDiff(originalFile.toString(), modifiedFile.toString(), originalContents, diff, 3)
+                        val patch = UnifiedDiffUtils.generateUnifiedDiff(filename, filename, originalContents, diff, 3)
                         if (!patch.isEmpty()) {
                             val patchFile = File(patches, "$relativeFile.patch")
                             patchFile.parentFile.mkdirs()

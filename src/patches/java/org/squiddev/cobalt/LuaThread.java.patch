@@ -1,5 +1,5 @@
---- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaThread.java
-+++ src\main\java\org\squiddev\cobalt\LuaThread.java
+--- LuaThread.java
++++ LuaThread.java
 @@ -30,11 +30,10 @@
  import org.squiddev.cobalt.function.LuaFunction;
  import org.squiddev.cobalt.lib.CoroutineLib;

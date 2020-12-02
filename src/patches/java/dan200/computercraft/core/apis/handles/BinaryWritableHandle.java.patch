@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
-+++ src\main\java\dan200\computercraft\core\apis\handles\BinaryWritableHandle.java
+--- BinaryWritableHandle.java
++++ BinaryWritableHandle.java
 @@ -14,8 +14,8 @@
  import java.io.IOException;
  import java.nio.ByteBuffer;

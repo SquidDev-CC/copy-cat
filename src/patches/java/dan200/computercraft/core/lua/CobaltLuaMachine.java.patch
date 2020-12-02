@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
-+++ src\main\java\dan200\computercraft\core\lua\CobaltLuaMachine.java
+--- CobaltLuaMachine.java
++++ CobaltLuaMachine.java
 @@ -41,12 +41,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine

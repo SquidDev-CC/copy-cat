@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
-+++ src\main\java\dan200\computercraft\core\filesystem\FileSystem.java
+--- FileSystem.java
++++ FileSystem.java
 @@ -18,11 +18,12 @@
  import java.lang.ref.Reference;
  import java.lang.ref.ReferenceQueue;

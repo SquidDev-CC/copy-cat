@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
-+++ src\main\java\dan200\computercraft\core\apis\http\ResourceGroup.java
+--- ResourceGroup.java
++++ ResourceGroup.java
 @@ -5,6 +5,7 @@
   */
  package dan200.computercraft.core.apis.http;

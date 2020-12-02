@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
-+++ src\main\java\dan200\computercraft\core\tracking\TrackingContext.java
+--- TrackingContext.java
++++ TrackingContext.java
 @@ -28,7 +28,6 @@
  
      public synchronized void start()

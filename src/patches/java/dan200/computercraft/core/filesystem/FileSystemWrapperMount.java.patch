@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
-+++ src\main\java\dan200\computercraft\core\filesystem\FileSystemWrapperMount.java
+--- FileSystemWrapperMount.java
++++ FileSystemWrapperMount.java
 @@ -9,8 +9,8 @@
  
  import javax.annotation.Nonnull;

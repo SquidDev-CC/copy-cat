@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\HandleGeneric.java
-+++ src\main\java\dan200\computercraft\core\apis\handles\HandleGeneric.java
+--- HandleGeneric.java
++++ HandleGeneric.java
 @@ -12,8 +12,8 @@
  import javax.annotation.Nonnull;
  import java.io.Closeable;

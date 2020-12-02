@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\TrackingField.java
-+++ src\main\java\dan200\computercraft\core\tracking\TrackingField.java
+--- TrackingField.java
++++ TrackingField.java
 @@ -8,7 +8,7 @@
  import java.util.Collections;
  import java.util.HashMap;

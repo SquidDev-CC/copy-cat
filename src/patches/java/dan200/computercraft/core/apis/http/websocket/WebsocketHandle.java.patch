@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
-+++ src\main\java\dan200\computercraft\core\apis\http\websocket\WebsocketHandle.java
+--- WebsocketHandle.java
++++ WebsocketHandle.java
 @@ -10,10 +10,8 @@
  import dan200.computercraft.core.apis.http.options.Options;
  import dan200.computercraft.core.tracking.TrackingField;

@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\PeripheralMethod.java
-+++ src\main\java\dan200\computercraft\core\asm\PeripheralMethod.java
+--- PeripheralMethod.java
++++ PeripheralMethod.java
 @@ -18,10 +18,6 @@
  
  public interface PeripheralMethod

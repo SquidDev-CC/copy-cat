@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
-+++ src\main\java\dan200\computercraft\core\apis\http\request\HttpRequest.java
+--- HttpRequest.java
++++ HttpRequest.java
 @@ -8,11 +8,9 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.core.apis.IAPIEnvironment;

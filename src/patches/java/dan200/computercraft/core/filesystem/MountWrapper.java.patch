@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
-+++ src\main\java\dan200\computercraft\core\filesystem\MountWrapper.java
+--- MountWrapper.java
++++ MountWrapper.java
 @@ -12,10 +12,10 @@
  import javax.annotation.Nonnull;
  import javax.annotation.Nullable;

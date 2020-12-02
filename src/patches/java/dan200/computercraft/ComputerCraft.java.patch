@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\ComputerCraft.java
-+++ src\main\java\dan200\computercraft\ComputerCraft.java
+--- ComputerCraft.java
++++ ComputerCraft.java
 @@ -5,6 +5,7 @@
   */
  package dan200.computercraft;

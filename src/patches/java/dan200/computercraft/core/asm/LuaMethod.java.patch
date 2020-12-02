@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\LuaMethod.java
-+++ src\main\java\dan200\computercraft\core\asm\LuaMethod.java
+--- LuaMethod.java
++++ LuaMethod.java
 @@ -13,10 +13,6 @@
  
  public interface LuaMethod

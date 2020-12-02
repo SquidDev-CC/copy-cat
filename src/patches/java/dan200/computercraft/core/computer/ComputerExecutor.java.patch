@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\ComputerExecutor.java
-+++ src\main\java\dan200\computercraft\core\computer\ComputerExecutor.java
+--- ComputerExecutor.java
++++ ComputerExecutor.java
 @@ -5,6 +5,7 @@
   */
  package dan200.computercraft.core.computer;

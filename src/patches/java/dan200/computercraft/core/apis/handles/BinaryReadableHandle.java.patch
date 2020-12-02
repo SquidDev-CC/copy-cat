@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\BinaryReadableHandle.java
-+++ src\main\java\dan200\computercraft\core\apis\handles\BinaryReadableHandle.java
+--- BinaryReadableHandle.java
++++ BinaryReadableHandle.java
 @@ -12,8 +12,8 @@
  import java.io.Closeable;
  import java.io.IOException;

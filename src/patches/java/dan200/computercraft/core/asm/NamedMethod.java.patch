@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\asm\NamedMethod.java
-+++ src\main\java\dan200\computercraft\core\asm\NamedMethod.java
+--- NamedMethod.java
++++ NamedMethod.java
 @@ -14,7 +14,7 @@
      private final T method;
      private final boolean nonYielding;

@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\tracking\Tracking.java
-+++ src\main\java\dan200\computercraft\core\tracking\Tracking.java
+--- Tracking.java
++++ Tracking.java
 @@ -15,6 +15,7 @@
  
  public final class Tracking

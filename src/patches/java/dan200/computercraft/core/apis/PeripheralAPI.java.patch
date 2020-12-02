@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\PeripheralAPI.java
-+++ src\main\java\dan200\computercraft\core\apis\PeripheralAPI.java
+--- PeripheralAPI.java
++++ PeripheralAPI.java
 @@ -352,7 +352,7 @@
              ? Objects.requireNonNull( ((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null" )
              : LuaMethod.EMPTY_METHODS;

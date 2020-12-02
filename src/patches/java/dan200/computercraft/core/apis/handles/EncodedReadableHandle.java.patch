@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
-+++ src\main\java\dan200\computercraft\core\apis\handles\EncodedReadableHandle.java
+--- EncodedReadableHandle.java
++++ EncodedReadableHandle.java
 @@ -12,8 +12,9 @@
  import java.io.BufferedReader;
  import java.io.Closeable;

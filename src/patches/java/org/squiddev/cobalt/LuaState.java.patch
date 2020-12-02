@@ -1,5 +1,5 @@
---- original\Cobalt\src\main\java\org\squiddev\cobalt\LuaState.java
-+++ src\main\java\org\squiddev\cobalt\LuaState.java
+--- LuaState.java
++++ LuaState.java
 @@ -123,11 +123,6 @@
  	private LuaThread mainThread;
  

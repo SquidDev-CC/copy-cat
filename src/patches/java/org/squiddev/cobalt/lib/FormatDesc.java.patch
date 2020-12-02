@@ -1,5 +1,5 @@
---- original\Cobalt\src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
-+++ src\main\java\org\squiddev\cobalt\lib\FormatDesc.java
+--- FormatDesc.java
++++ FormatDesc.java
 @@ -239,9 +239,12 @@
  			buf.append(Character.isUpperCase(conversion) ? "INF" : "inf");
  			if (leftAdjust) pad(buf, ' ', effectiveWidth - 3);

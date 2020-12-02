@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\MainThreadExecutor.java
-+++ src\main\java\dan200\computercraft\core\computer\MainThreadExecutor.java
+--- MainThreadExecutor.java
++++ MainThreadExecutor.java
 @@ -8,8 +8,6 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.api.peripheral.IWorkMonitor;

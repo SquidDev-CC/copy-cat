@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
-+++ src\main\java\dan200\computercraft\core\apis\http\websocket\Websocket.java
+--- Websocket.java
++++ Websocket.java
 @@ -9,11 +9,11 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.core.apis.IAPIEnvironment;

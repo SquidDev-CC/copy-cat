@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
-+++ src\main\java\dan200\computercraft\core\filesystem\ChannelWrapper.java
+--- ChannelWrapper.java
++++ ChannelWrapper.java
 @@ -5,9 +5,10 @@
   */
  package dan200.computercraft.core.filesystem;

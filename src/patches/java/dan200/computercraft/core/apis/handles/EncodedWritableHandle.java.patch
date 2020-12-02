@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
-+++ src\main\java\dan200\computercraft\core\apis\handles\EncodedWritableHandle.java
+--- EncodedWritableHandle.java
++++ EncodedWritableHandle.java
 @@ -5,6 +5,7 @@
   */
  package dan200.computercraft.core.apis.handles;

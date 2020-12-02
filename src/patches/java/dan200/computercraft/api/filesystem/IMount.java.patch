@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\api\filesystem\IMount.java
-+++ src\main\java\dan200\computercraft\api\filesystem\IMount.java
+--- IMount.java
++++ IMount.java
 @@ -5,14 +5,12 @@
   */
  package dan200.computercraft.api.filesystem;

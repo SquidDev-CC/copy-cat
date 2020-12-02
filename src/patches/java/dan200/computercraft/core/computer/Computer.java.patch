@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\computer\Computer.java
-+++ src\main\java\dan200\computercraft\core\computer\Computer.java
+--- Computer.java
++++ Computer.java
 @@ -39,12 +39,11 @@
      private final IComputerEnvironment m_environment;
      private final Terminal m_terminal;

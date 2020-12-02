@@ -1,5 +1,5 @@
---- original\CC-Tweaked\src\main\java\dan200\computercraft\core\apis\HTTPAPI.java
-+++ src\main\java\dan200\computercraft\core\apis\HTTPAPI.java
+--- HTTPAPI.java
++++ HTTPAPI.java
 @@ -13,16 +13,10 @@
  import dan200.computercraft.core.apis.http.*;
  import dan200.computercraft.core.apis.http.request.HttpRequest;
