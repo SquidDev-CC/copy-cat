@@ -8,10 +8,10 @@
  import dan200.computercraft.api.turtle.event.TurtleAction;
  import dan200.computercraft.core.apis.http.options.Action;
  import dan200.computercraft.core.apis.http.options.AddressRule;
-@@ -29,8 +30,9 @@
+@@ -27,8 +28,9 @@
+ import java.util.EnumSet;
+ import java.util.List;
  import java.util.concurrent.TimeUnit;
- import java.util.stream.Collectors;
- import java.util.stream.Stream;
 +*/
 +import cc.squiddev.cct.stub.Logger;
  
@@ -19,7 +19,7 @@
  public final class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
-@@ -56,11 +58,12 @@
+@@ -43,15 +45,17 @@
      public static boolean commandRequireCreative = true;
  
      public static int computerThreads = 1;
@@ -31,18 +31,15 @@
      public static boolean httpEnabled = true;
      public static boolean httpWebsocketEnabled = true;
 +    /*
-     public static List<AddressRule> httpRules = Collections.unmodifiableList( Stream.concat(
-         Stream.of( DEFAULT_HTTP_DENY )
-             .map( x -> AddressRule.parse( x, null, Action.DENY.toPartial() ) )
-@@ -69,6 +72,7 @@
-             .map( x -> AddressRule.parse( x, null, Action.ALLOW.toPartial() ) )
-             .filter( Objects::nonNull )
-     ).collect( Collectors.toList() ) );
+     public static List<AddressRule> httpRules = Collections.unmodifiableList( Arrays.asList(
+         AddressRule.parse( "$private", null, Action.DENY.toPartial() ),
+         AddressRule.parse( "*", null, Action.ALLOW.toPartial() )
+     ) );
 +    */
  
      public static int httpMaxRequests = 16;
      public static int httpMaxWebsockets = 4;
-@@ -79,7 +83,6 @@
+@@ -62,7 +66,6 @@
      public static int modemRangeDuringStorm = 64;
      public static int modemHighAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
@@ -50,7 +47,7 @@
      public static double monitorDistanceSq = 4096;
      public static long monitorBandwidth = 1_000_000;
  
-@@ -88,7 +91,6 @@
+@@ -71,7 +74,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -58,7 +55,7 @@
  
      public static int computerTermWidth = 51;
      public static int computerTermHeight = 19;
-@@ -102,6 +104,14 @@
+@@ -85,6 +87,14 @@
      public static int monitorWidth = 8;
      public static int monitorHeight = 6;
  
@@ -73,7 +70,7 @@
      public static final class TurtleUpgrades
      {
          public static TurtleModem wirelessModemNormal;
-@@ -136,4 +146,5 @@
+@@ -119,4 +129,5 @@
          Registry.setup();
          GenericSource.setup( () -> ServiceUtil.loadServicesForge( GenericSource.class ) );
      }
