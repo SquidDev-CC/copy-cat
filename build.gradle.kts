@@ -328,7 +328,7 @@ tasks {
 
                 // We load CC:T's properties and use them to substitute in the mod version
                 val props = Properties()
-                File("original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
+                File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
                 files.forEach { originalFile ->
                     val relativeFile = originalFile.relativeTo(original)
