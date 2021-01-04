@@ -12,7 +12,7 @@ import static dan200.computercraft.ComputerCraft.computerTermHeight;
 import static dan200.computercraft.ComputerCraft.computerTermWidth;
 
 public class Main {
-    public static String corsProxy = "https://cors-anywhere.herokuapp.com/{}";
+    public static String corsProxy = "https://cloud-catcher.squiddev.workers.dev/{}";
     private static final List<ComputerWrapper> computers = new ArrayList<>();
     private static long ticks;
 
