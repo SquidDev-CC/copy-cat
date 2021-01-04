@@ -90,6 +90,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     } else {
       this.persistance.removeChildren(this.path);
     }
+    this.persistance.removeAttributes(this.path);
     if (this.semaphore) this.semaphore.signal();
   }
 
