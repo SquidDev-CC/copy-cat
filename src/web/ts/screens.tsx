@@ -34,10 +34,9 @@ export const About = (): VNode<unknown> => <div class={dialogueBox}>
   </p>
 
   <p>
-    If you need help writing a program, I'd recommend checking out the <a href="https://forums.computercraft.cc/"
-      target="_blank" title ="The CC: Tweaked forums">CC: Tweaked</a> or <a href="https://discord.computercraft.cc"
-      title="The Minecraft Computer Mods Discord" target="_blank">ComputerCraft</a> forums. <a
-      href="https://tweaked.cc" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
+    If you need help writing a program, I'd recommend checking out the <a href="https://forums.computercraft.cc/" target="_blank" title="The CC: Tweaked forums">forums</a> or <a href="https://discord.computercraft.cc"
+      title="The Minecraft Computer Mods Discord" target="_blank">Discord</a>. <a
+        href="https://tweaked.cc" target="_blank" title="The CC: Tweaked wiki">The CC: Tweaked
     wiki</a> may also be a good source of documentation.
   </p>
 
