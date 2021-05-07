@@ -1,6 +1,6 @@
 --- LuaMethod.java
 +++ LuaMethod.java
-@@ -13,10 +13,6 @@
+@@ -12,10 +12,6 @@
  
  public interface LuaMethod
  {

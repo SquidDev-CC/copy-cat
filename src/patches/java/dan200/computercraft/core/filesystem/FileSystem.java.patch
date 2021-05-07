@@ -17,7 +17,7 @@
  import java.util.*;
  import java.util.function.Function;
  import java.util.regex.Pattern;
-@@ -346,12 +347,8 @@
+@@ -368,12 +369,8 @@
                   WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
              {
                  // Copy bytes as fast as we can
@@ -31,7 +31,7 @@
              catch( IOException e )
              {
                  throw new FileSystemException( e.getMessage() );
-@@ -502,7 +499,7 @@
+@@ -516,7 +513,7 @@
  
          // Collapse the string into its component parts, removing ..'s
          String[] parts = path.split( "/" );
@@ -40,7 +40,7 @@
          for( String part : parts )
          {
              if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -515,32 +512,32 @@
+@@ -529,32 +526,32 @@
              if( part.equals( ".." ) )
              {
                  // .. can cancel out the last folder entered

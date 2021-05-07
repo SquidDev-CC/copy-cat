@@ -16,7 +16,7 @@
 +    /*
      public synchronized void write( PacketBuffer buffer )
      {
-         buffer.writeInt( m_cursorX );
+         buffer.writeInt( cursorX );
 @@ -421,4 +420,5 @@
          if( c >= 'a' && c <= 'f' ) return c - 'a' + 10;
          return 15 - def.ordinal();

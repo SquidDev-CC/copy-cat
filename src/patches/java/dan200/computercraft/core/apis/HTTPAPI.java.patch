@@ -1,36 +1,37 @@
 --- HTTPAPI.java
 +++ HTTPAPI.java
-@@ -13,16 +13,10 @@
+@@ -13,10 +13,6 @@
  import dan200.computercraft.core.apis.http.*;
  import dan200.computercraft.core.apis.http.request.HttpRequest;
  import dan200.computercraft.core.apis.http.websocket.Websocket;
 -import io.netty.handler.codec.http.DefaultHttpHeaders;
+-import io.netty.handler.codec.http.HttpHeaderNames;
 -import io.netty.handler.codec.http.HttpHeaders;
 -import io.netty.handler.codec.http.HttpMethod;
  
  import javax.annotation.Nonnull;
  import java.net.URI;
--import java.util.Collections;
--import java.util.Locale;
--import java.util.Map;
--import java.util.Optional;
+@@ -24,6 +20,7 @@
+ import java.util.Locale;
+ import java.util.Map;
+ import java.util.Optional;
 +import java.util.*;
  
  import static dan200.computercraft.core.apis.TableHelper.*;
  
-@@ -34,9 +28,10 @@
+@@ -35,9 +32,10 @@
   */
  public class HTTPAPI implements ILuaAPI
  {
 +    private static final String[] VERBS = new String[]{"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"};
 +
-     private final IAPIEnvironment m_apiEnvironment;
+     private final IAPIEnvironment apiEnvironment;
  
 -    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>();
      private final ResourceGroup<HttpRequest> requests = new ResourceQueue<>( () -> ComputerCraft.httpMaxRequests );
      private final ResourceGroup<Websocket> websockets = new ResourceGroup<>( () -> ComputerCraft.httpMaxWebsockets );
  
-@@ -54,7 +49,6 @@
+@@ -55,7 +53,6 @@
      @Override
      public void startup()
      {
@@ -38,7 +39,7 @@
          requests.startup();
          websockets.startup();
      }
-@@ -62,7 +56,6 @@
+@@ -63,7 +60,6 @@
      @Override
      public void shutdown()
      {
@@ -46,7 +47,7 @@
          requests.shutdown();
          websockets.shutdown();
      }
-@@ -104,17 +97,17 @@
+@@ -105,17 +101,17 @@
              redirect = true;
          }
  
@@ -69,17 +70,18 @@
              {
                  throw new LuaException( "Unsupported HTTP method" );
              }
-@@ -142,7 +135,8 @@
+@@ -142,8 +138,8 @@
+     {
          try
          {
-             URI uri = HttpRequest.checkUri( address );
--            new CheckUrl( checkUrls, m_apiEnvironment, address, uri ).queue( CheckUrl::run );
-+            HttpRequest.checkUri( uri );
-+            m_apiEnvironment.queueEvent("http_check", address, true);
+-            URI uri = HttpRequest.checkUri( address );
+-            new CheckUrl( checkUrls, apiEnvironment, address, uri ).queue( CheckUrl::run );
++            HttpRequest.checkUri( address );
++            apiEnvironment.queueEvent("http_check", address, true);
  
              return new Object[] { true };
          }
-@@ -160,7 +154,7 @@
+@@ -161,7 +157,7 @@
              throw new LuaException( "Websocket connections are disabled" );
          }
  
@@ -88,19 +90,19 @@
  
          try
          {
-@@ -179,9 +173,9 @@
+@@ -180,9 +176,9 @@
      }
  
      @Nonnull
--    private static HttpHeaders getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
-+    private static Map<String, String> getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
+-    private HttpHeaders getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
++    private Map<String, String> getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
      {
 -        HttpHeaders headers = new DefaultHttpHeaders();
 +        Map<String, String> headers = new HashMap<>();
          for( Map.Entry<?, ?> entry : headerTable.entrySet() )
          {
              Object value = entry.getValue();
-@@ -189,7 +183,7 @@
+@@ -190,7 +186,7 @@
              {
                  try
                  {
@@ -109,3 +111,15 @@
                  }
                  catch( IllegalArgumentException e )
                  {
+@@ -199,9 +195,9 @@
+             }
+         }
+ 
+-        if( !headers.contains( HttpHeaderNames.USER_AGENT ) )
++        if( !headers.containsKey( "user-agent" ) )
+         {
+-            headers.set( HttpHeaderNames.USER_AGENT, apiEnvironment.getComputerEnvironment().getUserAgent() );
++            headers.put( "user-agent", apiEnvironment.getComputerEnvironment().getUserAgent() );
+         }
+         return headers;
+     }

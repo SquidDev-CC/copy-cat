@@ -1,7 +1,7 @@
 --- BinaryReadableHandle.java
 +++ BinaryReadableHandle.java
 @@ -12,8 +12,8 @@
- import java.io.Closeable;
+ import java.io.ByteArrayOutputStream;
  import java.io.IOException;
  import java.nio.ByteBuffer;
 -import java.nio.channels.ReadableByteChannel;

@@ -16,12 +16,12 @@
      private static final LuaMethod FUNCTION_METHOD = ( target, context, args ) -> ((ILuaFunction) target).call( args );
  
 @@ -71,6 +73,7 @@
-         LuaState state = m_state = LuaState.builder()
+         LuaState state = this.state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
 +            /*
              .coroutineExecutor( command -> {
-                 Tracking.addValue( m_computer, TrackingField.COROUTINES_CREATED, 1 );
+                 Tracking.addValue( this.computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
 @@ -84,6 +87,7 @@
                      }
@@ -30,17 +30,16 @@
 +            */
              .build();
  
-         m_globals = new LuaTable();
-@@ -122,7 +126,7 @@
+         globals = new LuaTable();
+@@ -122,7 +126,6 @@
          LuaTable table = wrapLuaObject( api );
          if( table == null )
          {
 -            ComputerCraft.log.warn( "API {} does not provide any methods", api );
-+            ComputerCraft.log.warn( "API does not provide any methods" );
              table = new LuaTable();
          }
  
-@@ -237,7 +241,7 @@
+@@ -237,7 +240,7 @@
              table.rawset( method, new ResultInterpreterFunction( this, LuaMethod.DYNAMIC.get( i ), object, context, method ) );
          }
  
@@ -49,16 +48,15 @@
              table.rawset( method.getName(), method.nonYielding()
                  ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
                  : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
-@@ -332,7 +336,7 @@
+@@ -332,7 +335,6 @@
  
          if( ComputerCraft.logComputerErrors )
          {
 -            ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
-+            ComputerCraft.log.warn( "Received unknown type returning nil." );
          }
          return Constants.NIL;
      }
-@@ -487,7 +491,6 @@
+@@ -487,7 +489,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
@@ -66,7 +64,7 @@
              handleSoftAbort();
          }
  
-@@ -514,6 +517,8 @@
+@@ -514,6 +515,8 @@
          @Override
          public long issueMainThreadTask( @Nonnull final ILuaTask task ) throws LuaException
          {
@@ -75,7 +73,7 @@
              // Issue command
              final long taskID = MainThread.getUniqueTaskID();
              final Runnable iTask = () -> {
-@@ -553,6 +558,7 @@
+@@ -553,6 +556,7 @@
              {
                  throw new LuaException( "Task limit exceeded" );
              }

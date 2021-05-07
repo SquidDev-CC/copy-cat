@@ -1,21 +1,21 @@
 --- Computer.java
 +++ Computer.java
 @@ -39,12 +39,11 @@
-     private final IComputerEnvironment m_environment;
-     private final Terminal m_terminal;
+     private final IComputerEnvironment environment;
+     private final Terminal terminal;
      private final ComputerExecutor executor;
 -    private final MainThreadExecutor serverExecutor;
  
      // Additional state about the computer and its environment.
-     private boolean m_blinking = false;
+     private boolean blinking = false;
      private final Environment internalEnvironment = new Environment( this );
 -    private final AtomicBoolean externalOutputChanged = new AtomicBoolean();
 +    private boolean externalOutputChanged = false;
  
      private boolean startRequested;
-     private int m_ticksSinceStart = -1;
+     private int ticksSinceStart = -1;
 @@ -56,7 +55,6 @@
-         m_terminal = terminal;
+         this.terminal = terminal;
  
          executor = new ComputerExecutor( this );
 -        serverExecutor = new MainThreadExecutor( this );
@@ -48,9 +48,9 @@
  
      public int getID()
 @@ -159,7 +159,7 @@
-         if( !Objects.equal( label, m_label ) )
+         if( !Objects.equal( label, this.label ) )
          {
-             m_label = label;
+             this.label = label;
 -            externalOutputChanged.set( true );
 +            externalOutputChanged = true;
          }
@@ -64,11 +64,11 @@
 +        if( internalEnvironment.updateOutput() ) externalOutputChanged = true;
  
          // Set output changed if the terminal has changed from blinking to not
-         boolean blinking = m_terminal.getCursorBlink() &&
+         boolean blinking = terminal.getCursorBlink() &&
 @@ -193,18 +193,20 @@
-         if( blinking != m_blinking )
+         if( blinking != this.blinking )
          {
-             m_blinking = blinking;
+             this.blinking = blinking;
 -            externalOutputChanged.set( true );
 +            externalOutputChanged = true;
          }
@@ -85,7 +85,7 @@
 -        return externalOutputChanged.getAndSet( false );
 +        boolean changed = externalOutputChanged;
 +        externalOutputChanged = false;
-+        return changed;
++        return externalOutputChanged;
      }
  
      public boolean isBlinking()
