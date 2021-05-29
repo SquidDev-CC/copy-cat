@@ -284,6 +284,7 @@ tasks {
                     // adding Minecraft as a dependency. This gets a little ugly.
                     exclude("java/dan200/computercraft/**/package-info.java")
                     include("java/dan200/computercraft/api/lua/**")
+                    exclude("java/dan200/computercraft/api/lua/GenericSource.java")
                     include("java/dan200/computercraft/api/filesystem/**")
                     include("java/dan200/computercraft/api/peripheral/**")
                     exclude("java/dan200/computercraft/api/peripheral/IPeripheralTile.java")
@@ -294,7 +295,7 @@ tasks {
                     // We exclude the actual asm generation stuff, but need some of the interfaces
                     exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
                     exclude("java/dan200/computercraft/core/asm/Generator.java")
-                    exclude("java/dan200/computercraft/core/asm/GenericSource.java")
+                    exclude("java/dan200/computercraft/core/asm/GenericMethod.java")
                     exclude("java/dan200/computercraft/core/asm/Reflect.java")
                     // We just exclude some FS stuff, as it's a bit of a faff to deal with.
                     exclude("java/dan200/computercraft/core/filesystem/ComboMount.java")

@@ -8,18 +8,24 @@
  import dan200.computercraft.api.turtle.event.TurtleAction;
  import dan200.computercraft.core.apis.http.options.Action;
  import dan200.computercraft.core.apis.http.options.AddressRule;
-@@ -27,8 +28,9 @@
+@@ -19,14 +20,14 @@
+ import net.minecraftforge.fml.common.Mod;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+-
++*/
+ import java.util.Arrays;
+ import java.util.Collections;
  import java.util.EnumSet;
  import java.util.List;
  import java.util.concurrent.TimeUnit;
-+*/
 +import cc.squiddev.cct.stub.Logger;
  
 -@Mod( ComputerCraft.MOD_ID )
  public final class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
-@@ -43,15 +45,17 @@
+@@ -41,15 +42,17 @@
      public static boolean commandRequireCreative = true;
  
      public static int computerThreads = 1;
@@ -39,7 +45,7 @@
  
      public static int httpMaxRequests = 16;
      public static int httpMaxWebsockets = 4;
-@@ -62,7 +66,6 @@
+@@ -60,7 +63,6 @@
      public static int modemRangeDuringStorm = 64;
      public static int modemHighAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
@@ -47,7 +53,7 @@
      public static double monitorDistanceSq = 4096;
      public static long monitorBandwidth = 1_000_000;
  
-@@ -71,7 +74,6 @@
+@@ -69,7 +71,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -55,12 +61,12 @@
  
      public static int computerTermWidth = 51;
      public static int computerTermHeight = 19;
-@@ -85,6 +87,14 @@
+@@ -83,6 +84,14 @@
      public static int monitorWidth = 8;
      public static int monitorHeight = 6;
  
 +    public static final Logger log = Logger.INSTANCE;
-+    static final String VERSION = "1.95.3";
++    static final String VERSION = "1.96.0";
 +
 +    public static String getVersion() {
 +        return VERSION;
@@ -70,9 +76,9 @@
      public static final class TurtleUpgrades
      {
          public static TurtleModem wirelessModemNormal;
-@@ -119,4 +129,5 @@
+@@ -116,4 +125,5 @@
+         Config.setup();
          Registry.setup();
-         GenericSource.setup( () -> ServiceUtil.loadServicesForge( GenericSource.class ) );
      }
 +    */
  }
