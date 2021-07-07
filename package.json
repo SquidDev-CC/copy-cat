@@ -29,7 +29,8 @@
     "monaco-editor": "^0.21.2",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
-    "setimmediate": "^1.0.5"
+    "setimmediate": "^1.0.5",
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^10.0.0",
