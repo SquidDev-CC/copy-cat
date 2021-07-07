@@ -23,7 +23,7 @@
     "host:min": "cd build/webMin && python -mhttp.server 8080"
   },
   "dependencies": {
-    "@squid-dev/cc-web-term": "^1.2.2",
+    "@squid-dev/cc-web-term": "^1.2.3",
     "clsx": "^1.1.1",
     "jszip": "^3.5.0",
     "monaco-editor": "^0.21.2",
