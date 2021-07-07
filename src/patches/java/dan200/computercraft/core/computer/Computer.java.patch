@@ -85,7 +85,7 @@
 -        return externalOutputChanged.getAndSet( false );
 +        boolean changed = externalOutputChanged;
 +        externalOutputChanged = false;
-+        return externalOutputChanged;
++        return changed;
      }
  
      public boolean isBlinking()
