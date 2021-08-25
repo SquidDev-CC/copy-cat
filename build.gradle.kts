@@ -69,11 +69,11 @@ tasks {
         outputs.file(File(dir, "classes.js")).withPropertyName("output")
 
         classpath = teavmCli + sourceSets.main.get().runtimeClasspath
-        main = "org.teavm.cli.TeaVMRunner"
+        mainClass.set("org.teavm.cli.TeaVMRunner")
         args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
-        /*javaLauncher.set(javaToolchains.launcherFor {
+        javaLauncher.set(project.javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(8))
-        })*/
+        })
     }
 
     val bundleTeaVM by registering {

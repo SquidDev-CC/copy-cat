@@ -1,5 +1,6 @@
 import type { ComputerAccess, ComputerCallbacks, ConfigGroup, Callbacks as ICallbacks } from "./classes";
 export type { ComputerAccess, FileSystemEntry, QueueEventHandler, Result, ConfigGroup as IConfigGroup } from "./classes";
+import { timeFormat } from "d3-time-format";
 
 import "setimmediate";
 
@@ -26,6 +27,10 @@ class Callbacks implements ICallbacks {
   public setImmediate(callback: () => void): void {
     // Bodge, as there's no types for 'setImmediate'
     (window as any).setImmediate(callback); // eslint-disable-line @typescript-eslint/no-explicit-any
+  }
+
+  public strftime(format: string, time: Date): string {
+    return timeFormat(format)(time);
   }
 }
 

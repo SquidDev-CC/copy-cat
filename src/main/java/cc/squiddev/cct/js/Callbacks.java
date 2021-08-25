@@ -3,6 +3,7 @@ package cc.squiddev.cct.js;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
+import org.teavm.jso.core.JSDate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,4 +44,7 @@ public class Callbacks {
 
     @JSBody(params = {"callback"}, script = "copycatCallbacks.setImmediate(callback);")
     public static native void setImmediate(Callback callback);
+
+    @JSBody(params = {"format", "time"}, script = "return copycatCallbacks.strftime(format, time);")
+    public static native String strftime(String format, JSDate time);
 }

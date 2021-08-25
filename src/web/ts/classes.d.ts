@@ -239,4 +239,6 @@ export interface Callbacks {
   setInterval(callback: () => void, delay: number): void;
 
   setImmediate(callback: () => void): void;
+
+  strftime(format: string, time: Date): string;
 }
