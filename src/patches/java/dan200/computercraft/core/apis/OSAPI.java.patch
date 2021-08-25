@@ -1,14 +1,16 @@
 --- OSAPI.java
 +++ OSAPI.java
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,9 @@
   */
  package dan200.computercraft.core.apis;
  
++import cc.squiddev.cct.js.Callbacks;
++import org.teavm.jso.core.JSDate;
 +import cc.squiddev.cct.stub.LuaDateTime;
  import dan200.computercraft.api.lua.IArguments;
  import dan200.computercraft.api.lua.ILuaAPI;
  import dan200.computercraft.api.lua.LuaException;
-@@ -443,29 +444,24 @@
+@@ -443,29 +446,24 @@
      public final Object date( Optional<String> formatA, Optional<Long> timeA ) throws LuaException
      {
          String format = formatA.orElse( "%c" );
@@ -42,7 +44,7 @@
 -        DateTimeFormatterBuilder formatter = new DateTimeFormatterBuilder();
 -        LuaDateTime.format( formatter, format, offset );
 -        return formatter.toFormatter( Locale.ROOT ).format( date );
-+        return instant.toString(); // TODO: Something!
++        return Callbacks.strftime(format, JSDate.create(instant.getTimeInMillis()));
      }
  
  }
