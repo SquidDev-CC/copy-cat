@@ -34,11 +34,12 @@ repositories {
 }
 
 val teavmCli by configurations.creating {
-    extendsFrom(configurations.runtime.get())
+    extendsFrom(configurations.runtimeOnly.get())
 }
 
 dependencies {
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    compileOnly("org.checkerframework:checker-qual:3.17.0")
 
     implementation("com.google.guava:guava:22.0")
     implementation("org.apache.commons:commons-lang3:3.6")
@@ -62,7 +63,7 @@ tasks {
         group = "build"
         description = "Converts Java code to Javascript using TeaVM"
 
-        inputs.files(project.configurations.getByName("runtime").allArtifacts.files).withPropertyName("jars")
+        inputs.files(project.configurations.getByName("runtimeOnly").allArtifacts.files).withPropertyName("jars")
 
         val dir = File(buildDir, "teaVM")
         outputs.file(File(dir, "classes.js")).withPropertyName("output")
@@ -70,9 +71,9 @@ tasks {
         classpath = teavmCli + sourceSets.main.get().runtimeClasspath
         main = "org.teavm.cli.TeaVMRunner"
         args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
-        javaLauncher.set(javaToolchains.launcherFor {
+        /*javaLauncher.set(javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(8))
-        })
+        })*/
     }
 
     val bundleTeaVM by registering {
@@ -122,11 +123,12 @@ tasks {
         description = "Combines multiple Javascript files into one"
 
         dependsOn(bundleTeaVM, genCssTypes)
+        inputs.file(File(buildDir, "javascript/classes.js")).withPropertyName("teaVM")
         inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
         inputs.file("package-lock.json").withPropertyName("package-lock.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
-        outputs.files(fileTree("$buildDir/rollup")).withPropertyName("output")
+        outputs.files(fileTree(File(buildDir, "rollup"))).withPropertyName("output")
 
         commandLine(mkCommand("npm run --silent prepare:rollup"))
     }
@@ -136,6 +138,7 @@ tasks {
         description = "Combines all resource files into one distribution."
 
         dependsOn(rollup)
+        inputs.files(fileTree(File(buildDir, "rollup"))).withPropertyName("rollup")
 
         /** Replace various template strings within our files. */
         fun replaceTemplate(x: String) = x
@@ -292,6 +295,7 @@ tasks {
 
                     // Core is pretty simple.
                     include("java/dan200/computercraft/core/**")
+                    exclude("java/dan200/computercraft/core/tracking/ComputerMBean.java")
                     // We exclude the actual asm generation stuff, but need some of the interfaces
                     exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
                     exclude("java/dan200/computercraft/core/asm/Generator.java")
@@ -309,6 +313,7 @@ tasks {
                     exclude("java/dan200/computercraft/core/apis/http/NetworkUtils.java")
                     exclude("java/dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
                     exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
+                    exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java")
 
                     exclude("java/dan200/computercraft/core/apis/http/options/AddressRuleConfig.java")
 
@@ -331,6 +336,7 @@ tasks {
                 val props = Properties()
                 File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
+                var failed = false
                 files.forEach { originalFile ->
                     val relativeFile = originalFile.relativeTo(original)
                     val modifiedFile = modified.resolve(relativeFile)
@@ -339,7 +345,13 @@ tasks {
                     if (patchFile.exists()) {
                         println("Patching $relativeFile")
                         val patch = UnifiedDiffUtils.parseUnifiedDiff(patchFile.readLines())
-                        val modifiedContents = DiffUtils.patch(originalFile.readLines(), patch)
+                        val modifiedContents = try {
+                            DiffUtils.patch(originalFile.readLines(), patch)
+                        } catch (e: Exception) {
+                            println("Failed to apply patch. This should be manually fixed")
+                            failed = true
+                            originalFile.readLines()
+                        }
                         modifiedFile.bufferedWriter().use { writer ->
                             modifiedContents.forEach {
                                 if (modifiedFile.name == "ComputerCraft.java" && it.startsWith("    static final String VERSION = \"")) {
@@ -356,6 +368,8 @@ tasks {
                         originalFile.copyTo(modifiedFile)
                     }
                 }
+
+                if (failed) throw IllegalStateException("Failed to apply patches")
             }
 
             // Generate Resources.java

@@ -1,18 +1,14 @@
 --- LuaState.java
 +++ LuaState.java
-@@ -123,11 +123,6 @@
- 	private LuaThread mainThread;
+@@ -125,7 +125,6 @@
+ 	/**
+ 	 * The currently active {@link YieldThreader}.
+ 	 */
+-	final YieldThreader threader;
  
  	/**
--	 * The currently active {@link YieldThreader}.
--	 */
--	final YieldThreader threader;
--
--	/**
  	 * If this state has been abandoned, and threads should be cleaned up.
- 	 *
- 	 * @see LuaThread#orphanCheckInterval
-@@ -152,7 +147,6 @@
+@@ -152,7 +151,6 @@
  		this.random = builder.random;
  		this.debug = builder.debug;
  		this.timezone = builder.timezone;
@@ -20,21 +16,22 @@
  	}
  
  	/**
-@@ -209,13 +203,6 @@
+@@ -209,12 +207,14 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
--		private static final AtomicInteger coroutineCount = new AtomicInteger();
--		private static final Executor defaultCoroutineExecutor = Executors.newCachedThreadPool(command -> {
--			Thread thread = new Thread(command, "Coroutine-" + coroutineCount.getAndIncrement());
--			thread.setDaemon(true);
--			return thread;
--		});
--
++		/*
+ 		private static final AtomicInteger coroutineCount = new AtomicInteger();
+ 		private static final Executor defaultCoroutineExecutor = Executors.newCachedThreadPool(command -> {
+ 			Thread thread = new Thread(command, "Coroutine-" + coroutineCount.getAndIncrement());
+ 			thread.setDaemon(true);
+ 			return thread;
+ 		});
++		*/
+ 
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
- 		private LuaTable stringMetatable;
-@@ -224,12 +211,11 @@
+@@ -224,12 +224,11 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
@@ -48,11 +45,16 @@
  
  		/**
  		 * Build a Lua state from this builder
-@@ -403,7 +389,6 @@
+@@ -401,10 +400,12 @@
+ 		 * @param coroutineExecutor The new executor
+ 		 * @return This builder
  		 */
++		/*
  		public Builder coroutineExecutor(Executor coroutineExecutor) {
  			if (coroutineExecutor == null) throw new NullPointerException("coroutineExecutor cannot be null");
--			this.coroutineExecutor = coroutineExecutor;
+ 			this.coroutineExecutor = coroutineExecutor;
  			return this;
  		}
++		*/
  	}
+ }

@@ -17,33 +17,21 @@
  {
      private static final int QUEUE_LIMIT = 256;
  
-@@ -71,7 +72,7 @@
-      */
-     private volatile boolean isOn = false;
- 
--    /**
-+    /*
-      * The lock to acquire when you need to modify the "on state" of a computer.
-      *
-      * We hold this lock when running any command, and attempt to hold it when updating APIs. This ensures you don't
-@@ -82,13 +83,13 @@
+@@ -82,13 +83,11 @@
       * @see #turnOn()
       * @see #shutdown()
       */
 -    private final ReentrantLock isOnLock = new ReentrantLock();
-+    // private final ReentrantLock isOnLock = new ReentrantLock();
  
--    /**
-+    /*
+     /**
       * A lock used for any changes to {@link #eventQueue}, {@link #command} or {@link #onComputerQueue}. This will be
       * used on the main thread, so locks should be kept as brief as possible.
       */
 -    private final Object queueLock = new Object();
-+    // private final Object queueLock = new Object();
  
      /**
       * Determines if this executor is present within {@link ComputerThread}.
-@@ -97,7 +98,7 @@
+@@ -97,7 +96,7 @@
       * @see #enqueue()
       * @see #afterWork()
       */
@@ -52,19 +40,11 @@
  
      /**
       * The amount of time this computer has used on a theoretical machine which shares work evenly amongst computers.
-@@ -148,18 +149,17 @@
- 
-     private IWritableMount rootMount;
- 
--    /**
-+    /*
-      * The thread the executor is running on. This is non-null when performing work. We use this to ensure we're only
-      * doing one bit of work at one time.
+@@ -154,12 +153,10 @@
       *
       * @see ComputerThread
       */
 -    final AtomicReference<Thread> executingThread = new AtomicReference<>();
-+    // final AtomicReference<Thread> executingThread = new AtomicReference<>();
  
      ComputerExecutor( Computer computer )
      {
@@ -73,7 +53,7 @@
  
          this.computer = computer;
  
-@@ -207,7 +207,6 @@
+@@ -207,7 +204,6 @@
       */
      void queueStart()
      {
@@ -81,7 +61,7 @@
          {
              // We should only schedule a start if we're not currently on and there's turn on.
              if( closed || isOn || command != null ) return;
-@@ -226,7 +225,6 @@
+@@ -226,7 +222,6 @@
       */
      void queueStop( boolean reboot, boolean close )
      {
@@ -89,15 +69,15 @@
          {
              if( closed ) return;
              closed = close;
-@@ -255,7 +253,6 @@
+@@ -269,7 +264,6 @@
          ILuaMachine machine = this.machine;
          if( machine != null ) machine.close();
  
 -        synchronized( queueLock )
          {
              if( closed ) return;
-             command = StateCommand.ABORT;
-@@ -274,7 +271,6 @@
+             this.command = command;
+@@ -288,7 +282,6 @@
          // Events should be skipped if we're not on.
          if( !isOn ) return;
  
@@ -105,7 +85,7 @@
          {
              // And if we've got some command in the pipeline, then don't queue events - they'll
              // probably be disposed of anyway.
-@@ -291,7 +287,6 @@
+@@ -305,7 +298,6 @@
       */
      private void enqueue()
      {
@@ -113,7 +93,7 @@
          {
              if( !onComputerQueue ) ComputerThread.queue( this );
          }
-@@ -302,7 +297,7 @@
+@@ -316,7 +308,7 @@
       */
      void tick()
      {
@@ -122,7 +102,7 @@
          {
              // This horrific structure means we don't try to update APIs while the state is being changed
              // (and so they may be running startup/shutdown).
-@@ -318,7 +313,6 @@
+@@ -332,7 +324,6 @@
              }
              finally
              {
@@ -130,7 +110,7 @@
              }
          }
      }
-@@ -407,13 +401,11 @@
+@@ -421,13 +412,11 @@
  
      private void turnOn() throws InterruptedException
      {
@@ -144,7 +124,7 @@
              {
                  eventQueue.clear();
              }
-@@ -442,7 +434,6 @@
+@@ -456,7 +445,6 @@
          }
          finally
          {
@@ -152,7 +132,7 @@
          }
  
          // Now actually start the computer, now that everything is set up.
-@@ -451,12 +442,10 @@
+@@ -465,12 +453,10 @@
  
      private void shutdown() throws InterruptedException
      {
@@ -165,7 +145,7 @@
              {
                  eventQueue.clear();
              }
-@@ -484,14 +473,13 @@
+@@ -498,14 +484,13 @@
          }
          finally
          {
@@ -181,7 +161,7 @@
      {
          vRuntimeStart = System.nanoTime();
          timeout.startTimer();
-@@ -502,7 +490,7 @@
+@@ -516,7 +501,7 @@
       *
       * @return If we have more work to do.
       */
@@ -190,7 +170,7 @@
      {
          if( interruptedEvent )
          {
-@@ -517,7 +505,6 @@
+@@ -531,7 +516,6 @@
  
          if( interruptedEvent ) return true;
  
@@ -198,7 +178,7 @@
          {
              if( eventQueue.isEmpty() && command == null ) return onComputerQueue = false;
              return true;
-@@ -533,7 +520,7 @@
+@@ -547,7 +531,7 @@
       * @see #command
       * @see #eventQueue
       */
@@ -207,7 +187,7 @@
      {
          if( interruptedEvent )
          {
-@@ -547,7 +534,6 @@
+@@ -561,7 +545,6 @@
  
          StateCommand command;
          Event event = null;

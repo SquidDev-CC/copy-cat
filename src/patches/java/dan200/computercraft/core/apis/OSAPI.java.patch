@@ -13,7 +13,7 @@
      {
          String format = formatA.orElse( "%c" );
 -        long time = timeA.orElseGet( () -> Instant.now().getEpochSecond() );
-+        long time = timeA.orElseGet( () -> Calendar.getInstance().getTimeInMillis() );
++        long time = timeA.orElseGet( () -> Calendar.getInstance().getTimeInMillis() / 1000) * 1000;
  
 -        Instant instant = Instant.ofEpochSecond( time );
 -        ZonedDateTime date;

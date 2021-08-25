@@ -58,11 +58,6 @@ public class Main {
             x -> ComputerCraft.defaultComputerSettings = x
         );
 
-        general.addBoolean("debug_enabled", "Debug enabled", ComputerCraft.debugEnable,
-            "Enable Lua's debug library. This is sandboxed to each computer, so is generally safe to be used by players.",
-            x -> ComputerCraft.debugEnable = x
-        );
-
         ConfigGroup terminal = Callbacks.config("Terminal", "Configure the terminal display");
 
         terminal.addInt("terminal.width", "Width", computerTermWidth, 1, 100,

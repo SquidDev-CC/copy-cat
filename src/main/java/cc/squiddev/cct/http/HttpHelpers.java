@@ -1,14 +1,18 @@
 package cc.squiddev.cct.http;
 
 import cc.squiddev.cct.Main;
-import cc.squiddev.cct.mount.Int8ArrayByteChannel;
+import cc.squiddev.cct.js.WebsocketClient;
 import cc.squiddev.cct.mount.ArrayByteChannel;
+import cc.squiddev.cct.mount.Int8ArrayByteChannel;
 import cc.squiddev.cct.stub.SeekableByteChannel;
+import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.apis.handles.BinaryReadableHandle;
 import dan200.computercraft.core.apis.handles.EncodedReadableHandle;
 import dan200.computercraft.core.apis.handles.HandleGeneric;
+import dan200.computercraft.core.apis.http.options.Action;
 import dan200.computercraft.core.apis.http.request.HttpRequest;
 import dan200.computercraft.core.apis.http.request.HttpResponseHandle;
+import dan200.computercraft.core.apis.http.websocket.Websocket;
 import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Int8Array;
@@ -65,6 +69,30 @@ public class HttpHelpers {
             request.setRequestHeader(header.getKey(), header.getValue());
         }
         request.send(postBuffer);
+    }
+
+    public static void makeWebsocket(Websocket ws, URI uri) {
+        WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
+        client.setBinaryType("arraybuffer");
+        client.onOpen(e -> ws.success(client, Action.ALLOW.toPartial().toOptions()));
+        client.onError(e -> {
+            ComputerCraft.log.error("Error " + e);
+            ws.failure("Could not connect");
+        });
+        client.setOnMessage(e -> {
+            if (ws.isClosed()) return;
+            Object converted;
+            if (e.isBinary()) {
+                Int8Array array = Int8Array.create(e.getDataAsArray());
+                byte[] contents = new byte[array.getLength()];
+                for (int i = 0; i < contents.length; i++) contents[i] = array.get(i);
+                converted = contents;
+            } else {
+                converted = e.getDataAsString();
+            }
+            ws.environment().queueEvent("websocket_message", ws.address(), converted, true);
+        });
+        client.onClose(e -> ws.close(e.getCode(), e.getReason()));
     }
 
     public static byte[] encode(String string) {

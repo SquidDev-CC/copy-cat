@@ -27,7 +27,7 @@
 +
      private final IAPIEnvironment apiEnvironment;
  
--    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>();
+-    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>( ResourceGroup.DEFAULT );
      private final ResourceGroup<HttpRequest> requests = new ResourceQueue<>( () -> ComputerCraft.httpMaxRequests );
      private final ResourceGroup<Websocket> websockets = new ResourceGroup<>( () -> ComputerCraft.httpMaxWebsockets );
  
@@ -66,22 +66,23 @@
 -            httpMethod = HttpMethod.valueOf( requestMethod.toUpperCase( Locale.ROOT ) );
 -            if( httpMethod == null || requestMethod.equalsIgnoreCase( "CONNECT" ) )
 +            httpMethod = requestMethod.toUpperCase();
-+            if( Arrays.binarySearch(VERBS, httpMethod) == -1 )
++            if( Arrays.binarySearch(VERBS, httpMethod) == -1 || requestMethod.equalsIgnoreCase( "CONNECT" ) )
              {
                  throw new LuaException( "Unsupported HTTP method" );
              }
-@@ -142,8 +138,8 @@
-     {
+@@ -146,10 +142,7 @@
          try
          {
--            URI uri = HttpRequest.checkUri( address );
--            new CheckUrl( checkUrls, apiEnvironment, address, uri ).queue( CheckUrl::run );
-+            HttpRequest.checkUri( address );
+             URI uri = HttpRequest.checkUri( address );
+-            if( !new CheckUrl( checkUrls, apiEnvironment, address, uri ).queue( CheckUrl::run ) )
+-            {
+-                throw new LuaException( "Too many ongoing checkUrl calls" );
+-            }
 +            apiEnvironment.queueEvent("http_check", address, true);
  
              return new Object[] { true };
          }
-@@ -161,7 +157,7 @@
+@@ -167,7 +160,7 @@
              throw new LuaException( "Websocket connections are disabled" );
          }
  
@@ -90,7 +91,7 @@
  
          try
          {
-@@ -180,9 +176,9 @@
+@@ -186,9 +179,9 @@
      }
  
      @Nonnull
@@ -102,16 +103,16 @@
          for( Map.Entry<?, ?> entry : headerTable.entrySet() )
          {
              Object value = entry.getValue();
-@@ -190,7 +186,7 @@
+@@ -196,7 +189,7 @@
              {
                  try
                  {
 -                    headers.add( (String) entry.getKey(), value );
-+                    headers.put( ((String) entry.getKey()).toLowerCase(), (String)value );
++                    headers.put(((String) entry.getKey()).toLowerCase(), (String) value );
                  }
                  catch( IllegalArgumentException e )
                  {
-@@ -199,9 +195,9 @@
+@@ -205,9 +198,9 @@
              }
          }
  

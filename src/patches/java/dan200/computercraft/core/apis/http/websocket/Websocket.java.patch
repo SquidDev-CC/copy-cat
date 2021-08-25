@@ -13,19 +13,18 @@
  import io.netty.bootstrap.Bootstrap;
  import io.netty.channel.Channel;
  import io.netty.channel.ChannelFuture;
-@@ -29,6 +29,11 @@
+@@ -29,6 +29,10 @@
+ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
  import io.netty.handler.codec.http.websocketx.WebSocketVersion;
- import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
  import io.netty.handler.ssl.SslContext;
 +*/
++import cc.squiddev.cct.http.HttpHelpers;
 +import cc.squiddev.cct.js.WebsocketClient;
-+import dan200.computercraft.core.apis.http.options.Action;
-+import org.teavm.jso.typedarrays.Int8Array;
 +import java.util.Map;
  
  import java.lang.ref.WeakReference;
  import java.net.InetSocketAddress;
-@@ -52,16 +57,14 @@
+@@ -52,16 +56,14 @@
      static final String CLOSE_EVENT = "websocket_closed";
      static final String MESSAGE_EVENT = "websocket_message";
  
@@ -44,7 +43,7 @@
      {
          super( limiter );
          this.environment = environment;
-@@ -117,7 +120,7 @@
+@@ -117,7 +119,7 @@
      public void connect()
      {
          if( isClosed() ) return;
@@ -53,35 +52,18 @@
          checkClosed();
      }
  
-@@ -128,6 +131,25 @@
+@@ -128,6 +130,8 @@
  
          try
          {
-+            WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
-+            client.setBinaryType("arraybuffer");
-+            client.onOpen(e -> success(client, Action.ALLOW.toPartial().toOptions()));
-+            client.onError(e -> ComputerCraft.log.error("Error " + e));
-+            client.setOnMessage(e -> {
-+                if (isClosed()) return;
-+                Object converted;
-+                if (e.isBinary()) {
-+                    Int8Array array = Int8Array.create(e.getDataAsArray());
-+                    byte[] contents = new byte[array.getLength()];
-+                    for (int i = 0; i < contents.length; i++) contents[i] = array.get(i);
-+                    converted = contents;
-+                } else {
-+                    converted = e.getDataAsString();
-+                }
-+                environment.queueEvent(MESSAGE_EVENT, address, converted, true);
-+            });
-+            client.onClose(e -> close(e.getCode(), e.getReason()));
++            HttpHelpers.makeWebsocket(this, uri);
 +            /*
              boolean ssl = uri.getScheme().equalsIgnoreCase( "wss" );
              InetSocketAddress socketAddress = NetworkUtils.getAddress( uri, ssl );
              Options options = NetworkUtils.getOptions( uri.getHost(), socketAddress );
-@@ -168,14 +190,11 @@
+@@ -170,22 +174,19 @@
                  .addListener( c -> {
-                     if( !c.isSuccess() ) failure( c.cause().getMessage() );
+                     if( !c.isSuccess() ) failure( NetworkUtils.toFriendlyError( c.cause() ) );
                  } );
 +            */
  
@@ -94,17 +76,33 @@
 -        }
          catch( Exception e )
          {
-             failure( "Could not connect" );
-@@ -183,7 +202,7 @@
+-            failure( NetworkUtils.toFriendlyError( e ) );
++            failure( "Could not connect" );
+             if( ComputerCraft.logComputerErrors ) ComputerCraft.log.error( "Error in websocket", e );
          }
      }
  
 -    void success( Channel channel, Options options )
-+    void success( WebsocketClient channel, Options options )
++    public void success( WebsocketClient channel, Options options )
      {
          if( isClosed() ) return;
  
-@@ -214,9 +233,6 @@
+@@ -196,12 +197,12 @@
+         checkClosed();
+     }
+ 
+-    void failure( String message )
++    public void failure( String message )
+     {
+         if( tryClose() ) environment.queueEvent( FAILURE_EVENT, address, message );
+     }
+ 
+-    void close( int status, String reason )
++    public void close( int status, String reason )
+     {
+         if( tryClose() )
+         {
+@@ -216,9 +217,6 @@
      {
          super.dispose();
  

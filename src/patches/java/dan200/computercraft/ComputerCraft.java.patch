@@ -25,7 +25,7 @@
  public final class ComputerCraft
  {
      public static final String MOD_ID = "computercraft";
-@@ -41,15 +42,17 @@
+@@ -40,15 +41,17 @@
      public static boolean commandRequireCreative = true;
  
      public static int computerThreads = 1;
@@ -45,7 +45,7 @@
  
      public static int httpMaxRequests = 16;
      public static int httpMaxWebsockets = 4;
-@@ -60,7 +63,6 @@
+@@ -61,7 +64,6 @@
      public static int modemRangeDuringStorm = 64;
      public static int modemHighAltitudeRangeDuringStorm = 384;
      public static int maxNotesPerTick = 8;
@@ -53,7 +53,7 @@
      public static double monitorDistanceSq = 4096;
      public static long monitorBandwidth = 1_000_000;
  
-@@ -69,7 +71,6 @@
+@@ -70,7 +72,6 @@
      public static int advancedTurtleFuelLimit = 100000;
      public static boolean turtlesObeyBlockProtection = true;
      public static boolean turtlesCanPush = true;
@@ -61,12 +61,12 @@
  
      public static int computerTermWidth = 51;
      public static int computerTermHeight = 19;
-@@ -83,6 +84,14 @@
+@@ -84,6 +85,14 @@
      public static int monitorWidth = 8;
      public static int monitorHeight = 6;
  
 +    public static final Logger log = Logger.INSTANCE;
-+    static final String VERSION = "1.96.0";
++    static final String VERSION = "1.98.2";
 +
 +    public static String getVersion() {
 +        return VERSION;
@@ -76,7 +76,7 @@
      public static final class TurtleUpgrades
      {
          public static TurtleModem wirelessModemNormal;
-@@ -116,4 +125,5 @@
+@@ -117,4 +126,5 @@
          Config.setup();
          Registry.setup();
      }

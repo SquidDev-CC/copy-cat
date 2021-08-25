@@ -1,32 +1,14 @@
 --- LuaThread.java
 +++ LuaThread.java
-@@ -30,11 +30,10 @@
- import org.squiddev.cobalt.function.LuaFunction;
- import org.squiddev.cobalt.lib.CoroutineLib;
- import org.squiddev.cobalt.lib.jse.JsePlatform;
-+import org.teavm.interop.Sync;
- 
- import java.lang.ref.WeakReference;
- import java.util.Objects;
--import java.util.concurrent.TimeUnit;
--import java.util.concurrent.locks.Condition;
- 
- import static org.squiddev.cobalt.debug.DebugFrame.FLAG_ERROR;
- import static org.squiddev.cobalt.debug.DebugFrame.FLAG_YPCALL;
-@@ -60,12 +59,6 @@
-  */
- public class LuaThread extends LuaValue {
- 	/**
--	 * Interval in nanoseconds at which to check for lua threads that are no longer referenced.
--	 * This can be changed by Java startup code if desired.
--	 */
--	public static long orphanCheckInterval = TimeUnit.SECONDS.toNanos(30);
--
--	/**
- 	 * A coroutine which has been run at all
+@@ -63,7 +63,6 @@
+ 	 * Interval in nanoseconds at which to check for lua threads that are no longer referenced.
+ 	 * This can be changed by Java startup code if desired.
  	 */
- 	private static final int STATUS_INITIAL = 0;
-@@ -262,14 +255,11 @@
+-	public static long orphanCheckInterval = TimeUnit.SECONDS.toNanos(30);
+ 
+ 	/**
+ 	 * A coroutine which has been run at all
+@@ -262,11 +261,7 @@
  		if (state.currentThread.state.javaCount == 0) {
  			throw UnwindThrowable.yield(args);
  		} else {
@@ -39,15 +21,11 @@
  		}
  	}
  
-+	/*
- 	/**
- 	 * Yield the current thread and wait for a response
- 	 *
-@@ -278,12 +268,12 @@
- 	 * @return The values this coroutine was resumed with
+@@ -279,11 +274,13 @@
  	 * @throws LuaError             If this thread cannot be yielded.
  	 * @throws InterruptedException If this thread was terminated when yielding.
--	 */
+ 	 */
++	/*
  	public static Varargs yieldBlocking(LuaState state, Varargs args) throws LuaError, InterruptedException {
  		Objects.requireNonNull(args, "args cannot be null");
  		checkYield(state);
@@ -57,7 +35,7 @@
  
  	private static void checkYield(LuaState state) throws LuaError {
  		LuaThread thread = state.currentThread;
-@@ -293,6 +283,7 @@
+@@ -293,6 +290,7 @@
  		if (thread.isMainThread()) throw new LuaError("cannot yield main thread");
  	}
  
@@ -65,7 +43,7 @@
  	private static Varargs yieldBlockingImpl(LuaState state, Varargs args) throws InterruptedException, LuaError {
  		State current = state.currentThread.state;
  
-@@ -302,6 +293,7 @@
+@@ -302,6 +300,7 @@
  		current.previousThread = null;
  		return transferControl(state, current, args);
  	}
@@ -73,7 +51,7 @@
  
  	/**
  	 * Resume a thread with arguments.
-@@ -328,6 +320,7 @@
+@@ -328,6 +327,7 @@
  		if (currentState.javaCount == 0) {
  			throw UnwindThrowable.resume(thread, args);
  		} else {
@@ -81,7 +59,7 @@
  			try {
  				// Mark the child coroutine as "active", and transfer.
  				state.currentThread = thread;
-@@ -342,9 +335,12 @@
+@@ -342,6 +342,8 @@
  			} catch (InterruptedException e) {
  				throw new InterruptedError(e);
  			}
@@ -90,11 +68,7 @@
  		}
  	}
  
-+	/*
- 	/**
- 	 * Suspend the current thread. Note, this may return or throw an exception, so you must handle both cases.
- 	 *
-@@ -361,7 +357,7 @@
+@@ -361,7 +363,7 @@
  		if (current.javaCount == 0) {
  			throw UnwindThrowable.suspend();
  		} else {
@@ -103,15 +77,15 @@
  		}
  	}
  
-@@ -370,7 +366,6 @@
- 	 *
+@@ -371,6 +373,7 @@
  	 * @param state The current lua state
  	 * @throws LuaError If this coroutine cannot be suspended.
--	 */
+ 	 */
++	/*
  	public static void suspendBlocking(LuaState state) throws LuaError {
  		State current = state.currentThread.state;
  		if (current.status != STATUS_RUNNING) {
-@@ -412,6 +407,7 @@
+@@ -412,6 +415,7 @@
  			thread.needsThreadedResume = false;
  		}
  	}
@@ -119,7 +93,7 @@
  
  	public static Varargs runMain(LuaState state, LuaFunction function) throws LuaError, InterruptedException {
  		return run(state, state.getMainThread(), function, Constants.NONE);
-@@ -434,6 +430,7 @@
+@@ -434,6 +438,7 @@
  	}
  
  	private static Varargs run(final LuaState state, LuaThread thread, LuaFunction function, Varargs args) throws LuaError, InterruptedException {
@@ -127,7 +101,7 @@
  		YieldThreader threader = state.threader;
  		threader.lock.lock();
  		try {
-@@ -491,11 +488,12 @@
+@@ -491,11 +496,11 @@
  		} finally {
  			threader.lock.unlock();
  		}
@@ -138,12 +112,11 @@
 -	static Varargs loop(final LuaState state, LuaThread thread, LuaFunction function, Varargs args) throws LuaError, TransferredControlThrowable {
 -		YieldThreader threader = state.threader;
 -
-+	@Sync
 +	static Varargs loop(final LuaState state, LuaThread thread, LuaFunction function, Varargs args) throws LuaError {
  		LuaError le = null;
  		do {
  			final State threadState = thread.state;
-@@ -521,6 +519,7 @@
+@@ -521,6 +526,7 @@
  						args = null;
  						le = LuaError.wrap(e);
  					}
@@ -151,7 +124,7 @@
  				} else if (threadState.needsThreadedResume) {
  					// We only ever resume coroutines which have yielded, never those which have
  					// resumed other coroutines. Consequently, we know we will never have an error here.
-@@ -534,6 +533,7 @@
+@@ -534,6 +540,7 @@
  					threadState.resumeLock.signal();
  
  					throw TransferredControlThrowable.INSTANCE;
@@ -159,20 +132,16 @@
  				} else {
  					threadState.status = STATUS_RUNNING;
  
-@@ -656,16 +656,6 @@
- 		int javaCount = 0;
+@@ -658,12 +665,10 @@
+ 		/**
+ 		 * The lock to wait on while this coroutine is suspended as a thread
+ 		 */
+-		Condition resumeLock;
  
  		/**
--		 * The lock to wait on while this coroutine is suspended as a thread
--		 */
--		Condition resumeLock;
--
--		/**
--		 * Whether we've yielded in a threaded manner.
--		 */
--		boolean needsThreadedResume;
--
--		/**
- 		 * Constructor for main thread only
+ 		 * Whether we've yielded in a threaded manner.
  		 */
- 		State(LuaThread owner, int status) {
+-		boolean needsThreadedResume;
+ 
+ 		/**
+ 		 * Constructor for main thread only

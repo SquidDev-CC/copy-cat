@@ -1,6 +1,6 @@
 --- CobaltLuaMachine.java
 +++ CobaltLuaMachine.java
-@@ -41,12 +41,14 @@
+@@ -40,12 +40,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -31,15 +31,7 @@
              .build();
  
          globals = new LuaTable();
-@@ -122,7 +126,6 @@
-         LuaTable table = wrapLuaObject( api );
-         if( table == null )
-         {
--            ComputerCraft.log.warn( "API {} does not provide any methods", api );
-             table = new LuaTable();
-         }
- 
-@@ -237,7 +240,7 @@
+@@ -237,7 +241,7 @@
              table.rawset( method, new ResultInterpreterFunction( this, LuaMethod.DYNAMIC.get( i ), object, context, method ) );
          }
  
@@ -48,36 +40,11 @@
              table.rawset( method.getName(), method.nonYielding()
                  ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
                  : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
-@@ -332,7 +335,6 @@
- 
-         if( ComputerCraft.logComputerErrors )
-         {
--            ComputerCraft.log.warn( "Received unknown type '{}', returning nil.", object.getClass().getName() );
-         }
-         return Constants.NIL;
-     }
-@@ -487,7 +489,6 @@
+@@ -487,7 +491,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
 -            if( timeout.isPaused() ) LuaThread.suspendBlocking( state );
              handleSoftAbort();
          }
- 
-@@ -514,6 +515,8 @@
-         @Override
-         public long issueMainThreadTask( @Nonnull final ILuaTask task ) throws LuaException
-         {
-+            throw new LuaException("Cannot throw main-thread task");
-+            /*
-             // Issue command
-             final long taskID = MainThread.getUniqueTaskID();
-             final Runnable iTask = () -> {
-@@ -553,6 +556,7 @@
-             {
-                 throw new LuaException( "Task limit exceeded" );
-             }
-+            */
-         }
-     }
  

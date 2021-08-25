@@ -1,0 +1,11 @@
+--- Bignum.java
++++ Bignum.java
+@@ -244,7 +244,7 @@
+ 
+ 	@SuppressWarnings({"cast.unsafe", "cast"})
+ 	private static BigInteger fromUnsigned(@Unsigned int value) {
+-		return BigInteger.valueOf(Integer.toUnsignedLong((@Signed int) value));
++		return BigInteger.valueOf(((long) value) & 0xffffffffL);
+ 	}
+ 
+ 	@SuppressWarnings("cast.unsafe")

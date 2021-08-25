@@ -1,28 +1,28 @@
 --- HttpRequest.java
 +++ HttpRequest.java
-@@ -8,11 +8,9 @@
+@@ -8,11 +8,11 @@
  import dan200.computercraft.ComputerCraft;
  import dan200.computercraft.core.apis.IAPIEnvironment;
  import dan200.computercraft.core.apis.http.HTTPRequestException;
 -import dan200.computercraft.core.apis.http.NetworkUtils;
  import dan200.computercraft.core.apis.http.Resource;
  import dan200.computercraft.core.apis.http.ResourceGroup;
--import dan200.computercraft.core.apis.http.options.Options;
--import dan200.computercraft.core.tracking.TrackingField;
+ import dan200.computercraft.core.apis.http.options.Options;
+ import dan200.computercraft.core.tracking.TrackingField;
 +/*
  import io.netty.bootstrap.Bootstrap;
  import io.netty.buffer.ByteBuf;
  import io.netty.buffer.Unpooled;
-@@ -27,6 +25,8 @@
+@@ -24,6 +24,8 @@
+ import io.netty.handler.codec.http.*;
  import io.netty.handler.ssl.SslContext;
- import io.netty.handler.timeout.ReadTimeoutException;
  import io.netty.handler.timeout.ReadTimeoutHandler;
 +*/
 +import cc.squiddev.cct.http.HttpHelpers;
  
  import java.net.InetSocketAddress;
  import java.net.URI;
-@@ -48,43 +48,42 @@
+@@ -45,42 +47,38 @@
  
      private static final int MAX_REDIRECTS = 16;
  
@@ -71,13 +71,9 @@
              }
 +            */
          }
-+
-+        if( !headers.containsKey( "accept-charset" ) ) headers.put( "accept-charset", "UTF-8" );
-+        headers.put("x-requested-with", "XMLHttpRequest");
      }
  
-     public IAPIEnvironment environment()
-@@ -121,20 +120,23 @@
+@@ -118,20 +116,22 @@
          }
      }
  
@@ -99,14 +95,13 @@
          try
          {
 +            HttpHelpers.makeRequest(this, uri, method, headers, postBuffer);
-+
 +            /*
              boolean ssl = uri.getScheme().equalsIgnoreCase( "https" );
              InetSocketAddress socketAddress = NetworkUtils.getAddress( uri, ssl );
              Options options = NetworkUtils.getOptions( uri.getHost(), socketAddress );
-@@ -192,14 +194,11 @@
+@@ -190,32 +190,29 @@
                  .addListener( c -> {
-                     if( !c.isSuccess() ) failure( c.cause() );
+                     if( !c.isSuccess() ) failure( NetworkUtils.toFriendlyError( c.cause() ) );
                  } );
 +            */
  
@@ -119,8 +114,9 @@
 -        }
          catch( Exception e )
          {
-             failure( "Could not connect" );
-@@ -207,7 +206,7 @@
+-            failure( NetworkUtils.toFriendlyError( e ) );
++            failure( "Could not connect" );
+             if( ComputerCraft.logComputerErrors ) ComputerCraft.log.error( "Error in HTTP request", e );
          }
      }
  
@@ -128,25 +124,6 @@
 +    public void failure( String message )
      {
          if( tryClose() ) environment.queueEvent( FAILURE_EVENT, address, message );
-     }
-@@ -219,6 +218,7 @@
-         {
-             message = cause.getMessage();
-         }
-+        /*
-         else if( cause instanceof TooLongFrameException )
-         {
-             message = "Response is too large";
-@@ -227,6 +227,7 @@
-         {
-             message = "Timed out";
-         }
-+        */
-         else
-         {
-             message = "Could not connect";
-@@ -235,12 +236,12 @@
-         failure( message );
      }
  
 -    void failure( String message, HttpResponseHandle object )
@@ -160,7 +137,7 @@
      {
          if( tryClose() ) environment.queueEvent( SUCCESS_EVENT, address, object );
      }
-@@ -249,16 +250,12 @@
+@@ -224,16 +221,12 @@
      protected void dispose()
      {
          super.dispose();
@@ -179,7 +156,7 @@
          {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -266,12 +263,12 @@
+@@ -241,12 +234,12 @@
          return size;
      }
  
