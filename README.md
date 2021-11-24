@@ -74,4 +74,4 @@ You will probably need to apply and then regenerate patches after doing so.
 [mimic]: https://gravlann.github.io/ "The Mimic ComputerCraft emulator"
 [cloud]: https://github.com/SquidDev-CC/cloud-catcher "The Cloud Catcher repository"
 [cobalt]: https://github.com/SquidDev/Cobalt "The Cobalt repository"
-[cct]: https://github.com/SquidDev-CC/CC-Tweaked "The CC: Tweaked repository"
+[cct]: https://github.com/cc-tweaked/CC-Tweaked "The CC: Tweaked repository"

@@ -12,7 +12,7 @@
  import java.nio.charset.Charset;
  import java.nio.charset.CharsetDecoder;
  import java.nio.charset.CodingErrorAction;
-@@ -173,9 +174,10 @@
+@@ -175,9 +176,10 @@
  
      public static BufferedReader openUtf8( ReadableByteChannel channel )
      {
@@ -24,7 +24,7 @@
      public static BufferedReader open( ReadableByteChannel channel, Charset charset )
      {
          // Create a charset decoder with the same properties as StreamDecoder does for
-@@ -185,4 +187,5 @@
+@@ -187,4 +189,5 @@
              .onUnmappableCharacter( CodingErrorAction.REPLACE );
          return new BufferedReader( Channels.newReader( channel, decoder, -1 ) );
      }

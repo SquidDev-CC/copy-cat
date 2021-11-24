@@ -1,11 +1,29 @@
 --- NamedMethod.java
 +++ NamedMethod.java
-@@ -13,7 +13,7 @@
+@@ -16,14 +16,11 @@
      private final T method;
      private final boolean nonYielding;
  
--    NamedMethod( String name, T method, boolean nonYielding )
+-    private final PeripheralType genericType;
+-
+-    NamedMethod( String name, T method, boolean nonYielding, PeripheralType genericType )
 +    public NamedMethod( String name, T method, boolean nonYielding )
      {
          this.name = name;
          this.method = method;
+         this.nonYielding = nonYielding;
+-        this.genericType = genericType;
+     }
+ 
+     @Nonnull
+@@ -42,10 +39,4 @@
+     {
+         return nonYielding;
+     }
+-
+-    @Nullable
+-    public PeripheralType getGenericType()
+-    {
+-        return genericType;
+-    }
+ }

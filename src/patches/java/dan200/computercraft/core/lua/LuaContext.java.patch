@@ -1,6 +1,6 @@
 --- LuaContext.java
 +++ LuaContext.java
-@@ -29,6 +29,7 @@
+@@ -27,6 +27,7 @@
      public long issueMainThreadTask( @Nonnull final ILuaTask task ) throws LuaException
      {
          // Issue command
@@ -8,12 +8,11 @@
          final long taskID = MainThread.getUniqueTaskID();
          final Runnable iTask = () -> {
              try
-@@ -67,6 +68,8 @@
+@@ -65,5 +66,7 @@
          {
              throw new LuaException( "Task limit exceeded" );
          }
 +        */
 +        throw new LuaException("Cannot throw main-thread task");
      }
- 
-     @Nonnull
+ }

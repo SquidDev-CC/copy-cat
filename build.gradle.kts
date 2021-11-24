@@ -290,8 +290,9 @@ tasks {
                     exclude("java/dan200/computercraft/api/lua/GenericSource.java")
                     include("java/dan200/computercraft/api/filesystem/**")
                     include("java/dan200/computercraft/api/peripheral/**")
-                    exclude("java/dan200/computercraft/api/peripheral/IPeripheralTile.java")
+                    exclude("java/dan200/computercraft/api/peripheral/GenericPeripheral.java")
                     exclude("java/dan200/computercraft/api/peripheral/IPeripheralProvider.java")
+                    exclude("java/dan200/computercraft/api/peripheral/IPeripheralTile.java")
 
                     // Core is pretty simple.
                     include("java/dan200/computercraft/core/**")

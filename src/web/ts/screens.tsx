@@ -5,7 +5,7 @@ const githubLink =
   <div class={infoDescription}>
     <p>
       Think you've found a bug? Have a suggestion? Why not put it
-      on <a href="https://github.com/SquidDev-CC/" title="The GitHub repository">the GitHub repo</a>?
+      on <a href="https://github.com/SquidDev-CC/copy-cat" title="The GitHub repository">the GitHub repo</a>?
     </p>
   </div>;
 
@@ -21,7 +21,7 @@ export const UnknownError = ({ error }: { error: string }): VNode<unknown> =>
 export const About = (): VNode<unknown> => <div class={dialogueBox}>
   <h2>About</h2>
   <p>
-    Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/SquidDev-CC/CC-Tweaked"
+    Copy Cat is a web emulator for the popular Minecraft mod <a href="https://github.com/cc-tweaked/CC-Tweaked"
       target="_blank" title="CC: Tweaked's source code">CC: Tweaked</a> (based on ComputerCraft by Dan200). Here you can
     play with a ComputerCraft computer, write and test programs and experiment to your heart's desire, without having to
     leave your browser!
@@ -63,7 +63,7 @@ export const About = (): VNode<unknown> => <div class={dialogueBox}>
       : MIT, Copyright (c) 2009-2011 Luaj.org. All rights reserved., modifications Copyright (c) 2015-2016 SquidDev
     </li>
     <li>
-      <a href="https://github.com/SquidDev-CC/CC-Tweaked" target="_blank">CC: Tweaked</a>
+      <a href="https://github.com/cc-tweaked/CC-Tweaked" target="_blank">CC: Tweaked</a>
       : ComputerCraft Public License
     </li>
     <li>

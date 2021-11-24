@@ -1,6 +1,6 @@
 [submodule "original/CC-Tweaked"]
 	path = original/CC-Tweaked
-	url = https://github.com/SquidDev-CC/CC-Tweaked.git
+	url = https://github.com/cc-tweaked/CC-Tweaked.git
 [submodule "original/Cobalt"]
 	path = original/Cobalt
 	url = https://github.com/SquidDev/Cobalt.git
