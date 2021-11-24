@@ -25,8 +25,10 @@ export default {
 
   plugins: [
     replace({
+      preventAssignment: true,
+
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.21.2",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.30.1",
     }),
 
     postcss({
