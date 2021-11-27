@@ -1,7 +1,7 @@
 import { Component, h, render } from "preact";
 import { Semaphore, Terminal, TerminalData } from "@squid-dev/cc-web-term";
 import type { ConfigGroup } from "./classes";
-import { ComputerAccess } from "./computer/access";
+import { ComputerAccess, splitName } from "./computer/access";
 import { StoragePersistence, VoidPersistence } from "./computer/persist";
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
@@ -60,6 +60,12 @@ class Computer extends Component<MainProps, MainState> {
     for (const fileName in files) {
       if (!Object.prototype.hasOwnProperty.call(files, fileName)) continue;
 
+      const [dirName,] = splitName(fileName);
+      if (dirName) {
+        const dir = computer.createDirectory(dirName)
+        if (dir.value === null) throw new Error(dir.error);
+      }
+
       const contents = files[fileName];
       const file = computer.createFile(fileName);
       if (file.value === null) throw new Error(file.error);
@@ -90,7 +96,7 @@ class Computer extends Component<MainProps, MainState> {
   }
 }
 
-const exported =  (element: HTMLElement, options?: MainProps): Promise<ComputerAccess> => {
+const exported = (element: HTMLElement, options?: MainProps): Promise<ComputerAccess> => {
   return new Promise((resolve, _) =>
     render(<Computer resolve={resolve} {...(options || {})} />, element));
 };
