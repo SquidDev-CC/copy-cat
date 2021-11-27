@@ -283,11 +283,11 @@ fn()`);
     }
 
     this.setState({ activeFile: { file, path, model: entry.model } });
-  }
+  };
 
   private openComputer = () => {
     this.setState({ activeFile: null });
-  }
+  };
 
   private saveZip = (e: Event) => {
     e.preventDefault();
@@ -296,16 +296,16 @@ fn()`);
     createZip(this.state.computer)
       .then(x => saveBlob("computer", "zip", x))
       .catch(err => console.error(err));
-  }
+  };
 
   private startDrag = (e: DragEvent) => {
     e.preventDefault();
     if (!this.state.dragging) this.setState({ dragging: true });
-  }
+  };
 
   private stopDrag = () => {
     this.setState({ dragging: false });
-  }
+  };
 
   private dropFile = (e: DragEvent) => {
     e.preventDefault();
@@ -325,5 +325,5 @@ fn()`);
       // tslint:disable-next-line:prefer-for-of
       for (let i = 0; i < files.length; i++) this.addFile(files[i]);
     }
-  }
+  };
 }

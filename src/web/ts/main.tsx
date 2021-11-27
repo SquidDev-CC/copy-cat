@@ -108,15 +108,15 @@ class Main extends Component<unknown, MainState> {
       dialogue: ({ settingStorage, configGroups }: MainState) =>
         <Settings store={settingStorage} configGroups={configGroups} />,
     });
-  }
+  };
 
   private closeDialogueClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget) this.setState({ dialogue: undefined });
-  }
+  };
 
   private computerVDom = ({ settings, dialogue }: MainState) => {
     return <Computer settings={settings} focused={dialogue === undefined} computerSettings={this.configFactory} />;
-  }
+  };
 
   private configFactory = (name: string, description: string | null): ConfigGroup => {
     const existing = this.state.configGroups.find(x => x.name === name);
@@ -131,7 +131,7 @@ class Main extends Component<unknown, MainState> {
     const group = new ConfigGroup(name, description, this.state.settingStorage);
     this.setState(s => ({ configGroups: [...s.configGroups, group] }));
     return group;
-  }
+  };
 }
 
 {

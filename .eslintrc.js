@@ -67,7 +67,6 @@ module.exports = {
 
         // Use Typescript's unused variable warnings instead
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars-experimental": "warn",
       },
     },
   ]

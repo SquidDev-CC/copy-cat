@@ -62,7 +62,7 @@ class Computer extends Component<MainProps, MainState> {
 
       const [dirName,] = splitName(fileName);
       if (dirName) {
-        const dir = computer.createDirectory(dirName)
+        const dir = computer.createDirectory(dirName);
         if (dir.value === null) throw new Error(dir.error);
       }
 
