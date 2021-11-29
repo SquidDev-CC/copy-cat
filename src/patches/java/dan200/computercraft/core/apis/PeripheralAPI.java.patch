@@ -1,6 +1,6 @@
 --- PeripheralAPI.java
 +++ PeripheralAPI.java
-@@ -352,7 +352,7 @@
+@@ -376,7 +376,7 @@
              ? Objects.requireNonNull( ((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null" )
              : LuaMethod.EMPTY_METHODS;
  
