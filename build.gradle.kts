@@ -319,6 +319,7 @@ tasks {
                     exclude("java/dan200/computercraft/core/apis/http/options/AddressRuleConfig.java")
 
                     include("java/dan200/computercraft/shared/util/Colour.java")
+                    include("java/dan200/computercraft/shared/util/LuaUtil.java")
                     include("java/dan200/computercraft/shared/util/IoUtil.java")
                     include("java/dan200/computercraft/shared/util/Palette.java")
                     include("java/dan200/computercraft/shared/util/StringUtil.java")
