@@ -1,6 +1,6 @@
 --- CobaltLuaMachine.java
 +++ CobaltLuaMachine.java
-@@ -40,12 +40,14 @@
+@@ -41,12 +41,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -15,7 +15,7 @@
  
      private static final LuaMethod FUNCTION_METHOD = ( target, context, args ) -> ((ILuaFunction) target).call( args );
  
-@@ -71,6 +73,7 @@
+@@ -72,6 +74,7 @@
          LuaState state = this.state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
@@ -23,7 +23,7 @@
              .coroutineExecutor( command -> {
                  Tracking.addValue( this.computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
-@@ -84,6 +87,7 @@
+@@ -85,6 +88,7 @@
                      }
                  } );
              } )
@@ -31,7 +31,7 @@
              .build();
  
          globals = new LuaTable();
-@@ -237,7 +241,7 @@
+@@ -238,7 +242,7 @@
              table.rawset( method, new ResultInterpreterFunction( this, LuaMethod.DYNAMIC.get( i ), object, context, method ) );
          }
  
@@ -40,7 +40,7 @@
              table.rawset( method.getName(), method.nonYielding()
                  ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
                  : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
-@@ -487,7 +491,6 @@
+@@ -488,7 +492,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  
              timeout.refresh();
