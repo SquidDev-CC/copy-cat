@@ -93,11 +93,11 @@ class Computer extends Component<MainProps, MainState> {
     });
   }
 
-  public componentDidMount(): void {
+  public override componentDidMount(): void {
     this.state.computer.start(() => emptyGroup, this.props);
   }
 
-  public computerDidUnmount(): void {
+  public override componentWillUnmount(): void {
     this.state.computer.dispose();
   }
 
