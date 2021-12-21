@@ -1,11 +1,22 @@
 --- PeripheralAPI.java
 +++ PeripheralAPI.java
-@@ -376,7 +376,7 @@
+@@ -376,16 +376,16 @@
              ? Objects.requireNonNull( ((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null" )
              : LuaMethod.EMPTY_METHODS;
  
 -        List<NamedMethod<PeripheralMethod>> methods = PeripheralMethod.GENERATOR.getMethods( peripheral.getClass() );
-+        List<NamedMethod<PeripheralMethod>> methods = Collections.emptyList();
++        List<NamedMethod<LuaMethod>> methods = cc.squiddev.cct.asm.Generator.getMethods(peripheral.getClass());
  
          Map<String, PeripheralMethod> methodMap = new HashMap<>( methods.size() + dynamicMethods.length );
          for( int i = 0; i < dynamicMethods.length; i++ )
+         {
+             methodMap.put( dynamicMethods[i], PeripheralMethod.DYNAMIC.get( i ) );
+         }
+-        for( NamedMethod<PeripheralMethod> method : methods )
++        for( NamedMethod<LuaMethod> method : methods )
+         {
+-            methodMap.put( method.getName(), method.getMethod() );
++            methodMap.put( method.getName(), (target, context, computer, args) -> method.getMethod().apply(target, context, args) );
+         }
+         return methodMap;
+     }

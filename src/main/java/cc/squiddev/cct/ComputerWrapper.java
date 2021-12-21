@@ -5,11 +5,15 @@ import cc.squiddev.cct.js.ComputerCallbacks;
 import cc.squiddev.cct.js.JsonParse;
 import cc.squiddev.cct.mount.ComputerAccessMount;
 import cc.squiddev.cct.mount.ResourceMount;
+import cc.squiddev.cct.peripheral.SpeakerPeripheral;
+import cc.squiddev.cct.peripheral.TickablePeripheral;
 import cc.squiddev.cct.stub.Logger;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.filesystem.IMount;
 import dan200.computercraft.api.filesystem.IWritableMount;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.computer.Computer;
+import dan200.computercraft.core.computer.ComputerSide;
 import dan200.computercraft.core.computer.IComputerEnvironment;
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.util.Palette;
@@ -22,6 +26,7 @@ import static dan200.computercraft.ComputerCraft.computerTermHeight;
 import static dan200.computercraft.ComputerCraft.computerTermWidth;
 
 public class ComputerWrapper implements IComputerEnvironment, ComputerCallbacks {
+    private static final ComputerSide[] SIDES = ComputerSide.values();
     private final TerminalMonitor terminalMonitor = new TerminalMonitor();
     private final Terminal terminal = new Terminal(computerTermWidth, computerTermHeight, terminalMonitor);
     private final Computer computer;
@@ -57,6 +62,11 @@ public class ComputerWrapper implements IComputerEnvironment, ComputerCallbacks 
         if (!customSize && (terminal.getWidth() != computerTermWidth || terminal.getHeight() != computerTermHeight)) {
             terminal.resize(computerTermWidth, computerTermHeight);
             computer.queueEvent("term_resize", null);
+        }
+
+        for (ComputerSide side : SIDES) {
+            IPeripheral peripheral = computer.getEnvironment().getPeripheral(side);
+            if (peripheral instanceof TickablePeripheral) ((TickablePeripheral) peripheral).tick();
         }
 
         if (terminalMonitor.pollChanged()) {
@@ -175,5 +185,20 @@ public class ComputerWrapper implements IComputerEnvironment, ComputerCallbacks 
             terminal.resize(width, height);
             computer.queueEvent("term_resize", null);
         }
+    }
+
+    @Override
+    public void setPeripheral(@Nonnull String sideName, @Nullable String kind) {
+        ComputerSide side = ComputerSide.valueOfInsensitive(sideName);
+        IPeripheral peripheral;
+        if (kind == null) {
+            peripheral = null;
+        } else if (kind.equals("peripheral")) {
+            peripheral = new SpeakerPeripheral();
+        } else {
+            throw new IllegalStateException("Unknown peripheral kind");
+        }
+
+        computer.getEnvironment().setPeripheral(side, peripheral);
     }
 }

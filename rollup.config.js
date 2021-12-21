@@ -28,7 +28,7 @@ export default {
       preventAssignment: true,
 
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.30.1",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.31.0",
     }),
 
     postcss({

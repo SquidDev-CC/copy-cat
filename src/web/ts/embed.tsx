@@ -1,6 +1,6 @@
 import { Component, h, render } from "preact";
 import { Semaphore, Terminal, TerminalData } from "@squid-dev/cc-web-term";
-import type { ConfigGroup } from "./classes";
+import type { ConfigGroup, PeripheralKind, Side } from "./classes";
 import { ComputerAccess, splitName } from "./computer/access";
 import { StoragePersistence, VoidPersistence } from "./computer/persist";
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
@@ -15,6 +15,9 @@ type MainProps = {
   width?: number,
   height?: number,
   resolve?: (computer: ComputerAccess) => void,
+  peripherals?: {
+    [side in Side]: PeripheralKind | null
+  },
 }
 
 type MainState = {
@@ -72,6 +75,15 @@ class Computer extends Component<MainProps, MainState> {
 
       const written = file.value.setContents(contents);
       if (written.value === null) throw new Error(written.error);
+    }
+
+    const peripherals = props.peripherals;
+    if (peripherals) {
+      for (const side in peripherals) {
+        if (!Object.prototype.hasOwnProperty.call(peripherals, side)) continue;
+        const kind = peripherals[side as Side];
+        if (kind !== null) computer.setPeripheral(side as Side, kind);
+      }
     }
 
     this.setState({

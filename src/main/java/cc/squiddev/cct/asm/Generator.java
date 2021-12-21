@@ -19,9 +19,10 @@ public class Generator {
     @Meta
     private static native void getMethodsImpl(Class<?> type, MakeMethod make);
 
-
     private static void getMethodsImpl(ReflectClass<Object> klass, Value<MakeMethod> make) {
-        if (!klass.getName().startsWith("dan200.computercraft.")) return;
+        if (!klass.getName().startsWith("dan200.computercraft.") && !klass.getName().startsWith("cc.squiddev.cct.peripheral")) {
+            return;
+        }
         if (klass.getName().contains("lambda")) return;
 
         Class<?> actualClass;

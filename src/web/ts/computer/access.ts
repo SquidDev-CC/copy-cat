@@ -1,7 +1,7 @@
 import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
 import { ConfigFactory, ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, Result, start } from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
-import type { ComputerCallbacks, FileAttributes } from "../classes";
+import type { ComputerCallbacks, FileAttributes, PeripheralKind, Side } from "../classes";
 
 const colours = "0123456789abcdef";
 
@@ -125,6 +125,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   private readonly filesystem: Map<string, FileSystemEntry> = new Map<string, FileSystemEntry>();
 
   private handlers?: ComputerCallbacks;
+  private callbacks: Array<(cb: ComputerCallbacks) => void> = [];
   private removed: boolean = false;
 
   public constructor(
@@ -275,6 +276,8 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
 
         if (typeof this.label === "string") computer.setLabel(this.label);
         else if (typeof label === "string") computer.setLabel(label);
+
+        for (const callback of this.callbacks) callback(computer);
       })
       .catch(e => console.error("Cannot start computer", e));
   }
@@ -308,5 +311,13 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   public dispose(): void {
     this.removed = true;
     if (this.handlers) this.handlers?.dispose();
+  }
+
+  public setPeripheral(side: Side, kind: PeripheralKind | null) {
+    if (this.handlers) {
+      this.handlers.setPeripheral(side, kind);
+    } else {
+      this.callbacks.push(handler => handler.setPeripheral(side, kind));
+    }
   }
 }

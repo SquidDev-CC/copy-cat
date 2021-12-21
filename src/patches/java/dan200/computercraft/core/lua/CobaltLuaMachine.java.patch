@@ -40,6 +40,15 @@
              table.rawset( method.getName(), method.nonYielding()
                  ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
                  : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
+@@ -455,7 +459,7 @@
+             if( isPaused ) resetPaused( ds, di );
+ 
+             // We check our current pause/abort state every 128 instructions.
+-            if( (count = (count + 1) & 127) == 0 )
++            if( (count = (count + 1) & 1023) == 0 )
+             {
+                 // If we've been hard aborted or closed then abort.
+                 if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
 @@ -488,7 +492,6 @@
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
  

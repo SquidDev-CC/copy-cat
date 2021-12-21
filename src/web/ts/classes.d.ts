@@ -2,6 +2,9 @@ declare function Start(callbacks: Callbacks): void;
 
 export default Start;
 
+export type Side = "up" | "down" | "left" | "right" | "front" | "back";
+export type PeripheralKind = "speaker";
+
 /**
  * A handler for {@link ICallbacks.onEvent}
  */
@@ -180,6 +183,14 @@ export interface ComputerCallbacks {
    * @param height The computer's height.
    */
   resize(width: number, height: number): void;
+
+  /**
+   * Set a peripheral on a particular side
+   *
+   * @param side The side to set the peripheral on.
+   * @param kind The kind of peripheral. For now, can only be "speaker".
+   */
+  setPeripheral(side: Side, kind: PeripheralKind | null): void;
 }
 
 export interface ConfigGroup {

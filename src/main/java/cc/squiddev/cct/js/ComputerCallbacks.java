@@ -45,4 +45,12 @@ public interface ComputerCallbacks extends JSObject {
      * @param height The computer's height.
      */
     void resize(int width, int height);
+
+    /**
+     * Set a peripheral on a particular side
+     *
+     * @param side The side to set the peripheral on.
+     * @param kind The kind of peripheral. For now, can only be "speaker".
+     */
+    void setPeripheral(@Nonnull String side, @Nullable String kind);
 }
