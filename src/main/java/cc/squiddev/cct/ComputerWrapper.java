@@ -193,7 +193,7 @@ public class ComputerWrapper implements IComputerEnvironment, ComputerCallbacks 
         IPeripheral peripheral;
         if (kind == null) {
             peripheral = null;
-        } else if (kind.equals("peripheral")) {
+        } else if (kind.equals("speaker")) {
             peripheral = new SpeakerPeripheral();
         } else {
             throw new IllegalStateException("Unknown peripheral kind");
