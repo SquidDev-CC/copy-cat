@@ -16,7 +16,7 @@ type MainProps = {
   height?: number,
   resolve?: (computer: ComputerAccess) => void,
   peripherals?: {
-    [side in Side]: PeripheralKind | null
+    [side in Side]?: PeripheralKind | null
   },
 }
 
@@ -82,7 +82,7 @@ class Computer extends Component<MainProps, MainState> {
       for (const side in peripherals) {
         if (!Object.prototype.hasOwnProperty.call(peripherals, side)) continue;
         const kind = peripherals[side as Side];
-        if (kind !== null) computer.setPeripheral(side as Side, kind);
+        if (kind !== null && kind !== undefined) computer.setPeripheral(side as Side, kind);
       }
     }
 

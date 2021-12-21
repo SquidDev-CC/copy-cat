@@ -70,7 +70,7 @@ tasks {
 
         classpath = teavmCli + sourceSets.main.get().runtimeClasspath
         mainClass.set("org.teavm.cli.TeaVMRunner")
-        args(listOf("-O2", "--targetdir", dir.absolutePath, application.mainClass.get()))
+        args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
         javaLauncher.set(project.javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(8))
         })
