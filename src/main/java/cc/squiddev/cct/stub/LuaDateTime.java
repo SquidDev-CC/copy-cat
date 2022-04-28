@@ -29,7 +29,7 @@ public final class LuaDateTime {
     public static Map<String, ?> toTable(Calendar calendar) {
         HashMap<String, Object> table = new HashMap<>(9);
         table.put("year", calendar.get(YEAR));
-        table.put("month", calendar.get(MONTH));
+        table.put("month", calendar.get(MONTH) + 1);
         table.put("day", calendar.get(DAY_OF_MONTH));
         table.put("hour", calendar.get(HOUR));
         table.put("min", calendar.get(MINUTE));

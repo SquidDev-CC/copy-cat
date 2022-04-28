@@ -1,16 +1,17 @@
 --- Palette.java
 +++ Palette.java
-@@ -5,9 +5,6 @@
+@@ -5,10 +5,6 @@
   */
  package dan200.computercraft.shared.util;
  
+-import dan200.computercraft.client.render.text.FixedWidthFontRenderer;
 -import net.minecraft.nbt.CompoundNBT;
 -import net.minecraft.network.PacketBuffer;
 -
+ import javax.annotation.Nonnull;
+ 
  public class Palette
- {
-     private static final int PALETTE_SIZE = 16;
-@@ -79,6 +76,7 @@
+@@ -101,6 +97,7 @@
          };
      }
  
@@ -18,8 +19,8 @@
      public void write( PacketBuffer buffer )
      {
          for( double[] colour : colours )
-@@ -120,4 +118,5 @@
-             colours[i] = decodeRGB8( rgb8[i] );
+@@ -146,4 +143,5 @@
+             setColour( i, colours[0], colours[1], colours[2] );
          }
      }
 +    */
