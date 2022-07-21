@@ -36,7 +36,7 @@
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.0",
-    "@rollup/plugin-url": "^6.1.0",
+    "@rollup/plugin-url": "^7.0.0",
     "@types/d3-time-format": "^4.0.0",
     "@types/requirejs": "^2.1.32",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
