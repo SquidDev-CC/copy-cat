@@ -12,7 +12,7 @@ import static dan200.computercraft.ComputerCraft.computerTermHeight;
 import static dan200.computercraft.ComputerCraft.computerTermWidth;
 
 public class Main {
-    public static String corsProxy = "https://proxy.cors.sh/{}";
+    public static String corsProxy = "https://copy-cat-cors.vercel.app/?{}";
     private static final List<ComputerWrapper> computers = new ArrayList<>();
     private static long ticks;
 
