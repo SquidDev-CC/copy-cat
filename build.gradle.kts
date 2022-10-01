@@ -30,7 +30,6 @@ java {
 
 repositories {
     mavenCentral()
-    maven("https://squiddev.cc/maven")
 }
 
 val teavmCli by configurations.creating {
