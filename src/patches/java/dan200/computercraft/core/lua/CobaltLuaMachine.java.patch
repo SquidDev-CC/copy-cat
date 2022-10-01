@@ -1,6 +1,6 @@
 --- CobaltLuaMachine.java
 +++ CobaltLuaMachine.java
-@@ -41,12 +41,14 @@
+@@ -43,12 +43,14 @@
  
  public class CobaltLuaMachine implements ILuaMachine
  {
@@ -15,7 +15,7 @@
  
      private static final LuaMethod FUNCTION_METHOD = ( target, context, args ) -> ((ILuaFunction) target).call( args );
  
-@@ -72,6 +74,7 @@
+@@ -74,6 +76,7 @@
          LuaState state = this.state = LuaState.builder()
              .resourceManipulator( new VoidResourceManipulator() )
              .debug( debug )
@@ -23,7 +23,7 @@
              .coroutineExecutor( command -> {
                  Tracking.addValue( this.computer, TrackingField.COROUTINES_CREATED, 1 );
                  COROUTINES.execute( () -> {
-@@ -85,6 +88,7 @@
+@@ -87,6 +90,7 @@
                      }
                  } );
              } )
@@ -31,7 +31,7 @@
              .build();
  
          globals = new LuaTable();
-@@ -238,7 +242,7 @@
+@@ -240,7 +244,7 @@
              table.rawset( method, new ResultInterpreterFunction( this, LuaMethod.DYNAMIC.get( i ), object, context, method ) );
          }
  
@@ -40,20 +40,24 @@
              table.rawset( method.getName(), method.nonYielding()
                  ? new BasicFunction( this, method.getMethod(), instance, context, method.getName() )
                  : new ResultInterpreterFunction( this, method.getMethod(), instance, context, method.getName() ) ) );
-@@ -455,7 +459,7 @@
+@@ -452,9 +456,10 @@
              if( isPaused ) resetPaused( ds, di );
  
              // We check our current pause/abort state every 128 instructions.
 -            if( (count = (count + 1) & 127) == 0 )
 +            if( (count = (count + 1) & 1023) == 0 )
              {
-                 // If we've been hard aborted or closed then abort.
                  if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
-@@ -488,7 +492,6 @@
++                timeout.refresh(); // Need to explicitly refresh as no multi-threading.
+                 if( timeout.isPaused() ) handlePause( ds, di );
+                 if( timeout.isSoftAborted() ) handleSoftAbort();
+             }
+@@ -467,7 +472,7 @@
+         {
+             LuaState state = CobaltLuaMachine.this.state;
              if( timeout.isHardAborted() || state == null ) throw HardAbortError.INSTANCE;
- 
-             timeout.refresh();
 -            if( timeout.isPaused() ) LuaThread.suspendBlocking( state );
-             handleSoftAbort();
++            timeout.refresh(); // Need to explicitly refresh as no multi-threading.
+             if( timeout.isSoftAborted() ) handleSoftAbort();
          }
  

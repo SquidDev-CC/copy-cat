@@ -297,6 +297,7 @@ tasks {
                     // Core is pretty simple.
                     include("java/dan200/computercraft/core/**")
                     exclude("java/dan200/computercraft/core/tracking/ComputerMBean.java")
+                    exclude("java/dan200/computercraft/core/computer/ComputerThread.java")
                     // We exclude the actual asm generation stuff, but need some of the interfaces
                     exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
                     exclude("java/dan200/computercraft/core/asm/Generator.java")

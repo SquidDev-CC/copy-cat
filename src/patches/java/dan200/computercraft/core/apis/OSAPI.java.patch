@@ -42,7 +42,7 @@
 +        if( format.equals( "*t" ) ) return LuaDateTime.toTable( instant );
  
 -        DateTimeFormatterBuilder formatter = new DateTimeFormatterBuilder();
--        LuaDateTime.format( formatter, format, offset );
+-        LuaDateTime.format( formatter, format );
 -        return formatter.toFormatter( Locale.ROOT ).format( date );
 +        return Callbacks.strftime(format, JSDate.create(instant.getTimeInMillis()));
      }

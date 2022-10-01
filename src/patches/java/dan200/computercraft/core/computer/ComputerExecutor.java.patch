@@ -15,9 +15,9 @@
 -final class ComputerExecutor
 +public final class ComputerExecutor
  {
+     static ILuaMachine.Factory luaFactory = CobaltLuaMachine::new;
      private static final int QUEUE_LIMIT = 256;
- 
-@@ -82,13 +83,11 @@
+@@ -83,13 +84,11 @@
       * @see #turnOn()
       * @see #shutdown()
       */
@@ -31,7 +31,7 @@
  
      /**
       * Determines if this executor is present within {@link ComputerThread}.
-@@ -97,7 +96,7 @@
+@@ -98,7 +97,7 @@
       * @see #enqueue()
       * @see #afterWork()
       */
@@ -40,7 +40,7 @@
  
      /**
       * The amount of time this computer has used on a theoretical machine which shares work evenly amongst computers.
-@@ -154,12 +153,10 @@
+@@ -155,12 +154,10 @@
       *
       * @see ComputerThread
       */
@@ -53,7 +53,7 @@
  
          this.computer = computer;
  
-@@ -207,7 +204,6 @@
+@@ -208,7 +205,6 @@
       */
      void queueStart()
      {
@@ -61,7 +61,7 @@
          {
              // We should only schedule a start if we're not currently on and there's turn on.
              if( closed || isOn || command != null ) return;
-@@ -226,7 +222,6 @@
+@@ -227,7 +223,6 @@
       */
      void queueStop( boolean reboot, boolean close )
      {
@@ -69,7 +69,7 @@
          {
              if( closed ) return;
              closed = close;
-@@ -269,7 +264,6 @@
+@@ -270,7 +265,6 @@
          ILuaMachine machine = this.machine;
          if( machine != null ) machine.close();
  
@@ -77,7 +77,7 @@
          {
              if( closed ) return;
              this.command = command;
-@@ -288,7 +282,6 @@
+@@ -289,7 +283,6 @@
          // Events should be skipped if we're not on.
          if( !isOn ) return;
  
@@ -85,7 +85,7 @@
          {
              // And if we've got some command in the pipeline, then don't queue events - they'll
              // probably be disposed of anyway.
-@@ -305,7 +298,6 @@
+@@ -306,7 +299,6 @@
       */
      private void enqueue()
      {
@@ -93,7 +93,7 @@
          {
              if( !onComputerQueue ) ComputerThread.queue( this );
          }
-@@ -316,7 +308,7 @@
+@@ -317,7 +309,7 @@
       */
      void tick()
      {
@@ -102,7 +102,7 @@
          {
              // This horrific structure means we don't try to update APIs while the state is being changed
              // (and so they may be running startup/shutdown).
-@@ -332,7 +324,6 @@
+@@ -333,7 +325,6 @@
              }
              finally
              {
@@ -110,7 +110,7 @@
              }
          }
      }
-@@ -421,13 +412,11 @@
+@@ -422,13 +413,11 @@
  
      private void turnOn() throws InterruptedException
      {
@@ -124,7 +124,7 @@
              {
                  eventQueue.clear();
              }
-@@ -456,7 +445,6 @@
+@@ -457,7 +446,6 @@
          }
          finally
          {
@@ -132,7 +132,7 @@
          }
  
          // Now actually start the computer, now that everything is set up.
-@@ -465,12 +453,10 @@
+@@ -466,12 +454,10 @@
  
      private void shutdown() throws InterruptedException
      {
@@ -145,7 +145,7 @@
              {
                  eventQueue.clear();
              }
-@@ -498,14 +484,13 @@
+@@ -499,14 +485,13 @@
          }
          finally
          {
@@ -161,7 +161,7 @@
      {
          vRuntimeStart = System.nanoTime();
          timeout.startTimer();
-@@ -516,7 +501,7 @@
+@@ -517,7 +502,7 @@
       *
       * @return If we have more work to do.
       */
@@ -170,7 +170,7 @@
      {
          if( interruptedEvent )
          {
-@@ -531,7 +516,6 @@
+@@ -532,7 +517,6 @@
  
          if( interruptedEvent ) return true;
  
@@ -178,7 +178,7 @@
          {
              if( eventQueue.isEmpty() && command == null ) return onComputerQueue = false;
              return true;
-@@ -547,7 +531,7 @@
+@@ -548,7 +532,7 @@
       * @see #command
       * @see #eventQueue
       */
@@ -187,7 +187,7 @@
      {
          if( interruptedEvent )
          {
-@@ -561,7 +545,6 @@
+@@ -562,7 +546,6 @@
  
          StateCommand command;
          Event event = null;
