@@ -26,14 +26,14 @@
     "@squid-dev/cc-web-term": "^1.2.3",
     "clsx": "^1.1.1",
     "jszip": "^3.5.0",
-    "monaco-editor": "^0.33.0",
+    "monaco-editor": "^0.34.0",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
     "setimmediate": "^1.0.5",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.0.6",
+    "@rollup/plugin-node-resolve": "^14.0.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.0",
     "@rollup/plugin-url": "^7.0.0",
