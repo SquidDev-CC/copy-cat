@@ -1,6 +1,6 @@
 --- LuaState.java
 +++ LuaState.java
-@@ -125,7 +125,6 @@
+@@ -129,7 +129,6 @@
  	/**
  	 * The currently active {@link YieldThreader}.
  	 */
@@ -8,15 +8,31 @@
  
  	/**
  	 * If this state has been abandoned, and threads should be cleaned up.
-@@ -152,7 +151,6 @@
+@@ -161,7 +160,6 @@
  		this.random = builder.random;
  		this.debug = builder.debug;
  		this.timezone = builder.timezone;
 -		this.threader = new YieldThreader(builder.coroutineExecutor);
+ 		this.reportError = builder.reportError;
  	}
  
- 	/**
-@@ -209,12 +207,14 @@
+@@ -236,6 +234,7 @@
+ 			out.append("\n");
+ 		}
+ 
++		/*
+ 		for (Thread thread : threader.threads) {
+ 			out.append("Thread ").append(thread.getName()).append(" is currently ").append(thread.getState()).append('\n');
+ 
+@@ -246,6 +245,7 @@
+ 				out.append("  at ").append(element).append('\n');
+ 			}
+ 		}
++		*/
+ 	}
+ 
+ 	@Deprecated
+@@ -265,12 +265,14 @@
  	 * A mutable builder for {@link LuaState}s.
  	 */
  	public static class Builder {
@@ -31,7 +47,7 @@
  
  		private InputStream stdin = System.in;
  		private PrintStream stdout = System.out;
-@@ -224,12 +224,11 @@
+@@ -280,12 +282,11 @@
  		private LuaTable nilMetatable;
  		private LuaTable functionMetatable;
  		private LuaTable threadMetatable;
@@ -42,10 +58,10 @@
  		private DebugHandler debug = DebugHandler.INSTANCE;
  		private TimeZone timezone = TimeZone.getDefault();
 -		private Executor coroutineExecutor = defaultCoroutineExecutor;
+ 		private ErrorReporter reportError;
  
  		/**
- 		 * Build a Lua state from this builder
-@@ -401,10 +400,12 @@
+@@ -457,11 +458,13 @@
  		 * @param coroutineExecutor The new executor
  		 * @return This builder
  		 */
@@ -56,5 +72,6 @@
  			return this;
  		}
 +		*/
- 	}
- }
+ 
+ 		@Deprecated
+ 		public Builder errorReporter(Consumer<Throwable> reporter) {

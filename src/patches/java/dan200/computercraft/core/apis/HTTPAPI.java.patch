@@ -1,6 +1,6 @@
 --- HTTPAPI.java
 +++ HTTPAPI.java
-@@ -13,10 +13,6 @@
+@@ -13,15 +13,8 @@
  import dan200.computercraft.core.apis.http.*;
  import dan200.computercraft.core.apis.http.request.HttpRequest;
  import dan200.computercraft.core.apis.http.websocket.Websocket;
@@ -9,118 +9,88 @@
 -import io.netty.handler.codec.http.HttpHeaders;
 -import io.netty.handler.codec.http.HttpMethod;
  
- import javax.annotation.Nonnull;
- import java.net.URI;
-@@ -24,6 +20,7 @@
- import java.util.Locale;
- import java.util.Map;
- import java.util.Optional;
+-import java.util.Collections;
+-import java.util.Locale;
+-import java.util.Map;
+-import java.util.Optional;
 +import java.util.*;
  
  import static dan200.computercraft.core.apis.TableHelper.*;
  
-@@ -35,9 +32,10 @@
-  */
- public class HTTPAPI implements ILuaAPI
- {
-+    private static final String[] VERBS = new String[]{"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"};
-+
+@@ -34,7 +27,6 @@
+ public class HTTPAPI implements ILuaAPI {
      private final IAPIEnvironment apiEnvironment;
  
--    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>( ResourceGroup.DEFAULT );
-     private final ResourceGroup<HttpRequest> requests = new ResourceQueue<>( () -> ComputerCraft.httpMaxRequests );
-     private final ResourceGroup<Websocket> websockets = new ResourceGroup<>( () -> ComputerCraft.httpMaxWebsockets );
+-    private final ResourceGroup<CheckUrl> checkUrls = new ResourceGroup<>(() -> ResourceGroup.DEFAULT_LIMIT);
+     private final ResourceGroup<HttpRequest> requests = new ResourceQueue<>(() -> CoreConfig.httpMaxRequests);
+     private final ResourceGroup<Websocket> websockets = new ResourceGroup<>(() -> CoreConfig.httpMaxWebsockets);
  
-@@ -55,7 +53,6 @@
+@@ -49,14 +41,12 @@
+ 
      @Override
-     public void startup()
-     {
+     public void startup() {
 -        checkUrls.startup();
          requests.startup();
          websockets.startup();
      }
-@@ -63,7 +60,6 @@
+ 
      @Override
-     public void shutdown()
-     {
+     public void shutdown() {
 -        checkUrls.shutdown();
          requests.shutdown();
          websockets.shutdown();
      }
-@@ -105,17 +101,17 @@
-             redirect = true;
-         }
+@@ -95,11 +85,11 @@
  
--        HttpHeaders headers = getHeaders( headerTable );
-+        Map<String, String> headers = getHeaders( headerTable );
+         var headers = getHeaders(headerTable);
  
 -        HttpMethod httpMethod;
 +        String httpMethod;
-         if( requestMethod == null )
-         {
+         if (requestMethod == null) {
 -            httpMethod = postString == null ? HttpMethod.GET : HttpMethod.POST;
 +            httpMethod = postString == null ? "GET" : "POST";
-         }
-         else
-         {
--            httpMethod = HttpMethod.valueOf( requestMethod.toUpperCase( Locale.ROOT ) );
--            if( httpMethod == null || requestMethod.equalsIgnoreCase( "CONNECT" ) )
-+            httpMethod = requestMethod.toUpperCase();
-+            if( Arrays.binarySearch(VERBS, httpMethod) == -1 || requestMethod.equalsIgnoreCase( "CONNECT" ) )
-             {
-                 throw new LuaException( "Unsupported HTTP method" );
+         } else {
+-            httpMethod = HttpMethod.valueOf(requestMethod.toUpperCase(Locale.ROOT));
++            httpMethod = requestMethod.toUpperCase(Locale.ROOT);
+             if (httpMethod == null || requestMethod.equalsIgnoreCase("CONNECT")) {
+                 throw new LuaException("Unsupported HTTP method");
              }
-@@ -146,10 +142,7 @@
-         try
-         {
-             URI uri = HttpRequest.checkUri( address );
--            if( !new CheckUrl( checkUrls, apiEnvironment, address, uri ).queue( CheckUrl::run ) )
--            {
--                throw new LuaException( "Too many ongoing checkUrl calls" );
+@@ -124,9 +114,7 @@
+     public final Object[] checkURL(String address) throws LuaException {
+         try {
+             var uri = HttpRequest.checkUri(address);
+-            if (!new CheckUrl(checkUrls, apiEnvironment, address, uri).queue(CheckUrl::run)) {
+-                throw new LuaException("Too many ongoing checkUrl calls");
 -            }
 +            apiEnvironment.queueEvent("http_check", address, true);
  
-             return new Object[] { true };
+             return new Object[]{ true };
+         } catch (HTTPRequestException e) {
+@@ -154,21 +142,21 @@
          }
-@@ -167,7 +160,7 @@
-             throw new LuaException( "Websocket connections are disabled" );
-         }
- 
--        HttpHeaders headers = getHeaders( headerTbl.orElse( Collections.emptyMap() ) );
-+        Map<String, String> headers = getHeaders( headerTbl.orElse( Collections.emptyMap() ) );
- 
-         try
-         {
-@@ -186,9 +179,9 @@
      }
  
-     @Nonnull
--    private HttpHeaders getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
-+    private Map<String, String> getHeaders( @Nonnull Map<?, ?> headerTable ) throws LuaException
-     {
+-    private HttpHeaders getHeaders(Map<?, ?> headerTable) throws LuaException {
 -        HttpHeaders headers = new DefaultHttpHeaders();
++    private Map<String, String> getHeaders(Map<?, ?> headerTable) throws LuaException {
 +        Map<String, String> headers = new HashMap<>();
-         for( Map.Entry<?, ?> entry : headerTable.entrySet() )
-         {
-             Object value = entry.getValue();
-@@ -196,7 +189,7 @@
-             {
-                 try
-                 {
--                    headers.add( (String) entry.getKey(), value );
-+                    headers.put(((String) entry.getKey()).toLowerCase(), (String) value );
+         for (Map.Entry<?, ?> entry : headerTable.entrySet()) {
+             var value = entry.getValue();
+-            if (entry.getKey() instanceof String && value instanceof String) {
++            if (entry.getKey() instanceof String k && value instanceof String v) {
+                 try {
+-                    headers.add((String) entry.getKey(), value);
++                    headers.put(k.toLowerCase(), v);
+                 } catch (IllegalArgumentException e) {
+                     throw new LuaException(e.getMessage());
                  }
-                 catch( IllegalArgumentException e )
-                 {
-@@ -205,9 +198,9 @@
              }
          }
  
--        if( !headers.contains( HttpHeaderNames.USER_AGENT ) )
-+        if( !headers.containsKey( "user-agent" ) )
-         {
--            headers.set( HttpHeaderNames.USER_AGENT, apiEnvironment.getComputerEnvironment().getUserAgent() );
-+            headers.put( "user-agent", apiEnvironment.getComputerEnvironment().getUserAgent() );
+-        if (!headers.contains(HttpHeaderNames.USER_AGENT)) {
+-            headers.set(HttpHeaderNames.USER_AGENT, apiEnvironment.getGlobalEnvironment().getUserAgent());
++        if (!headers.containsKey("user-agent")) {
++            headers.put("user-agent", apiEnvironment.getGlobalEnvironment().getUserAgent());
          }
          return headers;
      }

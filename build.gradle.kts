@@ -2,8 +2,7 @@ import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import java.net.URLClassLoader
-import java.util.Properties
+import java.util.*
 
 buildscript {
     repositories {
@@ -24,12 +23,17 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
 repositories {
     mavenCentral()
+    maven("https://squiddev.cc/maven") {
+        content {
+            includeGroup("org.teavm")
+        }
+    }
 }
 
 val teavmCli by configurations.creating {
@@ -39,22 +43,26 @@ val teavmCli by configurations.creating {
 dependencies {
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     compileOnly("org.checkerframework:checker-qual:3.17.0")
+    compileOnly("org.jetbrains:annotations:23.0.0")
+    compileOnly("com.google.errorprone:error_prone_annotations:2.14.0")
 
     implementation("com.google.guava:guava:22.0")
     implementation("org.apache.commons:commons-lang3:3.6")
     implementation("it.unimi.dsi:fastutil:8.2.2")
     implementation("org.ow2.asm:asm:8.0.1")
 
-    implementation("org.teavm:teavm-jso:${project.properties["teavm_version"]}")
-    implementation("org.teavm:teavm-jso-apis:${project.properties["teavm_version"]}")
-    implementation("org.teavm:teavm-platform:${project.properties["teavm_version"]}")
-    implementation("org.teavm:teavm-classlib:${project.properties["teavm_version"]}")
+    val teavmVersion = "0.7.0-dev-1212"
+    implementation("org.teavm:teavm-jso:$teavmVersion")
+    implementation("org.teavm:teavm-jso-apis:$teavmVersion")
+    implementation("org.teavm:teavm-platform:$teavmVersion")
+    implementation("org.teavm:teavm-classlib:$teavmVersion")
+    implementation("org.teavm:teavm-metaprogramming-api:$teavmVersion")
 
-    teavmCli("org.teavm:teavm-cli:${project.properties["teavm_version"]}")
+    teavmCli("org.teavm:teavm-cli:0.7.0-dev-1209")
 }
 
 application {
-    mainClass.set("cc.squiddev.cct.Main")
+    mainClass.set("cc.tweaked.web.Main")
 }
 
 tasks {
@@ -71,7 +79,7 @@ tasks {
         mainClass.set("org.teavm.cli.TeaVMRunner")
         args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
         javaLauncher.set(project.javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(17))
         })
     }
 
@@ -229,6 +237,32 @@ tasks {
         delete(fileTree("src/main/java/org/squiddev/cobalt/") { exclude(".editorconfig") })
     }
 
+    val importMap = mapOf(
+        "com.google.common.io.ByteStreams" to "ByteStreams",
+        "java.io.UncheckedIOException" to "UncheckedIOException",
+        "java.nio.file.FileSystemException" to "FileSystemException",
+        "java.nio.file.AccessDeniedException" to "AccessDeniedException",
+        "java.nio.channels.FileChannel" to "FileChannel",
+        "java.nio.channels.Channel" to "Channel",
+        "java.nio.channels.Channels" to "Channels",
+        "java.nio.channels.ClosedChannelException" to "ClosedChannelException",
+        "java.nio.channels.NonWritableChannelException" to "NonWritableChannelException",
+        "java.nio.channels.ReadableByteChannel" to "ReadableByteChannel",
+        "java.nio.channels.SeekableByteChannel" to "SeekableByteChannel",
+        "java.nio.channels.WritableByteChannel" to "WritableByteChannel",
+        "java.nio.file.attribute.BasicFileAttributes" to "BasicFileAttributes",
+        "java.util.concurrent.locks.ReentrantLock" to "ReentrantLock",
+    )
+
+    val importReg = Regex("^import ([^ ;]+);")
+
+    fun patchLine(contents: String) = contents.replace(importReg) {
+        val import = importMap[it.groups[1]!!.value]
+        if (import == null) it.value else "import cc.tweaked.web.stub.$import;"
+    }
+
+    fun File.readPatchedLines() = readLines().map { patchLine(it) }
+
     val makePatches by registering {
         group = "patch"
         description = "Diffs a canonical directory against our currently modified version"
@@ -236,12 +270,13 @@ tasks {
 
         doLast {
             listOf(
-                Pair("CC-Tweaked", "dan200/computercraft"),
-                Pair("Cobalt", "org/squiddev/cobalt")
-            ).forEach { (project, packageName) ->
+                Triple("CC-Tweaked", "projects/core-api/src/main", "dan200/computercraft/api"),
+                Triple("CC-Tweaked", "projects/core/src/main", "dan200/computercraft/core"),
+                Triple("Cobalt", "src/main", "org/squiddev/cobalt")
+            ).forEach { (project, location, packageName) ->
                 val patches = File(projectDir, "src/patches/java/$packageName")
                 val modified = File(projectDir, "src/main/java/$packageName")
-                val original = File(projectDir, "original/$project/src/main/java/$packageName")
+                val original = File(projectDir, "original/$project/$location/java/$packageName")
                 if (!modified.isDirectory) throw IllegalArgumentException("$modified is not a directory or does not exist")
                 if (!original.isDirectory) throw IllegalArgumentException("$original is not a directory or does not exist")
 
@@ -251,12 +286,12 @@ tasks {
                         val relativeFile = modifiedFile.relativeTo(modified)
 
                         val originalFile = original.resolve(relativeFile)
-                        val originalContents = originalFile.readLines()
+                        val originalContents = originalFile.readPatchedLines()
 
                         val filename = relativeFile.name
-                        val diff = DiffUtils.diff(originalContents, modifiedFile.readLines())
+                        val diff = DiffUtils.diff(originalContents, modifiedFile.readPatchedLines())
                         val patch = UnifiedDiffUtils.generateUnifiedDiff(filename, filename, originalContents, diff, 3)
-                        if (!patch.isEmpty()) {
+                        if (patch.isNotEmpty()) {
                             val patchFile = File(patches, "$relativeFile.patch")
                             patchFile.parentFile.mkdirs()
                             patchFile.bufferedWriter().use { writer ->
@@ -277,25 +312,21 @@ tasks {
         dependsOn(cleanSources)
 
         doLast {
+            // We load CC:T's properties and use them to substitute in the mod version
+            val props = Properties()
+            File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
+
             listOf(
-                fileTree("original/CC-Tweaked/src/main") {
+                fileTree("original/CC-Tweaked/projects/core-api/src/main") {
+                    include("java/**")
+                    exclude("java/dan200/computercraft/api/filesystem/FileAttributes.java")
+                },
+                fileTree("original/CC-Tweaked/projects/core/src/main") {
                     include("resources/data/computercraft/lua/bios.lua")
                     include("resources/data/computercraft/lua/rom/**")
 
-                    // We need some stuff from the api and shared, but don't want to have to cope with
-                    // adding Minecraft as a dependency. This gets a little ugly.
-                    exclude("java/dan200/computercraft/**/package-info.java")
-                    include("java/dan200/computercraft/api/lua/**")
-                    exclude("java/dan200/computercraft/api/lua/GenericSource.java")
-                    include("java/dan200/computercraft/api/filesystem/**")
-                    include("java/dan200/computercraft/api/peripheral/**")
-                    exclude("java/dan200/computercraft/api/peripheral/GenericPeripheral.java")
-                    exclude("java/dan200/computercraft/api/peripheral/IPeripheralProvider.java")
-                    exclude("java/dan200/computercraft/api/peripheral/IPeripheralTile.java")
+                    include("java/**")
 
-                    // Core is pretty simple.
-                    include("java/dan200/computercraft/core/**")
-                    exclude("java/dan200/computercraft/core/tracking/ComputerMBean.java")
                     exclude("java/dan200/computercraft/core/computer/ComputerThread.java")
                     // We exclude the actual asm generation stuff, but need some of the interfaces
                     exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
@@ -303,40 +334,27 @@ tasks {
                     exclude("java/dan200/computercraft/core/asm/GenericMethod.java")
                     exclude("java/dan200/computercraft/core/asm/Reflect.java")
                     // We just exclude some FS stuff, as it's a bit of a faff to deal with.
-                    exclude("java/dan200/computercraft/core/filesystem/ComboMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/EmptyMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/ArchiveMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/FileMount.java")
+                    exclude("java/dan200/computercraft/core/filesystem/WritableFileMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
                     exclude("java/dan200/computercraft/core/filesystem/SubMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/ResourceMount.java")
                     // Also exclude all the Netty-specific code
                     exclude("java/dan200/computercraft/core/apis/http/CheckUrl.java")
                     exclude("java/dan200/computercraft/core/apis/http/NetworkUtils.java")
                     exclude("java/dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
                     exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
                     exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java")
-
-                    exclude("java/dan200/computercraft/core/apis/http/options/AddressRuleConfig.java")
-
-                    include("java/dan200/computercraft/shared/util/Colour.java")
-                    include("java/dan200/computercraft/shared/util/LuaUtil.java")
-                    include("java/dan200/computercraft/shared/util/IoUtil.java")
-                    include("java/dan200/computercraft/shared/util/Palette.java")
-                    include("java/dan200/computercraft/shared/util/StringUtil.java")
-                    include("java/dan200/computercraft/shared/util/ThreadUtils.java")
-                    include("java/dan200/computercraft/ComputerCraft.java")
+                    exclude("java/dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java")
                 },
                 fileTree("original/Cobalt/src/main") {
                     include("java/**")
+                    exclude("java/org/squiddev/cobalt/YieldThreader.java")
                 }
             ).forEach { files ->
                 val patches = File(projectDir, "src/patches/")
                 val modified = File(projectDir, "src/main/")
                 val original = files.dir
-
-                // We load CC:T's properties and use them to substitute in the mod version
-                val props = Properties()
-                File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
                 var failed = false
                 files.forEach { originalFile ->
@@ -348,26 +366,25 @@ tasks {
                         println("Patching $relativeFile")
                         val patch = UnifiedDiffUtils.parseUnifiedDiff(patchFile.readLines())
                         val modifiedContents = try {
-                            DiffUtils.patch(originalFile.readLines(), patch)
+                            DiffUtils.patch(originalFile.readPatchedLines(), patch)
                         } catch (e: Exception) {
                             println("Failed to apply patch. This should be manually fixed")
                             failed = true
-                            originalFile.readLines()
+                            originalFile.readPatchedLines()
                         }
                         modifiedFile.bufferedWriter().use { writer ->
                             modifiedContents.forEach {
-                                if (modifiedFile.name == "ComputerCraft.java" && it.startsWith("    static final String VERSION = \"")) {
-                                    // Update the version number within ComputerCraft.java. Yes, ugly, but easier than
-                                    // the alternatives.
-                                    writer.write("    static final String VERSION = \"${props["mod_version"]}\";")
-                                } else {
-                                    writer.write(it)
-                                }
+                                writer.write(it)
                                 writer.write("\n")
                             }
                         }
                     } else {
-                        originalFile.copyTo(modifiedFile)
+                        modifiedFile.bufferedWriter().use { writer ->
+                            originalFile.readPatchedLines().forEach {
+                                writer.write(it)
+                                writer.write("\n")
+                            }
+                        }
                     }
                 }
 
@@ -377,12 +394,18 @@ tasks {
             // Generate Resources.java
             println("Making Resources.java")
             val builder = StringBuilder()
-            val resources = fileTree("original/CC-Tweaked/src/main/resources/data/computercraft/lua/rom/")
-            resources.forEach { builder.append("        \"").append(it.relativeTo(resources.dir).toString().replace('\\', '/')).append("\",\n") }
+            val resources = fileTree("original/CC-Tweaked/projects/core/src/main/resources/data/computercraft/lua/rom/")
+            resources.forEach {
+                builder
+                    .append("        \"")
+                    .append(it.relativeTo(resources.dir).toString().replace('\\', '/'))
+                    .append("\",\n")
+            }
 
-            val contents = File(projectDir, "src/main/java/cc/squiddev/cct/mount/Resources.java.txt").readText().replace("__FILES__", builder.toString())
-            File(projectDir, "src/main/java/cc/squiddev/cct/mount/Resources.java").writeText(contents)
-
+            val contents = File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java.txt").readText()
+                .replace("__FILES__", builder.toString())
+                .replace("__VERSION__", props["modVersion"].toString())
+            File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java").writeText(contents)
         }
     }
 

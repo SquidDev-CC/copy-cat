@@ -101,7 +101,7 @@
  		YieldThreader threader = state.threader;
  		threader.lock.lock();
  		try {
-@@ -491,11 +496,11 @@
+@@ -495,11 +500,11 @@
  		} finally {
  			threader.lock.unlock();
  		}
@@ -116,7 +116,7 @@
  		LuaError le = null;
  		do {
  			final State threadState = thread.state;
-@@ -521,6 +526,7 @@
+@@ -525,6 +530,7 @@
  						args = null;
  						le = LuaError.wrap(e);
  					}
@@ -124,7 +124,7 @@
  				} else if (threadState.needsThreadedResume) {
  					// We only ever resume coroutines which have yielded, never those which have
  					// resumed other coroutines. Consequently, we know we will never have an error here.
-@@ -534,6 +540,7 @@
+@@ -538,6 +544,7 @@
  					threadState.resumeLock.signal();
  
  					throw TransferredControlThrowable.INSTANCE;
@@ -132,7 +132,7 @@
  				} else {
  					threadState.status = STATUS_RUNNING;
  
-@@ -658,12 +665,10 @@
+@@ -662,12 +669,10 @@
  		/**
  		 * The lock to wait on while this coroutine is suspended as a thread
  		 */

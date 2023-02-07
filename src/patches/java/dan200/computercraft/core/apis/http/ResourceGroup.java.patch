@@ -1,19 +1,11 @@
 --- ResourceGroup.java
 +++ ResourceGroup.java
-@@ -6,6 +6,7 @@
- package dan200.computercraft.core.apis.http;
- 
- import java.util.Collections;
-+import java.util.HashSet;
- import java.util.Set;
- import java.util.concurrent.ConcurrentHashMap;
- import java.util.function.IntSupplier;
-@@ -27,7 +28,7 @@
+@@ -23,7 +23,7 @@
  
      boolean active = false;
  
--    final Set<T> resources = Collections.newSetFromMap( new ConcurrentHashMap<>() );
-+    final Set<T> resources = new HashSet<>();
+-    final Set<T> resources = Collections.newSetFromMap(new ConcurrentHashMap<>());
++    final Set<T> resources = new java.util.HashSet<>();
  
-     public ResourceGroup( IntSupplier limit )
-     {
+     public ResourceGroup(IntSupplier limit) {
+         this.limit = limit;

@@ -1,82 +1,20 @@
 --- FileSystem.java
 +++ FileSystem.java
-@@ -18,11 +18,12 @@
- import java.lang.ref.Reference;
- import java.lang.ref.ReferenceQueue;
- import java.lang.ref.WeakReference;
--import java.nio.channels.Channel;
--import java.nio.channels.ReadableByteChannel;
--import java.nio.channels.WritableByteChannel;
-+import cc.squiddev.cct.stub.ChannelHelpers;
-+import cc.squiddev.cct.stub.Channel;
-+import cc.squiddev.cct.stub.ReadableByteChannel;
-+import cc.squiddev.cct.stub.WritableByteChannel;
- import java.nio.file.AccessDeniedException;
--import java.nio.file.attribute.BasicFileAttributes;
-+import cc.squiddev.cct.stub.BasicFileAttributes;
- import java.util.*;
- import java.util.function.Function;
- import java.util.regex.Pattern;
-@@ -368,12 +369,8 @@
-                  WritableByteChannel destination = destinationMount.openForWrite( destinationPath ) )
-             {
-                 // Copy bytes as fast as we can
--                ByteStreams.copy( source, destination );
-+                ChannelHelpers.copy( source, destination );
-             }
--            catch( AccessDeniedException e )
--            {
--                throw new FileSystemException( "Access denied" );
--            }
-             catch( IOException e )
-             {
-                 throw new FileSystemException( e.getMessage() );
-@@ -516,7 +513,7 @@
- 
+@@ -422,7 +422,7 @@
          // Collapse the string into its component parts, removing ..'s
-         String[] parts = path.split( "/" );
--        Stack<String> outputParts = new Stack<>();
-+        List<String> outputParts = new ArrayList<>();
-         for( String part : parts )
-         {
-             if( part.isEmpty() || part.equals( "." ) || threeDotsPattern.matcher( part ).matches() )
-@@ -529,32 +526,32 @@
-             if( part.equals( ".." ) )
-             {
-                 // .. can cancel out the last folder entered
--                if( !outputParts.empty() )
-+                if( !outputParts.isEmpty() )
-                 {
--                    String top = outputParts.peek();
-+                    String top = outputParts.get(outputParts.size() - 1);
-                     if( !top.equals( ".." ) )
-                     {
--                        outputParts.pop();
-+                        outputParts.remove(outputParts.size() - 1);
-                     }
-                     else
-                     {
--                        outputParts.push( ".." );
-+                        outputParts.add( ".." );
-                     }
-                 }
-                 else
-                 {
--                    outputParts.push( ".." );
-+                    outputParts.add( ".." );
-                 }
-             }
-             else if( part.length() >= 255 )
-             {
-                 // If part length > 255 and it is the last part
--                outputParts.push( part.substring( 0, 255 ) );
-+                outputParts.add( part.substring( 0, 255 ) );
-             }
-             else
-             {
-                 // Anything else we add to the stack
--                outputParts.push( part );
-+                outputParts.add( part );
-             }
-         }
+         var outputParts = new ArrayDeque<String>();
+         for (var fullPart : Splitter.on('/').split(path)) {
+-            var part = fullPart.strip();
++            var part = fullPart.trim();
  
+             if (part.isEmpty() || part.equals(".") || threeDotsPattern.matcher(part).matches()) {
+                 // . is redundant
+@@ -444,7 +444,7 @@
+                 }
+             } else if (part.length() >= 255) {
+                 // If part length > 255 and it is the last part
+-                outputParts.addLast(part.substring(0, 255).strip());
++                outputParts.addLast(part.substring(0, 255).trim());
+             } else {
+                 // Anything else we add to the stack
+                 outputParts.addLast(part);

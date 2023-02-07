@@ -1,0 +1,20 @@
+package cc.tweaked.web.mount;
+
+import org.teavm.classlib.ResourceSupplier;
+import org.teavm.classlib.ResourceSupplierContext;
+
+public class Resources implements ResourceSupplier {
+    public static final String VERSION = "__VERSION__";
+
+    static final String[] FILES = new String[] {
+__FILES__
+    };
+
+    @Override
+    public String[] supplyResources(ResourceSupplierContext context) {
+        String[] out = new String[FILES.length + 1];
+        out[0] = "data/computercraft/lua/bios.lua";
+        for (int i = 0; i < FILES.length; i++) out[i + 1] = "data/computercraft/lua/rom/" + FILES[i];
+        return out;
+    }
+}

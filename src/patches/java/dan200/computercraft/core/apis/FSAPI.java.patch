@@ -1,26 +1,12 @@
 --- FSAPI.java
 +++ FSAPI.java
-@@ -20,9 +20,9 @@
- 
- import java.io.BufferedReader;
- import java.io.BufferedWriter;
--import java.nio.channels.ReadableByteChannel;
--import java.nio.channels.WritableByteChannel;
--import java.nio.file.attribute.BasicFileAttributes;
-+import cc.squiddev.cct.stub.ReadableByteChannel;
-+import cc.squiddev.cct.stub.WritableByteChannel;
-+import cc.squiddev.cct.stub.BasicFileAttributes;
- import java.nio.file.attribute.FileTime;
- import java.util.HashMap;
- import java.util.Map;
-@@ -606,8 +606,8 @@
+@@ -524,7 +524,7 @@
          }
      }
  
--    private static long getFileTime( FileTime time )
-+    private static long getFileTime( long time )
-     {
+-    private static long getFileTime(@Nullable FileTime time) {
 -        return time == null ? 0 : time.toMillis();
++    private static long getFileTime(long time) {
 +        return time;
      }
  }

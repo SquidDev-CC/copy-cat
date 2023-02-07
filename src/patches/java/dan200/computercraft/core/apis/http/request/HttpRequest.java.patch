@@ -1,34 +1,43 @@
 --- HttpRequest.java
 +++ HttpRequest.java
-@@ -8,11 +8,11 @@
- import dan200.computercraft.ComputerCraft;
+@@ -8,29 +8,16 @@
+ import dan200.computercraft.core.Logging;
  import dan200.computercraft.core.apis.IAPIEnvironment;
  import dan200.computercraft.core.apis.http.HTTPRequestException;
 -import dan200.computercraft.core.apis.http.NetworkUtils;
  import dan200.computercraft.core.apis.http.Resource;
  import dan200.computercraft.core.apis.http.ResourceGroup;
- import dan200.computercraft.core.apis.http.options.Options;
- import dan200.computercraft.core.tracking.TrackingField;
-+/*
- import io.netty.bootstrap.Bootstrap;
- import io.netty.buffer.ByteBuf;
- import io.netty.buffer.Unpooled;
-@@ -24,6 +24,8 @@
- import io.netty.handler.codec.http.*;
- import io.netty.handler.ssl.SslContext;
- import io.netty.handler.timeout.ReadTimeoutHandler;
-+*/
-+import cc.squiddev.cct.http.HttpHelpers;
+-import dan200.computercraft.core.metrics.Metrics;
+-import io.netty.bootstrap.Bootstrap;
+-import io.netty.buffer.ByteBuf;
+-import io.netty.buffer.Unpooled;
+-import io.netty.channel.ChannelFuture;
+-import io.netty.channel.ChannelInitializer;
+-import io.netty.channel.socket.SocketChannel;
+-import io.netty.channel.socket.nio.NioSocketChannel;
+-import io.netty.handler.codec.http.*;
+-import io.netty.handler.timeout.ReadTimeoutHandler;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
  
- import java.net.InetSocketAddress;
+ import javax.annotation.Nullable;
  import java.net.URI;
-@@ -45,42 +47,38 @@
+ import java.net.URISyntaxException;
+-import java.nio.charset.StandardCharsets;
+ import java.util.Locale;
+-import java.util.concurrent.Future;
+-import java.util.concurrent.TimeUnit;
++import java.util.Map;
+ import java.util.concurrent.atomic.AtomicInteger;
+ 
+ /**
+@@ -43,41 +30,37 @@
  
      private static final int MAX_REDIRECTS = 16;
  
--    private Future<?> executorFuture;
--    private ChannelFuture connectFuture;
--    private HttpRequestHandler currentRequest;
+-    private @Nullable Future<?> executorFuture;
+-    private @Nullable ChannelFuture connectFuture;
+-    private @Nullable HttpRequestHandler currentRequest;
 -
      private final IAPIEnvironment environment;
  
@@ -41,133 +50,119 @@
  
      final AtomicInteger redirects;
  
--    public HttpRequest( ResourceGroup<HttpRequest> limiter, IAPIEnvironment environment, String address, String postText, HttpHeaders headers, boolean binary, boolean followRedirects )
-+    public HttpRequest( ResourceGroup<HttpRequest> limiter, IAPIEnvironment environment, String address, String postText, Map<String, String> headers, boolean binary, boolean followRedirects )
-     {
-         super( limiter );
+     public HttpRequest(
+         ResourceGroup<HttpRequest> limiter, IAPIEnvironment environment, String address, @Nullable String postText,
+-        HttpHeaders headers, boolean binary, boolean followRedirects
++        Map<String, String> headers, boolean binary, boolean followRedirects
+     ) {
+         super(limiter);
          this.environment = environment;
          this.address = address;
 -        postBuffer = postText != null
--            ? Unpooled.wrappedBuffer( postText.getBytes( StandardCharsets.UTF_8 ) )
--            : Unpooled.buffer( 0 );
+-            ? Unpooled.wrappedBuffer(postText.getBytes(StandardCharsets.UTF_8))
+-            : Unpooled.buffer(0);
 +        postBuffer = postText;
          this.headers = headers;
          this.binary = binary;
-         redirects = new AtomicInteger( followRedirects ? MAX_REDIRECTS : 0 );
+         redirects = new AtomicInteger(followRedirects ? MAX_REDIRECTS : 0);
  
-         if( postText != null )
-         {
--            if( !headers.contains( HttpHeaderNames.CONTENT_TYPE ) )
-+            if( !headers.containsKey( "content-type" ) )
-             {
--                headers.set( HttpHeaderNames.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=utf-8" );
-+                headers.put( "content-type", "application/x-www-form-urlencoded; charset=utf-8" );
+         if (postText != null) {
+-            if (!headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
+-                headers.set(HttpHeaderNames.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=utf-8");
++            if (!headers.containsKey("content-type")) {
++                headers.put("content-type", "application/x-www-form-urlencoded; charset=utf-8");
              }
  
 +            /*
-             if( !headers.contains( HttpHeaderNames.CONTENT_LENGTH ) )
-             {
-                 headers.set( HttpHeaderNames.CONTENT_LENGTH, postBuffer.readableBytes() );
+             if (!headers.contains(HttpHeaderNames.CONTENT_LENGTH)) {
+                 headers.set(HttpHeaderNames.CONTENT_LENGTH, postBuffer.readableBytes());
              }
 +            */
          }
      }
  
-@@ -118,20 +116,22 @@
+@@ -108,17 +91,19 @@
          }
      }
  
--    public void request( URI uri, HttpMethod method )
-+    public void request( URI uri, String method )
-     {
-         if( isClosed() ) return;
--        executorFuture = NetworkUtils.EXECUTOR.submit( () -> doRequest( uri, method ) );
-+        doRequest( uri, method );
+-    public void request(URI uri, HttpMethod method) {
++    public void request(URI uri, String method) {
+         if (isClosed()) return;
+-        executorFuture = NetworkUtils.EXECUTOR.submit(() -> doRequest(uri, method));
++        doRequest(uri, method);
          checkClosed();
      }
  
--    private void doRequest( URI uri, HttpMethod method )
-+    private void doRequest( URI uri, String method )
-     {
+-    private void doRequest(URI uri, HttpMethod method) {
++    private void doRequest(URI uri, String method) {
          // If we're cancelled, abort.
-         if( isClosed() ) return;
+         if (isClosed()) return;
  
-         try
-         {
-+            HttpHelpers.makeRequest(this, uri, method, headers, postBuffer);
+         try {
++            cc.tweaked.web.http.HttpHelpers.makeRequest(this, uri, method, headers, postBuffer);
 +            /*
-             boolean ssl = uri.getScheme().equalsIgnoreCase( "https" );
-             InetSocketAddress socketAddress = NetworkUtils.getAddress( uri, ssl );
-             Options options = NetworkUtils.getOptions( uri.getHost(), socketAddress );
-@@ -190,32 +190,29 @@
-                 .addListener( c -> {
-                     if( !c.isSuccess() ) failure( NetworkUtils.toFriendlyError( c.cause() ) );
-                 } );
+             var ssl = uri.getScheme().equalsIgnoreCase("https");
+             var socketAddress = NetworkUtils.getAddress(uri, ssl);
+             var options = NetworkUtils.getOptions(uri.getHost(), socketAddress);
+@@ -171,52 +156,47 @@
+                 .addListener(c -> {
+                     if (!c.isSuccess()) failure(NetworkUtils.toFriendlyError(c.cause()));
+                 });
 +            */
  
              // Do an additional check for cancellation
              checkClosed();
-         }
--        catch( HTTPRequestException e )
--        {
--            failure( e.getMessage() );
--        }
-         catch( Exception e )
-         {
--            failure( NetworkUtils.toFriendlyError( e ) );
-+            failure( "Could not connect" );
-             if( ComputerCraft.logComputerErrors ) ComputerCraft.log.error( "Error in HTTP request", e );
+-        } catch (HTTPRequestException e) {
+-            failure(NetworkUtils.toFriendlyError(e));
+         } catch (Exception e) {
+-            failure(NetworkUtils.toFriendlyError(e));
++            failure("Could not connect");
+             LOG.error(Logging.HTTP_ERROR, "Error in HTTP request", e);
          }
      }
  
--    void failure( String message )
-+    public void failure( String message )
-     {
-         if( tryClose() ) environment.queueEvent( FAILURE_EVENT, address, message );
+-    void failure(String message) {
++    public void failure(String message) {
+         if (tryClose()) environment.queueEvent(FAILURE_EVENT, address, message);
      }
  
--    void failure( String message, HttpResponseHandle object )
-+    public void failure( String message, HttpResponseHandle object )
-     {
-         if( tryClose() ) environment.queueEvent( FAILURE_EVENT, address, message, object );
+-    void failure(String message, HttpResponseHandle object) {
++    public void failure(String message, HttpResponseHandle object) {
+         if (tryClose()) environment.queueEvent(FAILURE_EVENT, address, message, object);
      }
  
--    void success( HttpResponseHandle object )
-+    public void success( HttpResponseHandle object )
-     {
-         if( tryClose() ) environment.queueEvent( SUCCESS_EVENT, address, object );
+-    void success(HttpResponseHandle object) {
++    public void success(HttpResponseHandle object) {
+         if (tryClose()) environment.queueEvent(SUCCESS_EVENT, address, object);
      }
-@@ -224,16 +221,12 @@
-     protected void dispose()
-     {
+ 
+     @Override
+     protected void dispose() {
          super.dispose();
 -
--        executorFuture = closeFuture( executorFuture );
--        connectFuture = closeChannel( connectFuture );
--        currentRequest = closeCloseable( currentRequest );
+-        executorFuture = closeFuture(executorFuture);
+-        connectFuture = closeChannel(connectFuture);
+-        currentRequest = closeCloseable(currentRequest);
      }
  
--    public static long getHeaderSize( HttpHeaders headers )
-+    public static long getHeaderSize( Map<String, String> headers )
-     {
+-    public static long getHeaderSize(HttpHeaders headers) {
++    public static long getHeaderSize(Map<String, String> headers) {
          long size = 0;
--        for( Map.Entry<String, String> header : headers )
-+        for( Map.Entry<String, String> header : headers.entrySet() )
-         {
+-        for (var header : headers) {
++        for (var header : headers.entrySet()) {
              size += header.getKey() == null ? 0 : header.getKey().length();
              size += header.getValue() == null ? 0 : header.getValue().length() + 1;
-@@ -241,12 +234,12 @@
+         }
          return size;
      }
  
--    public ByteBuf body()
-+    public String body()
-     {
+-    public ByteBuf body() {
++    public String body() {
          return postBuffer;
      }
  
--    public HttpHeaders headers()
-+    public Map<String, String> headers()
-     {
+-    public HttpHeaders headers() {
++    public Map<String, String> headers() {
          return headers;
      }
+ 

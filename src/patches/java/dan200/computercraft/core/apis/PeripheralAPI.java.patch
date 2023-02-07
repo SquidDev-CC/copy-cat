@@ -1,22 +1,19 @@
 --- PeripheralAPI.java
 +++ PeripheralAPI.java
-@@ -375,16 +375,16 @@
-             ? Objects.requireNonNull( ((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null" )
+@@ -322,14 +322,14 @@
+             ? Objects.requireNonNull(((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null")
              : LuaMethod.EMPTY_METHODS;
  
--        List<NamedMethod<PeripheralMethod>> methods = PeripheralMethod.GENERATOR.getMethods( peripheral.getClass() );
-+        List<NamedMethod<LuaMethod>> methods = cc.squiddev.cct.asm.Generator.getMethods(peripheral.getClass());
+-        var methods = PeripheralMethod.GENERATOR.getMethods(peripheral.getClass());
++        var methods = cc.tweaked.web.asm.Generator.getMethods(peripheral.getClass());
  
-         Map<String, PeripheralMethod> methodMap = new HashMap<>( methods.size() + dynamicMethods.length );
-         for( int i = 0; i < dynamicMethods.length; i++ )
-         {
-             methodMap.put( dynamicMethods[i], PeripheralMethod.DYNAMIC.get( i ) );
+         Map<String, PeripheralMethod> methodMap = new HashMap<>(methods.size() + dynamicMethods.length);
+         for (var i = 0; i < dynamicMethods.length; i++) {
+             methodMap.put(dynamicMethods[i], PeripheralMethod.DYNAMIC.get(i));
          }
--        for( NamedMethod<PeripheralMethod> method : methods )
-+        for( NamedMethod<LuaMethod> method : methods )
-         {
--            methodMap.put( method.getName(), method.getMethod() );
-+            methodMap.put( method.getName(), (target, context, computer, args) -> method.getMethod().apply(target, context, args) );
+         for (var method : methods) {
+-            methodMap.put(method.getName(), method.getMethod());
++            methodMap.put(method.getName(), (target, context, computer, args) -> method.getMethod().apply(target, context, args));
          }
          return methodMap;
      }

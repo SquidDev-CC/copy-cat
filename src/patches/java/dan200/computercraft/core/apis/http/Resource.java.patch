@@ -1,64 +1,26 @@
 --- Resource.java
 +++ Resource.java
-@@ -6,8 +6,6 @@
+@@ -6,7 +6,6 @@
  package dan200.computercraft.core.apis.http;
  
- import dan200.computercraft.shared.util.IoUtil;
--import io.netty.channel.Channel;
+ import dan200.computercraft.core.util.IoUtil;
 -import io.netty.channel.ChannelFuture;
  
+ import javax.annotation.Nullable;
  import java.io.Closeable;
- import java.lang.ref.Reference;
-@@ -24,7 +22,7 @@
-  */
- public abstract class Resource<T extends Resource<T>> implements Closeable
- {
--    private final AtomicBoolean closed = new AtomicBoolean( false );
-+    private boolean closed;
-     private final ResourceGroup<T> limiter;
- 
-     protected Resource( ResourceGroup<T> limiter )
-@@ -39,7 +37,7 @@
-      */
-     public final boolean isClosed()
-     {
--        return closed.get();
-+        return closed;
-     }
- 
-     /**
-@@ -49,7 +47,7 @@
-      */
-     public final boolean checkClosed()
-     {
--        if( !closed.get() ) return false;
-+        if( !closed ) return false;
-         dispose();
-         return true;
-     }
-@@ -61,7 +59,8 @@
-      */
-     protected final boolean tryClose()
-     {
--        if( closed.getAndSet( true ) ) return false;
-+        if( closed ) return false;
-+        closed = true;
-         dispose();
-         return true;
-     }
-@@ -110,6 +109,7 @@
+@@ -101,6 +100,7 @@
          return null;
      }
  
 +    /*
-     protected static ChannelFuture closeChannel( ChannelFuture future )
-     {
-         if( future != null )
-@@ -121,6 +121,7 @@
+     @Nullable
+     protected static ChannelFuture closeChannel(@Nullable ChannelFuture future) {
+         if (future != null) {
+@@ -111,6 +111,7 @@
  
          return null;
      }
 +    */
  
-     protected static <T extends Future<?>> T closeFuture( T future )
-     {
+     @Nullable
+     protected static <T extends Future<?>> T closeFuture(@Nullable T future) {

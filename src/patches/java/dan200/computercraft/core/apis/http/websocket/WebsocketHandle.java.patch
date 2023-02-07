@@ -1,63 +1,49 @@
 --- WebsocketHandle.java
 +++ WebsocketHandle.java
-@@ -10,10 +10,8 @@
+@@ -10,10 +10,7 @@
  import dan200.computercraft.core.apis.http.options.Options;
- import dan200.computercraft.core.tracking.TrackingField;
- import dan200.computercraft.shared.util.StringUtil;
+ import dan200.computercraft.core.metrics.Metrics;
+ import dan200.computercraft.core.util.StringUtil;
 -import io.netty.buffer.Unpooled;
 -import io.netty.channel.Channel;
 -import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 -import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-+import cc.squiddev.cct.js.WebsocketClient;
 +import org.teavm.jso.typedarrays.Int8Array;
  
- import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
  import java.io.Closeable;
-@@ -35,11 +33,11 @@
- {
+@@ -34,11 +31,11 @@
+ public class WebsocketHandle implements Closeable {
      private final Websocket websocket;
      private final Options options;
 -    private boolean closed = false;
 +    public boolean closed = false;
  
--    private Channel channel;
-+    private WebsocketClient channel;
+-    private @Nullable Channel channel;
++    private @Nullable cc.tweaked.web.js.WebsocketClient channel;
  
--    public WebsocketHandle( Websocket websocket, Options options, Channel channel )
-+    public WebsocketHandle( Websocket websocket, Options options, WebsocketClient channel )
-     {
+-    public WebsocketHandle(Websocket websocket, Options options, Channel channel) {
++    public WebsocketHandle(Websocket websocket, Options options, cc.tweaked.web.js.WebsocketClient channel) {
          this.websocket = websocket;
          this.options = options;
-@@ -91,12 +89,19 @@
+         this.channel = channel;
+@@ -88,9 +85,16 @@
  
-         websocket.environment().addTrackingChange( TrackingField.WEBSOCKET_OUTGOING, text.length() );
- 
--        Channel channel = this.channel;
-+        WebsocketClient channel = this.channel;
-         if( channel != null )
-         {
--            channel.writeAndFlush( binary.orElse( false )
--                ? new BinaryWebSocketFrame( Unpooled.wrappedBuffer( LuaValues.encode( text ) ) )
--                : new TextWebSocketFrame( text ) );
-+            if(binary.orElse(false)) {
+         var channel = this.channel;
+         if (channel != null) {
+-            channel.writeAndFlush(binary.orElse(false)
+-                ? new BinaryWebSocketFrame(Unpooled.wrappedBuffer(LuaValues.encode(text)))
+-                : new TextWebSocketFrame(text));
++            if (binary.orElse(false)) {
 +                Int8Array array = Int8Array.create(text.length());
 +                for (int i = 0; i < array.getLength(); i++) {
 +                    char c = text.charAt(i);
 +                    array.set(i, c < 256 ? (byte) c : 63);
 +                }
-+                channel.send(array.getBuffer());
++                channel.send(array);
 +            } else {
 +                channel.send(text);
 +            }
          }
      }
  
-@@ -121,7 +126,7 @@
-     {
-         closed = true;
- 
--        Channel channel = this.channel;
-+        WebsocketClient channel = this.channel;
-         if( channel != null )
-         {
-             channel.close();

@@ -1,0 +1,13 @@
+--- CoreConfig.java
++++ CoreConfig.java
+@@ -31,10 +31,6 @@
+ 
+     public static boolean httpEnabled = true;
+     public static boolean httpWebsocketEnabled = true;
+-    public static List<AddressRule> httpRules = List.of(
+-        AddressRule.parse("$private", OptionalInt.empty(), Action.DENY.toPartial()),
+-        AddressRule.parse("*", OptionalInt.empty(), Action.ALLOW.toPartial())
+-    );
+     public static int httpMaxRequests = 16;
+     public static int httpMaxWebsockets = 4;
+     public static int httpDownloadBandwidth = 32 * 1024 * 1024;

@@ -1,13 +1,13 @@
 --- LuaMethod.java
 +++ LuaMethod.java
-@@ -12,10 +12,6 @@
+@@ -10,10 +10,6 @@
+ import java.util.Collections;
  
- public interface LuaMethod
- {
--    Generator<LuaMethod> GENERATOR = new Generator<>( LuaMethod.class, Collections.singletonList( ILuaContext.class ),
--        m -> ( target, context, args ) -> context.executeMainThreadTask( () -> ResultHelpers.checkNormalResult( m.apply( target, context, args ) ) )
+ public interface LuaMethod {
+-    Generator<LuaMethod> GENERATOR = new Generator<>(LuaMethod.class, Collections.singletonList(ILuaContext.class),
+-        m -> (target, context, args) -> context.executeMainThreadTask(() -> ResultHelpers.checkNormalResult(m.apply(target, context, args)))
 -    );
 -
      IntCache<LuaMethod> DYNAMIC = new IntCache<>(
-         method -> ( instance, context, args ) -> ((IDynamicLuaObject) instance).callMethod( context, method, args )
+         method -> (instance, context, args) -> ((IDynamicLuaObject) instance).callMethod(context, method, args)
      );

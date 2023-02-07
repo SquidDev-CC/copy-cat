@@ -1,11 +1,11 @@
 --- PartialOptions.java
 +++ PartialOptions.java
-@@ -29,7 +29,7 @@
+@@ -34,7 +34,7 @@
+         this.websocketMessage = websocketMessage;
      }
  
-     @Nonnull
--    Options toOptions()
-+    public Options toOptions()
-     {
-         if( options != null ) return options;
+-    Options toOptions() {
++    public Options toOptions() {
+         if (options != null) return options;
  
+         return options = new Options(

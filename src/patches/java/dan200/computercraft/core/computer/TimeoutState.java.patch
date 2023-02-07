@@ -1,25 +1,20 @@
 --- TimeoutState.java
 +++ TimeoutState.java
-@@ -7,6 +7,7 @@
- 
- import dan200.computercraft.core.lua.ILuaMachine;
- import dan200.computercraft.core.lua.MachineResult;
-+import cc.squiddev.cct.stub.ComputerThread;
- 
- import java.util.concurrent.TimeUnit;
- 
-@@ -37,12 +38,12 @@
-     /**
-      * The total time a task is allowed to run before aborting in nanoseconds.
+@@ -48,7 +48,7 @@
       */
--    static final long TIMEOUT = TimeUnit.MILLISECONDS.toNanos( 7000 );
-+    static final long TIMEOUT = 7000 * 1_000_000L;
+     public static final String ABORT_MESSAGE = "Too long without yielding";
  
-     /**
-      * The time the task is allowed to run after each abort in nanoseconds.
+-    private final ComputerThread scheduler;
++    private final cc.tweaked.web.ComputerThread scheduler;
+ 
+     private boolean paused;
+     private boolean softAbort;
+@@ -74,7 +74,7 @@
       */
--    static final long ABORT_TIMEOUT = TimeUnit.MILLISECONDS.toNanos( 1500 );
-+    static final long ABORT_TIMEOUT = 1500 * 1_000_000L;
+     private long currentDeadline;
  
-     /**
-      * The error message to display when we trigger an abort.
+-    public TimeoutState(ComputerThread scheduler) {
++    public TimeoutState(cc.tweaked.web.ComputerThread scheduler) {
+         this.scheduler = scheduler;
+     }
+ 
