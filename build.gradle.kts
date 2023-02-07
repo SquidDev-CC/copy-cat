@@ -328,10 +328,6 @@ tasks {
                 },
                 fileTree("original/CC-Tweaked/projects/core/src/main/java") {
                     exclude("dan200/computercraft/core/computer/ComputerThread.java")
-                    // We exclude the actual asm generation stuff, but need some of the interfaces
-                    exclude("dan200/computercraft/core/asm/DeclaringClassLoader.java")
-                    exclude("dan200/computercraft/core/asm/Generator.java")
-                    exclude("dan200/computercraft/core/asm/GenericMethod.java")
                     // We just exclude some FS stuff, as it's a bit of a faff to deal with.
                     exclude("dan200/computercraft/core/filesystem/ArchiveMount.java")
                     exclude("dan200/computercraft/core/filesystem/FileMount.java")

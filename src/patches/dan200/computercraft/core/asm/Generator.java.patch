@@ -1,0 +1,95 @@
+--- Generator.java
++++ Generator.java
+@@ -20,6 +20,8 @@
+ import org.objectweb.asm.Type;
+ import cc.tweaked.web.stub.Logger;
+ import cc.tweaked.web.stub.LoggerFactory;
++import org.teavm.metaprogramming.Metaprogramming;
++import org.teavm.metaprogramming.ReflectClass;
+ 
+ import javax.annotation.Nullable;
+ import java.lang.reflect.Method;
+@@ -34,6 +36,7 @@
+ 
+ import static org.objectweb.asm.Opcodes.*;
+ 
++@org.teavm.metaprogramming.CompileTime
+ public final class Generator<T> {
+     private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
+ 
+@@ -56,11 +59,11 @@
+ 
+     private final Function<T, T> wrap;
+ 
+-    private final LoadingCache<Class<?>, List<NamedMethod<T>>> classCache = CacheBuilder
++    private final LoadingCache<Class<?>, List<NamedMethod<ReflectClass<T>>>> classCache = CacheBuilder
+         .newBuilder()
+         .build(CacheLoader.from(catching(this::build, Collections.emptyList())));
+ 
+-    private final LoadingCache<Method, Optional<T>> methodCache = CacheBuilder
++    private final LoadingCache<Method, Optional<ReflectClass<T>>> methodCache = CacheBuilder
+         .newBuilder()
+         .build(CacheLoader.from(catching(this::build, Optional.empty())));
+ 
+@@ -76,7 +79,7 @@
+         this.methodDesc = methodDesc.toString();
+     }
+ 
+-    public List<NamedMethod<T>> getMethods(Class<?> klass) {
++    public List<NamedMethod<ReflectClass<T>>> getMethods(Class<?> klass) {
+         try {
+             return classCache.get(klass);
+         } catch (ExecutionException e) {
+@@ -85,8 +88,8 @@
+         }
+     }
+ 
+-    private List<NamedMethod<T>> build(Class<?> klass) {
+-        ArrayList<NamedMethod<T>> methods = null;
++    private List<NamedMethod<ReflectClass<T>>> build(Class<?> klass) {
++        ArrayList<NamedMethod<ReflectClass<T>>> methods = null;
+         for (var method : klass.getMethods()) {
+             var annotation = method.getAnnotation(LuaFunction.class);
+             if (annotation == null) continue;
+@@ -103,7 +106,7 @@
+             addMethod(methods, method, annotation, null, instance);
+         }
+ 
+-        for (var method : GenericMethod.all()) {
++        for (var method : List.<GenericMethod>of()) {
+             if (!method.target.isAssignableFrom(klass)) continue;
+ 
+             var instance = methodCache.getUnchecked(method.method).orElse(null);
+@@ -118,7 +121,7 @@
+         return Collections.unmodifiableList(methods);
+     }
+ 
+-    private void addMethod(List<NamedMethod<T>> methods, Method method, LuaFunction annotation, @Nullable PeripheralType genericType, T instance) {
++    private void addMethod(List<NamedMethod<ReflectClass<T>>> methods, Method method, LuaFunction annotation, @Nullable PeripheralType genericType, ReflectClass<T> instance) {
+         var names = annotation.value();
+         var isSimple = method.getReturnType() != MethodResult.class && !annotation.mainThread();
+         if (names.length == 0) {
+@@ -130,7 +133,7 @@
+         }
+     }
+ 
+-    private Optional<T> build(Method method) {
++    private Optional<ReflectClass<T>> build(Method method) {
+         var name = method.getDeclaringClass().getName() + "." + method.getName();
+         var modifiers = method.getModifiers();
+ 
+@@ -174,11 +177,10 @@
+             var bytes = generate(className, target, method, annotation.unsafe());
+             if (bytes == null) return Optional.empty();
+ 
+-            var klass = DeclaringClassLoader.INSTANCE.define(className, bytes, method.getDeclaringClass().getProtectionDomain());
++            var klass = Metaprogramming.createClass(bytes);
+ 
+-            var instance = klass.asSubclass(base).getDeclaredConstructor().newInstance();
+-            return Optional.of(annotation.mainThread() ? wrap.apply(instance) : instance);
+-        } catch (ReflectiveOperationException | ClassFormatError | RuntimeException e) {
++            return Optional.of(klass.asSubclass(base));
++        } catch (ClassFormatError | RuntimeException e) {
+             LOG.error("Error generating wrapper for {}.", name, e);
+             return Optional.empty();
+         }

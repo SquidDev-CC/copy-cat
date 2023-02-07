@@ -1,0 +1,11 @@
+--- NamedMethod.java
++++ NamedMethod.java
+@@ -16,7 +16,7 @@
+ 
+     private final @Nullable PeripheralType genericType;
+ 
+-    NamedMethod(String name, T method, boolean nonYielding, @Nullable PeripheralType genericType) {
++    public NamedMethod(String name, T method, boolean nonYielding, @Nullable PeripheralType genericType) {
+         this.name = name;
+         this.method = method;
+         this.nonYielding = nonYielding;

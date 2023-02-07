@@ -1,13 +1,15 @@
 package dan200.computercraft.core.asm;
 
+import dan200.computercraft.api.lua.ILuaContext;
 import org.teavm.metaprogramming.*;
 import org.teavm.metaprogramming.reflect.ReflectMethod;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @CompileTime
-public class Generator {
+public class JsGenerator {
     public static List<NamedMethod<LuaMethod>> getMethods(Class<?> klass) {
         List<NamedMethod<LuaMethod>> out = new ArrayList<>();
         getMethodsImpl(klass, (name, method, nonYielding) -> out.add(new NamedMethod<>(name, method, nonYielding, null)));
@@ -30,17 +32,23 @@ public class Generator {
             throw new RuntimeException(e);
         }
 
-        for (NamedMethod<ReflectClass<LuaMethod>> method : ClassGenerator.LUA_METHOD.getMethods(actualClass)) {
+        for (var method : Internal.LUA_METHOD.getMethods(actualClass)) {
             String name = method.getName();
             boolean nonYielding = method.nonYielding();
             ReflectMethod actualMethod = method.getMethod().getMethod("<init>");
 
             Metaprogramming.emit(() -> make.get().make(name, (LuaMethod) actualMethod.construct(), nonYielding));
         }
-
     }
 
     public interface MakeMethod {
         void make(String name, LuaMethod method, boolean nonYielding);
+    }
+
+    private static class Internal {
+        public static final Generator<LuaMethod> LUA_METHOD = new Generator<>(
+            LuaMethod.class, Collections.singletonList(ILuaContext.class),
+            m -> (target, context, args) -> context.executeMainThreadTask(() -> ResultHelpers.checkNormalResult(m.apply(target, context, args)))
+        );
     }
 }

@@ -1,19 +1,11 @@
 --- PeripheralAPI.java
 +++ PeripheralAPI.java
-@@ -12,6 +12,7 @@
- import dan200.computercraft.api.peripheral.IPeripheral;
- import dan200.computercraft.api.peripheral.NotAttachedException;
- import dan200.computercraft.api.peripheral.WorkMonitor;
-+import dan200.computercraft.core.asm.Generator;
- import dan200.computercraft.core.asm.LuaMethod;
- import dan200.computercraft.core.asm.PeripheralMethod;
- import dan200.computercraft.core.computer.ComputerSide;
-@@ -322,14 +323,14 @@
+@@ -322,14 +322,14 @@
              ? Objects.requireNonNull(((IDynamicPeripheral) peripheral).getMethodNames(), "Peripheral methods cannot be null")
              : LuaMethod.EMPTY_METHODS;
  
 -        var methods = PeripheralMethod.GENERATOR.getMethods(peripheral.getClass());
-+        var methods = Generator.getMethods(peripheral.getClass());
++        var methods = dan200.computercraft.core.asm.JsGenerator.getMethods(peripheral.getClass());
  
          Map<String, PeripheralMethod> methodMap = new HashMap<>(methods.size() + dynamicMethods.length);
          for (var i = 0; i < dynamicMethods.length; i++) {
