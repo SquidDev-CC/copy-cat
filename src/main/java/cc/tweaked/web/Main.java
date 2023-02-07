@@ -4,6 +4,7 @@ import cc.tweaked.web.js.Callbacks;
 import cc.tweaked.web.js.ConfigGroup;
 import dan200.computercraft.core.ComputerContext;
 import dan200.computercraft.core.CoreConfig;
+import dan200.computercraft.core.computer.ComputerThread;
 import dan200.computercraft.core.computer.mainthread.NoWorkMainThreadScheduler;
 import dan200.computercraft.core.lua.CobaltLuaMachine;
 
@@ -16,9 +17,10 @@ public class Main {
     private static final List<ComputerWrapper> computers = new ArrayList<>();
     private static long ticks;
 
-    static final ComputerContext context = new ComputerContext(
+    private static final ComputerThread worker = new ComputerThread(1);
+    private static final ComputerContext context = new ComputerContext(
         GlobalEnvironmentImpl.INSTANCE,
-        ComputerThread.INSTANCE,
+        worker,
         new NoWorkMainThreadScheduler(),
         CobaltLuaMachine::new
     );
@@ -28,7 +30,7 @@ public class Main {
     public static void main(String[] args) {
         setupConfig();
         Callbacks.setup(access -> {
-            ComputerWrapper wrapper = new ComputerWrapper(access);
+            ComputerWrapper wrapper = new ComputerWrapper(context, access);
             computers.add(wrapper);
             return wrapper;
         });

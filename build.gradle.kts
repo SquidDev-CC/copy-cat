@@ -65,6 +65,8 @@ application {
     mainClass.set("cc.tweaked.web.Main")
 }
 
+sourceSets.main { java.srcDir("src/main/javaPatched") }
+
 tasks {
     val compileTeaVM by registering(JavaExec::class) {
         group = "build"
@@ -232,26 +234,30 @@ tasks {
         group = "patch"
         description = "Cleans the modified sources"
 
-        delete("src/main/java/dan200/computercraft/")
+        delete("src/main/javaPatched/dan200/computercraft")
         delete("src/main/resources/data/computercraft")
-        delete(fileTree("src/main/java/org/squiddev/cobalt/") { exclude(".editorconfig") })
+        delete(fileTree("src/main/javaPatched/org/squiddev/cobalt/") { exclude(".editorconfig") })
     }
 
     val importMap = mapOf(
         "com.google.common.io.ByteStreams" to "ByteStreams",
         "java.io.UncheckedIOException" to "UncheckedIOException",
-        "java.nio.file.FileSystemException" to "FileSystemException",
-        "java.nio.file.AccessDeniedException" to "AccessDeniedException",
-        "java.nio.channels.FileChannel" to "FileChannel",
         "java.nio.channels.Channel" to "Channel",
         "java.nio.channels.Channels" to "Channels",
         "java.nio.channels.ClosedChannelException" to "ClosedChannelException",
+        "java.nio.channels.FileChannel" to "FileChannel",
         "java.nio.channels.NonWritableChannelException" to "NonWritableChannelException",
         "java.nio.channels.ReadableByteChannel" to "ReadableByteChannel",
         "java.nio.channels.SeekableByteChannel" to "SeekableByteChannel",
         "java.nio.channels.WritableByteChannel" to "WritableByteChannel",
+        "java.nio.file.AccessDeniedException" to "AccessDeniedException",
+        "java.nio.file.FileSystemException" to "FileSystemException",
         "java.nio.file.attribute.BasicFileAttributes" to "BasicFileAttributes",
         "java.util.concurrent.locks.ReentrantLock" to "ReentrantLock",
+        "org.slf4j.Logger" to "Logger",
+        "org.slf4j.LoggerFactory" to "LoggerFactory",
+        "org.slf4j.Marker" to "Marker",
+        "org.slf4j.MarkerFactory" to "MarkerFactory",
     )
 
     val importReg = Regex("^import ([^ ;]+);")
@@ -274,8 +280,8 @@ tasks {
                 Triple("CC-Tweaked", "projects/core/src/main", "dan200/computercraft/core"),
                 Triple("Cobalt", "src/main", "org/squiddev/cobalt")
             ).forEach { (project, location, packageName) ->
-                val patches = File(projectDir, "src/patches/java/$packageName")
-                val modified = File(projectDir, "src/main/java/$packageName")
+                val patches = File(projectDir, "src/patches/$packageName")
+                val modified = File(projectDir, "src/main/javaPatched/$packageName")
                 val original = File(projectDir, "original/$project/$location/java/$packageName")
                 if (!modified.isDirectory) throw IllegalArgumentException("$modified is not a directory or does not exist")
                 if (!original.isDirectory) throw IllegalArgumentException("$original is not a directory or does not exist")
@@ -317,43 +323,36 @@ tasks {
             File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
             listOf(
-                fileTree("original/CC-Tweaked/projects/core-api/src/main") {
-                    include("java/**")
-                    exclude("java/dan200/computercraft/api/filesystem/FileAttributes.java")
+                fileTree("original/CC-Tweaked/projects/core-api/src/main/java") {
+                    exclude("dan200/computercraft/api/filesystem/FileAttributes.java")
                 },
-                fileTree("original/CC-Tweaked/projects/core/src/main") {
-                    include("resources/data/computercraft/lua/bios.lua")
-                    include("resources/data/computercraft/lua/rom/**")
-
-                    include("java/**")
-
-                    exclude("java/dan200/computercraft/core/computer/ComputerThread.java")
+                fileTree("original/CC-Tweaked/projects/core/src/main/java") {
+                    exclude("dan200/computercraft/core/computer/ComputerThread.java")
                     // We exclude the actual asm generation stuff, but need some of the interfaces
-                    exclude("java/dan200/computercraft/core/asm/DeclaringClassLoader.java")
-                    exclude("java/dan200/computercraft/core/asm/Generator.java")
-                    exclude("java/dan200/computercraft/core/asm/GenericMethod.java")
-                    exclude("java/dan200/computercraft/core/asm/Reflect.java")
+                    exclude("dan200/computercraft/core/asm/DeclaringClassLoader.java")
+                    exclude("dan200/computercraft/core/asm/Generator.java")
+                    exclude("dan200/computercraft/core/asm/GenericMethod.java")
+                    exclude("dan200/computercraft/core/asm/Reflect.java")
                     // We just exclude some FS stuff, as it's a bit of a faff to deal with.
-                    exclude("java/dan200/computercraft/core/filesystem/ArchiveMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/FileMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/WritableFileMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/JarMount.java")
-                    exclude("java/dan200/computercraft/core/filesystem/SubMount.java")
+                    exclude("dan200/computercraft/core/filesystem/ArchiveMount.java")
+                    exclude("dan200/computercraft/core/filesystem/FileMount.java")
+                    exclude("dan200/computercraft/core/filesystem/WritableFileMount.java")
+                    exclude("dan200/computercraft/core/filesystem/JarMount.java")
+                    exclude("dan200/computercraft/core/filesystem/SubMount.java")
                     // Also exclude all the Netty-specific code
-                    exclude("java/dan200/computercraft/core/apis/http/CheckUrl.java")
-                    exclude("java/dan200/computercraft/core/apis/http/NetworkUtils.java")
-                    exclude("java/dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
-                    exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
-                    exclude("java/dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java")
-                    exclude("java/dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java")
+                    exclude("dan200/computercraft/core/apis/http/CheckUrl.java")
+                    exclude("dan200/computercraft/core/apis/http/NetworkUtils.java")
+                    exclude("dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
+                    exclude("dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
+                    exclude("dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java")
+                    exclude("dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java")
                 },
-                fileTree("original/Cobalt/src/main") {
-                    include("java/**")
-                    exclude("java/org/squiddev/cobalt/YieldThreader.java")
+                fileTree("original/Cobalt/src/main/java") {
+                    exclude("org/squiddev/cobalt/YieldThreader.java")
                 }
             ).forEach { files ->
                 val patches = File(projectDir, "src/patches/")
-                val modified = File(projectDir, "src/main/")
+                val modified = File(projectDir, "src/main/javaPatched")
                 val original = files.dir
 
                 var failed = false
@@ -406,6 +405,16 @@ tasks {
                 .replace("__FILES__", builder.toString())
                 .replace("__VERSION__", props["modVersion"].toString())
             File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java").writeText(contents)
+
+            File(projectDir, "src/main/javaPatched/org/squiddev/cobalt/.editorconfig")
+                .writeText("[*.java]\nindent_style = tab\n")
+
+            copy {
+                from("original/CC-Tweaked/projects/core/src/main/resources")
+                include("data/computercraft/lua/bios.lua")
+                include("data/computercraft/lua/rom/**")
+                into("src/main/resources")
+            }
         }
     }
 

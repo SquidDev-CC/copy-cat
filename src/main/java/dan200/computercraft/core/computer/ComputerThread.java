@@ -1,8 +1,7 @@
-package cc.tweaked.web;
+package dan200.computercraft.core.computer;
 
 import cc.tweaked.web.js.Callbacks;
 import cc.tweaked.web.js.Callbacks.Callback;
-import dan200.computercraft.core.computer.ComputerExecutor;
 
 import java.util.ArrayDeque;
 import java.util.concurrent.TimeUnit;
@@ -12,16 +11,17 @@ import java.util.concurrent.TimeUnit;
  * all the work a computer can do.
  */
 public class ComputerThread {
-    public static final ComputerThread INSTANCE = new ComputerThread();
-
     private static final ArrayDeque<ComputerExecutor> executors = new ArrayDeque<>();
-    private final Callback CALLBACK = this::workOnce;
+    private final Callback callback = this::workOnce;
+
+    public ComputerThread(int threads) {
+    }
 
     public void queue(ComputerExecutor executor) {
         if (executor.onComputerQueue) throw new IllegalStateException("Cannot queue already queued executor");
         executor.onComputerQueue = true;
 
-        if (executors.isEmpty()) Callbacks.setImmediate(CALLBACK);
+        if (executors.isEmpty()) Callbacks.setImmediate(callback);
         executors.add(executor);
     }
 
@@ -38,7 +38,7 @@ public class ComputerThread {
         }
 
         if (executor.afterWork()) executors.push(executor);
-        if (!executors.isEmpty()) Callbacks.setImmediate(CALLBACK);
+        if (!executors.isEmpty()) Callbacks.setImmediate(callback);
     }
 
     public boolean hasPendingWork() {

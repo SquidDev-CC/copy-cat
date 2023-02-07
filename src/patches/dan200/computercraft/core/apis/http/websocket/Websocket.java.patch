@@ -21,8 +21,8 @@
 -import io.netty.handler.codec.http.HttpObjectAggregator;
 -import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 -import io.netty.handler.codec.http.websocketx.WebSocketVersion;
- import org.slf4j.Logger;
- import org.slf4j.LoggerFactory;
+ import cc.tweaked.web.stub.Logger;
+ import cc.tweaked.web.stub.LoggerFactory;
  
 @@ -33,6 +20,7 @@
  import java.lang.ref.WeakReference;

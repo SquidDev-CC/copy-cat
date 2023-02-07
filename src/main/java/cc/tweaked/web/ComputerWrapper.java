@@ -6,8 +6,11 @@ import cc.tweaked.web.js.JsonParse;
 import cc.tweaked.web.mount.ComputerAccessMount;
 import cc.tweaked.web.peripheral.SpeakerPeripheral;
 import cc.tweaked.web.peripheral.TickablePeripheral;
+import cc.tweaked.web.stub.Logger;
+import cc.tweaked.web.stub.LoggerFactory;
 import dan200.computercraft.api.filesystem.WritableMount;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.core.ComputerContext;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.computer.ComputerEnvironment;
 import dan200.computercraft.core.computer.ComputerSide;
@@ -15,13 +18,12 @@ import dan200.computercraft.core.metrics.Metric;
 import dan200.computercraft.core.metrics.MetricsObserver;
 import dan200.computercraft.core.terminal.Palette;
 import dan200.computercraft.core.terminal.Terminal;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, MetricsObserver {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ComputerWrapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComputerWrapper.class);
 
     private static final ComputerSide[] SIDES = ComputerSide.values();
     private final TerminalMonitor terminalMonitor = new TerminalMonitor();
@@ -31,9 +33,9 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
     private boolean disposed = false;
     private boolean customSize;
 
-    public ComputerWrapper(ComputerAccess computerAccess) {
+    public ComputerWrapper(ComputerContext context, ComputerAccess computerAccess) {
         this.computerAccess = computerAccess;
-        this.computer = new Computer(Main.context, this, terminal, 0);
+        this.computer = new Computer(context, this, terminal, 0);
 
         if (!disposed) computer.turnOn();
     }
