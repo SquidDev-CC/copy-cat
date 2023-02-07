@@ -7,12 +7,12 @@
 -    static <T> void allMethods(Generator<T> generator, Object object, BiConsumer<Object, NamedMethod<T>> accept) {
 -        for (var method : generator.getMethods(object.getClass())) accept.accept(object, method);
 +    static void allMethods(Object object, BiConsumer<Object, NamedMethod<LuaMethod>> accept) {
-+        for (var method : cc.tweaked.web.asm.Generator.getMethods(object.getClass())) accept.accept(object, method);
++        for (var method : Generator.getMethods(object.getClass())) accept.accept(object, method);
  
          if (object instanceof ObjectSource source) {
              for (var extra : source.getExtra()) {
 -                for (var method : generator.getMethods(extra.getClass())) accept.accept(extra, method);
-+                for (var method : cc.tweaked.web.asm.Generator.getMethods(extra.getClass())) accept.accept(extra, method);
++                for (var method : Generator.getMethods(extra.getClass())) accept.accept(extra, method);
              }
          }
      }

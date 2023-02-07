@@ -26,8 +26,8 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
     private static final Logger LOG = LoggerFactory.getLogger(ComputerWrapper.class);
 
     private static final ComputerSide[] SIDES = ComputerSide.values();
-    private final TerminalMonitor terminalMonitor = new TerminalMonitor();
-    private final Terminal terminal = new Terminal(Main.computerTermWidth, Main.computerTermHeight, true, terminalMonitor);
+    private boolean terminalChanged = false;
+    private final Terminal terminal = new Terminal(Main.computerTermWidth, Main.computerTermHeight, true, () -> terminalChanged = true);
     private final Computer computer;
     private final ComputerAccess computerAccess;
     private boolean disposed = false;
@@ -65,10 +65,11 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
 
         for (ComputerSide side : SIDES) {
             IPeripheral peripheral = computer.getEnvironment().getPeripheral(side);
-            if (peripheral instanceof TickablePeripheral) ((TickablePeripheral) peripheral).tick();
+            if (peripheral instanceof TickablePeripheral toTick) toTick.tick();
         }
 
-        if (terminalMonitor.pollChanged()) {
+        if (terminalChanged) {
+            terminalChanged = false;
             computerAccess.updateTerminal(
                 terminal.getWidth(), terminal.getHeight(),
                 terminal.getCursorX(), terminal.getCursorY(),

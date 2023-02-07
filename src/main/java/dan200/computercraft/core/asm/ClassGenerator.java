@@ -1,18 +1,16 @@
-package cc.tweaked.web.asm;
+package dan200.computercraft.core.asm;
 
+import cc.tweaked.web.stub.Logger;
+import cc.tweaked.web.stub.LoggerFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.primitives.Primitives;
 import com.google.common.reflect.TypeToken;
 import dan200.computercraft.api.lua.*;
-import dan200.computercraft.core.asm.LuaMethod;
-import dan200.computercraft.core.asm.NamedMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import cc.tweaked.web.stub.Logger;
-import cc.tweaked.web.stub.LoggerFactory;
 import org.teavm.metaprogramming.CompileTime;
 import org.teavm.metaprogramming.Metaprogramming;
 import org.teavm.metaprogramming.ReflectClass;
@@ -304,9 +302,7 @@ public final class ClassGenerator<T> {
             return true;
         }
 
-        LOG.error("Unknown parameter type {} for method {}.{}.",
-            arg.getName(), method.getDeclaringClass().getName(), method.getName());
+        LOG.error("Unknown parameter type {} for method {}.{}.", arg.getName(), method.getDeclaringClass().getName(), method.getName());
         return null;
     }
 }
-

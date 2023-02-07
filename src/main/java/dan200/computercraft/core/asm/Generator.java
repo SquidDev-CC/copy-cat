@@ -1,7 +1,5 @@
-package cc.tweaked.web.asm;
+package dan200.computercraft.core.asm;
 
-import dan200.computercraft.core.asm.LuaMethod;
-import dan200.computercraft.core.asm.NamedMethod;
 import org.teavm.metaprogramming.*;
 import org.teavm.metaprogramming.reflect.ReflectMethod;
 
