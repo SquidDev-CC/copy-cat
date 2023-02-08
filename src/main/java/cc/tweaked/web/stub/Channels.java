@@ -38,8 +38,8 @@ public class Channels {
             }
 
             @Override
-            public void write(byte[] buf, int off, int len) throws IOException {
-                writer.write(ByteBuffer.wrap(buf, off, len).flip());
+            public void write(byte[] buffer, int off, int len) throws IOException {
+                writer.write(ByteBuffer.wrap(buffer, off, len));
             }
         }, dec);
     }
