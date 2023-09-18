@@ -17,13 +17,7 @@ public class Main {
     private static final List<ComputerWrapper> computers = new ArrayList<>();
     private static long ticks;
 
-    private static final ComputerThread worker = new ComputerThread(1);
-    private static final ComputerContext context = new ComputerContext(
-        GlobalEnvironmentImpl.INSTANCE,
-        worker,
-        new NoWorkMainThreadScheduler(),
-        CobaltLuaMachine::new
-    );
+    private static final ComputerContext context = ComputerContext.builder(GlobalEnvironmentImpl.INSTANCE).build();
     static int computerTermWidth = 51;
     static int computerTermHeight = 19;
 

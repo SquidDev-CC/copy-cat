@@ -47,7 +47,8 @@ export const start = async (computer: ComputerAccess, config: ConfigFactory): Pr
   }
 
   loaded = true;
-  classes.default(new Callbacks(config));
+  (window as any).copycatCallbacks = new Callbacks(config);
+  classes.main();
   if (!doAddComputer) throw new Error("Callbacks.setup was never called");
 
   return doAddComputer(computer);

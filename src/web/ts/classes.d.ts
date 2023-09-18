@@ -1,6 +1,4 @@
-declare function Start(callbacks: Callbacks): void;
-
-export default Start;
+export const main: () => void;
 
 export type Side = "up" | "down" | "left" | "right" | "front" | "back";
 export type PeripheralKind = "speaker";

@@ -1,6 +1,6 @@
 --- Websocket.java
 +++ Websocket.java
-@@ -9,23 +9,10 @@
+@@ -8,23 +8,10 @@
  import dan200.computercraft.core.Logging;
  import dan200.computercraft.core.apis.IAPIEnvironment;
  import dan200.computercraft.core.apis.http.HTTPRequestException;
@@ -19,40 +19,32 @@
 -import io.netty.handler.codec.http.HttpHeaderNames;
 -import io.netty.handler.codec.http.HttpHeaders;
 -import io.netty.handler.codec.http.HttpObjectAggregator;
--import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
+-import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 -import io.netty.handler.codec.http.websocketx.WebSocketVersion;
  import cc.tweaked.web.stub.Logger;
  import cc.tweaked.web.stub.LoggerFactory;
  
-@@ -33,6 +20,7 @@
- import java.lang.ref.WeakReference;
- import java.net.URI;
- import java.net.URISyntaxException;
-+import java.util.Map;
- import java.util.concurrent.Future;
- 
- /**
-@@ -52,16 +40,14 @@
+@@ -51,17 +38,15 @@
      static final String CLOSE_EVENT = "websocket_closed";
      static final String MESSAGE_EVENT = "websocket_message";
  
 -    private @Nullable Future<?> executorFuture;
 -    private @Nullable ChannelFuture connectFuture;
--    private @Nullable WeakReference<WebsocketHandle> websocketHandle;
-+    private WeakReference<WebsocketHandle> websocketHandle;
+     private @Nullable WeakReference<WebsocketHandle> websocketHandle;
  
      private final IAPIEnvironment environment;
      private final URI uri;
      private final String address;
 -    private final HttpHeaders headers;
-+    private final Map<String, String> headers;
++    private final java.util.Map<String, String> headers;
+     private final int timeout;
  
--    public Websocket(ResourceGroup<Websocket> limiter, IAPIEnvironment environment, URI uri, String address, HttpHeaders headers) {
-+    public Websocket(ResourceGroup<Websocket> limiter, IAPIEnvironment environment, URI uri, String address, Map<String, String> headers) {
+-    public Websocket(ResourceGroup<Websocket> limiter, IAPIEnvironment environment, URI uri, String address, HttpHeaders headers, int timeout) {
++    public Websocket(ResourceGroup<Websocket> limiter, IAPIEnvironment environment, URI uri, String address, java.util.Map<String, String> headers, int timeout) {
          super(limiter);
          this.environment = environment;
          this.uri = uri;
-@@ -103,7 +89,7 @@
+@@ -104,7 +89,7 @@
  
      public void connect() {
          if (isClosed()) return;
@@ -61,7 +53,7 @@
          checkClosed();
      }
  
-@@ -112,6 +98,8 @@
+@@ -113,6 +98,8 @@
          if (isClosed()) return;
  
          try {
@@ -70,7 +62,7 @@
              var ssl = uri.getScheme().equalsIgnoreCase("wss");
              var socketAddress = NetworkUtils.getAddress(uri, ssl);
              var options = NetworkUtils.getOptions(uri.getHost(), socketAddress);
-@@ -151,18 +139,17 @@
+@@ -151,18 +138,17 @@
                  .addListener(c -> {
                      if (!c.isSuccess()) failure(NetworkUtils.toFriendlyError(c.cause()));
                  });
@@ -92,7 +84,7 @@
          if (isClosed()) return;
  
          var handle = new WebsocketHandle(this, options, channel);
-@@ -172,11 +159,11 @@
+@@ -172,11 +158,11 @@
          checkClosed();
      }
  
@@ -106,7 +98,7 @@
          if (tryClose()) {
              environment.queueEvent(CLOSE_EVENT, address,
                  Strings.isNullOrEmpty(reason) ? null : reason,
-@@ -188,9 +175,6 @@
+@@ -188,9 +174,6 @@
      protected void dispose() {
          super.dispose();
  

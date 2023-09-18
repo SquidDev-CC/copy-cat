@@ -18,7 +18,7 @@ buildscript {
 
 plugins {
     java
-    application
+    distribution
 }
 
 java {
@@ -29,9 +29,13 @@ java {
 
 repositories {
     mavenCentral()
-    maven("https://squiddev.cc/maven") {
-        content {
-            includeGroup("org.teavm")
+
+    exclusiveContent {
+        forRepository {
+            maven("https://squiddev.cc/maven")
+        }
+        filter {
+            includeGroup("org.squiddev")
         }
     }
 }
@@ -49,61 +53,42 @@ dependencies {
     implementation("com.google.guava:guava:22.0")
     implementation("org.apache.commons:commons-lang3:3.6")
     implementation("it.unimi.dsi:fastutil:8.2.2")
-    implementation("org.ow2.asm:asm:8.0.1")
+    implementation("org.ow2.asm:asm:9.5")
+    implementation("org.squiddev:Cobalt:0.7.3")
 
-    val teavmVersion = "0.7.0-dev-1212"
-    implementation("org.teavm:teavm-jso:$teavmVersion")
-    implementation("org.teavm:teavm-jso-apis:$teavmVersion")
-    implementation("org.teavm:teavm-platform:$teavmVersion")
-    implementation("org.teavm:teavm-classlib:$teavmVersion")
-    implementation("org.teavm:teavm-metaprogramming-api:$teavmVersion")
+    implementation("org.teavm:teavm-jso")
+    implementation("org.teavm:teavm-jso-apis")
+    implementation("org.teavm:teavm-platform")
+    implementation("org.teavm:teavm-classlib")
+    implementation("org.teavm:teavm-metaprogramming-api")
 
-    teavmCli("org.teavm:teavm-cli:0.7.0-dev-1209")
-}
-
-application {
-    mainClass.set("cc.tweaked.web.Main")
+    teavmCli("org.teavm:teavm-cli")
 }
 
 sourceSets.main { java.srcDir("src/main/javaPatched") }
 
 tasks {
+    val teaVMDir = layout.buildDirectory.dir("teaVM")
+    val classesFile = layout.buildDirectory.file("teaVM/classes.js")
+    val rollupDir = layout.buildDirectory.dir("rollup")
+    val webDir = layout.buildDirectory.dir("web")
+    val minifiedDir = layout.buildDirectory.dir("minified")
+    val webMinDir = layout.buildDirectory.dir("webMin")
+
     val compileTeaVM by registering(JavaExec::class) {
         group = "build"
         description = "Converts Java code to Javascript using TeaVM"
 
         inputs.files(project.configurations.getByName("runtimeOnly").allArtifacts.files).withPropertyName("jars")
 
-        val dir = File(buildDir, "teaVM")
-        outputs.file(File(dir, "classes.js")).withPropertyName("output")
+        outputs.file(classesFile).withPropertyName("output")
 
         classpath = teavmCli + sourceSets.main.get().runtimeClasspath
         mainClass.set("org.teavm.cli.TeaVMRunner")
-        args(listOf("-O2", "--minify", "--targetdir", dir.absolutePath, application.mainClass.get()))
+        args(listOf("-O2", "--minify", "--targetdir", teaVMDir.get().asFile.absolutePath, "cc.tweaked.web.Main"))
         javaLauncher.set(project.javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(17))
         })
-    }
-
-    val bundleTeaVM by registering {
-        group = "build"
-        description = "Converts the TeaVM file into a AMD module"
-
-        dependsOn(compileTeaVM)
-        inputs.file(File(buildDir, "teaVM/classes.js")).withPropertyName("input")
-        outputs.file(File(buildDir, "javascript/classes.js")).withPropertyName("output")
-
-        doLast {
-            File(buildDir, "javascript/classes.js").bufferedWriter().use { writer ->
-                File(buildDir, "teaVM/classes.js").reader().use { it.copyTo(writer) }
-
-                // Export a simple function which sets the callbacks and then boots the VM
-                writer.write("export default callbacks => {\n")
-                writer.write("  window.copycatCallbacks = callbacks;\n")
-                writer.write("  main();\n");
-                writer.write("};\n");
-            }
-        }
     }
 
     /**
@@ -131,13 +116,13 @@ tasks {
         group = "build"
         description = "Combines multiple Javascript files into one"
 
-        dependsOn(bundleTeaVM, genCssTypes)
-        inputs.file(File(buildDir, "javascript/classes.js")).withPropertyName("teaVM")
+        dependsOn(compileTeaVM, genCssTypes)
+        inputs.file(classesFile).withPropertyName("teaVM")
         inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
         inputs.file("package-lock.json").withPropertyName("package-lock.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
-        outputs.files(fileTree(File(buildDir, "rollup"))).withPropertyName("output")
+        outputs.files(fileTree(rollupDir)).withPropertyName("output")
 
         commandLine(mkCommand("npm run --silent prepare:rollup"))
     }
@@ -147,7 +132,7 @@ tasks {
         description = "Combines all resource files into one distribution."
 
         dependsOn(rollup)
-        inputs.files(fileTree(File(buildDir, "rollup"))).withPropertyName("rollup")
+        inputs.files(fileTree(rollupDir)).withPropertyName("rollup")
 
         /** Replace various template strings within our files. */
         fun replaceTemplate(x: String) = x
@@ -163,22 +148,22 @@ tasks {
             }
         })
 
-        from("$buildDir/rollup");
+        from(rollupDir);
 
         from("src/web/public") {
             filter { replaceTemplate(it) }
         }
 
-        into("$buildDir/web")
+        into(webDir)
     }
 
     val minify by registering {
         group = "build"
         description = "Minifies the JS and CSS files"
 
-        val js = fileTree("$buildDir/web") { include("**/*.js") }
-        val css = fileTree("$buildDir/web") { include("**/*.css") }
-        val dest = file("$buildDir/minified")
+        val js = fileTree(webDir) { include("**/*.js") }
+        val css = fileTree(webDir) { include("**/*.css") }
+        val dest = file(minifiedDir)
 
         inputs.files(js).withPropertyName("js")
         inputs.files(css).withPropertyName("css")
@@ -218,9 +203,9 @@ tasks {
 
         dependsOn(website, minify)
 
-        from("$buildDir/web") { exclude("**/*.css", "**/*.js") }
-        from("$buildDir/minified") { include("**/*.css", "**/*.js") }
-        into("$buildDir/webMin")
+        from(webDir) { exclude("**/*.css", "**/*.js") }
+        from(minifiedDir) { include("**/*.css", "**/*.js") }
+        into(webMinDir)
     }
 
     val cleanPatches by registering(Delete::class) {
@@ -236,7 +221,6 @@ tasks {
 
         delete("src/main/javaPatched/dan200/computercraft")
         delete("src/main/resources/data/computercraft")
-        delete(fileTree("src/main/javaPatched/org/squiddev/cobalt/") { exclude(".editorconfig") })
     }
 
     val importMap = mapOf(
@@ -278,7 +262,6 @@ tasks {
             listOf(
                 Triple("CC-Tweaked", "projects/core-api/src/main", "dan200/computercraft/api"),
                 Triple("CC-Tweaked", "projects/core/src/main", "dan200/computercraft/core"),
-                Triple("Cobalt", "src/main", "org/squiddev/cobalt")
             ).forEach { (project, location, packageName) ->
                 val patches = File(projectDir, "src/patches/$packageName")
                 val modified = File(projectDir, "src/main/javaPatched/$packageName")
@@ -322,35 +305,41 @@ tasks {
             val props = Properties()
             File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
+            var failed = false
             listOf(
                 fileTree("original/CC-Tweaked/projects/core-api/src/main/java") {
                     exclude("dan200/computercraft/api/filesystem/FileAttributes.java")
                 },
                 fileTree("original/CC-Tweaked/projects/core/src/main/java") {
-                    exclude("dan200/computercraft/core/computer/ComputerThread.java")
-                    // We just exclude some FS stuff, as it's a bit of a faff to deal with.
-                    exclude("dan200/computercraft/core/filesystem/ArchiveMount.java")
-                    exclude("dan200/computercraft/core/filesystem/FileMount.java")
-                    exclude("dan200/computercraft/core/filesystem/WritableFileMount.java")
-                    exclude("dan200/computercraft/core/filesystem/JarMount.java")
-                    exclude("dan200/computercraft/core/filesystem/SubMount.java")
-                    // Also exclude all the Netty-specific code
-                    exclude("dan200/computercraft/core/apis/http/CheckUrl.java")
-                    exclude("dan200/computercraft/core/apis/http/NetworkUtils.java")
-                    exclude("dan200/computercraft/core/apis/http/request/HttpRequestHandler.java")
-                    exclude("dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java")
-                    exclude("dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java")
-                    exclude("dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java")
+                    exclude(
+                        // We tear out most of the ASM system with our own implementation
+                        "dan200/computercraft/core/asm/Generator.java",
+                        "dan200/computercraft/core/asm/IntCache.java",
+                        "dan200/computercraft/core/asm/LuaMethodSupplier.java",
+                        "dan200/computercraft/core/asm/MethodSupplierImpl.java",
+                        "dan200/computercraft/core/asm/PeripheralMethodSupplier.java",
+                        // We replace ComputerThread with a Javascript-compatible version
+                        "dan200/computercraft/core/computer/ComputerThread.java",
+                        // We just exclude some FS stuff, as it's a bit of a faff to deal with.
+                        "dan200/computercraft/core/filesystem/ArchiveMount.java",
+                        "dan200/computercraft/core/filesystem/FileMount.java",
+                        "dan200/computercraft/core/filesystem/WritableFileMount.java",
+                        "dan200/computercraft/core/filesystem/JarMount.java",
+                        "dan200/computercraft/core/filesystem/SubMount.java",
+                        // Also exclude all the Netty-specific code
+                        "dan200/computercraft/core/apis/http/CheckUrl.java",
+                        "dan200/computercraft/core/apis/http/NetworkUtils.java",
+                        "dan200/computercraft/core/apis/http/request/HttpRequestHandler.java",
+                        "dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java",
+                        "dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java",
+                        "dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java",
+                    )
                 },
-                fileTree("original/Cobalt/src/main/java") {
-                    exclude("org/squiddev/cobalt/YieldThreader.java")
-                }
             ).forEach { files ->
                 val patches = File(projectDir, "src/patches/")
                 val modified = File(projectDir, "src/main/javaPatched")
                 val original = files.dir
 
-                var failed = false
                 files.forEach { originalFile ->
                     val relativeFile = originalFile.relativeTo(original)
                     val modifiedFile = modified.resolve(relativeFile)
@@ -381,9 +370,9 @@ tasks {
                         }
                     }
                 }
-
-                if (failed) throw IllegalStateException("Failed to apply patches")
             }
+
+            if (failed) throw IllegalStateException("Failed to apply patches")
 
             // Generate Resources.java
             println("Making Resources.java")
@@ -400,9 +389,6 @@ tasks {
                 .replace("__FILES__", builder.toString())
                 .replace("__VERSION__", props["modVersion"].toString())
             File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java").writeText(contents)
-
-            File(projectDir, "src/main/javaPatched/org/squiddev/cobalt/.editorconfig")
-                .writeText("[*.java]\nindent_style = tab\n")
 
             copy {
                 from("original/CC-Tweaked/projects/core/src/main/resources")

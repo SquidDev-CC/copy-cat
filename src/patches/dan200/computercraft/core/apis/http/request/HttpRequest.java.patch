@@ -1,13 +1,13 @@
 --- HttpRequest.java
 +++ HttpRequest.java
-@@ -8,29 +8,16 @@
+@@ -7,19 +7,9 @@
  import dan200.computercraft.core.Logging;
  import dan200.computercraft.core.apis.IAPIEnvironment;
  import dan200.computercraft.core.apis.http.HTTPRequestException;
 -import dan200.computercraft.core.apis.http.NetworkUtils;
  import dan200.computercraft.core.apis.http.Resource;
  import dan200.computercraft.core.apis.http.ResourceGroup;
--import dan200.computercraft.core.metrics.Metrics;
+ import dan200.computercraft.core.metrics.Metrics;
 -import io.netty.bootstrap.Bootstrap;
 -import io.netty.buffer.ByteBuf;
 -import io.netty.buffer.Unpooled;
@@ -20,40 +20,29 @@
  import cc.tweaked.web.stub.Logger;
  import cc.tweaked.web.stub.LoggerFactory;
  
- import javax.annotation.Nullable;
- import java.net.URI;
- import java.net.URISyntaxException;
--import java.nio.charset.StandardCharsets;
- import java.util.Locale;
--import java.util.concurrent.Future;
--import java.util.concurrent.TimeUnit;
-+import java.util.Map;
- import java.util.concurrent.atomic.AtomicInteger;
- 
- /**
-@@ -43,41 +30,37 @@
- 
+@@ -43,14 +33,12 @@
      private static final int MAX_REDIRECTS = 16;
  
--    private @Nullable Future<?> executorFuture;
+     private @Nullable Future<?> executorFuture;
 -    private @Nullable ChannelFuture connectFuture;
 -    private @Nullable HttpRequestHandler currentRequest;
--
+ 
      private final IAPIEnvironment environment;
  
      private final String address;
 -    private final ByteBuf postBuffer;
 -    private final HttpHeaders headers;
 +    private final String postBuffer;
-+    private final Map<String, String> headers;
++    private final java.util.Map<String, String> headers;
      private final boolean binary;
+     private final int timeout;
  
-     final AtomicInteger redirects;
+@@ -58,27 +46,27 @@
  
      public HttpRequest(
          ResourceGroup<HttpRequest> limiter, IAPIEnvironment environment, String address, @Nullable String postText,
--        HttpHeaders headers, boolean binary, boolean followRedirects
-+        Map<String, String> headers, boolean binary, boolean followRedirects
+-        HttpHeaders headers, boolean binary, boolean followRedirects, int timeout
++        java.util.Map<String, String> headers, boolean binary, boolean followRedirects, int timeout
      ) {
          super(limiter);
          this.environment = environment;
@@ -65,6 +54,7 @@
          this.headers = headers;
          this.binary = binary;
          redirects = new AtomicInteger(followRedirects ? MAX_REDIRECTS : 0);
+         this.timeout = timeout;
  
          if (postText != null) {
 -            if (!headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
@@ -81,7 +71,7 @@
          }
      }
  
-@@ -108,17 +91,19 @@
+@@ -109,17 +97,19 @@
          }
      }
  
@@ -104,7 +94,7 @@
              var ssl = uri.getScheme().equalsIgnoreCase("https");
              var socketAddress = NetworkUtils.getAddress(uri, ssl);
              var options = NetworkUtils.getOptions(uri.getHost(), socketAddress);
-@@ -171,52 +156,47 @@
+@@ -163,52 +153,47 @@
                  .addListener(c -> {
                      if (!c.isSuccess()) failure(NetworkUtils.toFriendlyError(c.cause()));
                  });
@@ -146,7 +136,7 @@
      }
  
 -    public static long getHeaderSize(HttpHeaders headers) {
-+    public static long getHeaderSize(Map<String, String> headers) {
++    public static long getHeaderSize(java.util.Map<String, String> headers) {
          long size = 0;
 -        for (var header : headers) {
 +        for (var header : headers.entrySet()) {
@@ -162,7 +152,7 @@
      }
  
 -    public HttpHeaders headers() {
-+    public Map<String, String> headers() {
++    public java.util.Map<String, String> headers() {
          return headers;
      }
  

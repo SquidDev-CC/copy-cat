@@ -19,8 +19,8 @@
     "prepare:uglifycss": "uglifycss --max-line-len 120",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "host": "cd build/web && python -mhttp.server 8080",
-    "host:min": "cd build/webMin && python -mhttp.server 8080"
+    "host": "python -m http.server -d build/web --bind 127.0.0.1 8080",
+    "host:min": "python -m http.server -d build/webMin --bind 127.0.0.1 8080"
   },
   "dependencies": {
     "@squid-dev/cc-web-term": "^1.2.3",

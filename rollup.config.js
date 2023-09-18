@@ -61,12 +61,12 @@ export default {
       async writeBundle () {
         await Promise.all([
           fs.copyFile("node_modules/requirejs/require.js", `${out}/require.js`),
-          fs.copyFile("node_modules/jszip/dist/jszip.js", `${out}/jszip.js`)
+          fs.copyFile("node_modules/jszip/dist/jszip.js", `${out}/jszip.js`),
         ]);
       },
       async resolveId (source) {
-        if (source !== "./classes") return null;
-        return path.resolve("build/javascript/classes.js");
+        if (source === "./classes") return path.resolve("build/teaVM/classes.js");
+        return null;
       },
     },
   ],

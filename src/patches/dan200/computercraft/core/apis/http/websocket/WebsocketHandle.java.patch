@@ -1,18 +1,17 @@
 --- WebsocketHandle.java
 +++ WebsocketHandle.java
-@@ -10,10 +10,7 @@
+@@ -8,10 +8,6 @@
+ import dan200.computercraft.api.lua.*;
  import dan200.computercraft.core.apis.http.options.Options;
  import dan200.computercraft.core.metrics.Metrics;
- import dan200.computercraft.core.util.StringUtil;
 -import io.netty.buffer.Unpooled;
 -import io.netty.channel.Channel;
 -import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 -import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-+import org.teavm.jso.typedarrays.Int8Array;
  
  import javax.annotation.Nullable;
  import java.io.Closeable;
-@@ -34,11 +31,11 @@
+@@ -32,11 +28,11 @@
  public class WebsocketHandle implements Closeable {
      private final Websocket websocket;
      private final Options options;
@@ -27,7 +26,7 @@
          this.websocket = websocket;
          this.options = options;
          this.channel = channel;
-@@ -88,9 +85,16 @@
+@@ -86,9 +82,16 @@
  
          var channel = this.channel;
          if (channel != null) {
@@ -35,7 +34,7 @@
 -                ? new BinaryWebSocketFrame(Unpooled.wrappedBuffer(LuaValues.encode(text)))
 -                : new TextWebSocketFrame(text));
 +            if (binary.orElse(false)) {
-+                Int8Array array = Int8Array.create(text.length());
++                var array = org.teavm.jso.typedarrays.Int8Array.create(text.length());
 +                for (int i = 0; i < array.getLength(); i++) {
 +                    char c = text.charAt(i);
 +                    array.set(i, c < 256 ? (byte) c : 63);
