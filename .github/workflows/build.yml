@@ -12,16 +12,17 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set up JDK 1.8
+    - name: Set up Java
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: 17
+        distribution: 'temurin'
 
     - name: Setup node.js
       run: npm ci
 
     - name: Build with Gradle
       run: ./gradlew applyPatches assemble
-    
+
     - name: Lint JS/TS
       run: npm run --silent lint
