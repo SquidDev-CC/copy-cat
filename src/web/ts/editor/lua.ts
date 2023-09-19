@@ -143,8 +143,7 @@ const tokens: languages.IMonarchLanguage = {
       }],
     ],
   },
-} as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-// The TS definition isn't up to date.
+};
 
 languages.register({
   id: "luax",

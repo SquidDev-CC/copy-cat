@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A ComputerCraft emulator for the web",
   "main": "src/server/index.js",
+  "type": "module",
   "keywords": [
     "computercraft"
   ],
@@ -15,41 +16,35 @@
   "scripts": {
     "prepare:setup": "node tools/setup.js",
     "prepare:rollup": "rollup -c",
-    "prepare:terser": "terser --compress --mangle --comments",
-    "prepare:uglifycss": "uglifycss --max-line-len 120",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "host": "python -m http.server -d build/web --bind 127.0.0.1 8080",
     "host:min": "python -m http.server -d build/webMin --bind 127.0.0.1 8080"
   },
   "dependencies": {
     "@squid-dev/cc-web-term": "^1.2.3",
-    "clsx": "^1.1.1",
     "jszip": "^3.5.0",
-    "monaco-editor": "^0.34.0",
+    "monaco-editor": "^0.43.0",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
-    "setimmediate": "^1.0.5",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^14.0.0",
-    "@rollup/plugin-replace": "^4.0.0",
-    "@rollup/plugin-typescript": "^8.3.0",
-    "@rollup/plugin-url": "^7.0.0",
-    "@types/d3-time-format": "^4.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-replace": "^5.0.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@rollup/plugin-url": "^8.0.0",
     "@types/requirejs": "^2.1.32",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "d3-time-format": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.3.0",
     "postcss": "^8.4.3",
     "postcss-selector-parser": "^6.0.6",
-    "rollup": "^2.33.3",
-    "rollup-plugin-license": "^2.2.0",
+    "rollup": "^3.0.0",
+    "rollup-plugin-license": "^3.0.0",
     "rollup-plugin-postcss": "^4.0.0",
     "terser": "^5.5.1",
-    "typescript": "^4.1.2",
-    "uglifycss": "0.0.29"
+    "typescript": "^5.0.2"
   }
 }

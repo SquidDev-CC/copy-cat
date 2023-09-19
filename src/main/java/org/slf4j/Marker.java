@@ -1,4 +1,4 @@
-package cc.tweaked.web.stub;
+package org.slf4j;
 
 public final class Marker {
     Marker() {

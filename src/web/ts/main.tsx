@@ -1,18 +1,18 @@
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
-import clsx from "clsx";
 import type * as monaco from "monaco-editor";
-import { Component, JSX, h, render } from "preact";
+import { Component, type JSX, type VNode, h, render } from "preact";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
 import { ConfigGroup, SettingStore, Settings } from "./settings";
 import { actionButton, darkTheme, dialogueOverlay, infoButtons, lightTheme } from "./styles.css";
+import { classNames } from "./utils";
 
 type MainState = {
   settings: Settings,
   settingStorage: SettingStore,
-  configGroups: ConfigGroup[],
+  configGroups: Array<ConfigGroup>,
 
   currentVDom: (state: MainState) => JSX.Element,
   dialogue?: (state: MainState) => JSX.Element,
@@ -23,7 +23,7 @@ class Main extends Component<unknown, MainState> {
     super(props, context);
   }
 
-  public componentWillMount() {
+  public componentWillMount(): void {
     const settingStorage = new SettingStore();
 
     const configEditor = new ConfigGroup("Editor", "Configure the built-in editor", settingStorage);
@@ -58,7 +58,7 @@ class Main extends Component<unknown, MainState> {
       },
     );
 
-    const fonts: { [font: string]: string } = {
+    const fonts: Record<string, string> = {
       "standard": termFont,
       "hd": termFontHd,
 
@@ -75,14 +75,14 @@ class Main extends Component<unknown, MainState> {
     );
   }
 
-  public shouldComponentUpdate(_: unknown, newState: MainState) {
+  public shouldComponentUpdate(_: unknown, newState: MainState): boolean {
     return this.state.currentVDom !== newState.currentVDom ||
       this.state.dialogue !== newState.dialogue ||
       this.state.settings !== newState.settings;
   }
 
-  public render(_: unknown, state: MainState) {
-    return <div class={clsx("container", {[darkTheme]: state.settings.darkMode, [lightTheme]: !state.settings.darkMode})}>
+  public render(_: unknown, state: MainState): VNode {
+    return <div class={classNames("container", state.settings.darkMode ? darkTheme : lightTheme)}>
       {state.currentVDom(state)}
       <div class={infoButtons}>
         <button class={actionButton} title="Configure how the emulator behaves" type="button"
@@ -103,18 +103,18 @@ class Main extends Component<unknown, MainState> {
     </div>;
   }
 
-  private openSettings = () => {
+  private openSettings = (): void => {
     this.setState({
       dialogue: ({ settingStorage, configGroups }: MainState) =>
         <Settings store={settingStorage} configGroups={configGroups} />,
     });
   };
 
-  private closeDialogueClick = (e: MouseEvent) => {
+  private closeDialogueClick = (e: MouseEvent): void => {
     if (e.target === e.currentTarget) this.setState({ dialogue: undefined });
   };
 
-  private computerVDom = ({ settings, dialogue }: MainState) => {
+  private computerVDom = ({ settings, dialogue }: MainState): VNode => {
     return <Computer settings={settings} focused={dialogue === undefined} computerSettings={this.configFactory} />;
   };
 
@@ -137,7 +137,7 @@ class Main extends Component<unknown, MainState> {
 {
   requirejs.config({ paths: { vs: "__monaco__/min/vs" } });
 
-  (window as any).MonacoEnvironment = { // eslint-disable-line @typescript-eslint/no-explicit-any
+  (window as any).MonacoEnvironment = { // eslint-disable-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     getWorkerUrl: (_workerId: string, _label: string) =>
       `data:text/javascript;charset=utf-8,${encodeURIComponent(`
       self.MonacoEnvironment = {
@@ -148,6 +148,6 @@ class Main extends Component<unknown, MainState> {
   } as monaco.Environment;
 
   // Start the window!
-  const page = document.getElementById("page") as HTMLElement;
-  render(<Main />, page, page.lastElementChild || undefined);
+  const page = document.getElementById("page")!;
+  render(<Main />, page, page.lastElementChild ?? undefined);
 }

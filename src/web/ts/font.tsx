@@ -1,7 +1,7 @@
 import { iconFont } from "./styles.css";
-import { VNode, h } from "preact";
+import { type VNode, h } from "preact";
 
-const mk = (child: VNode<unknown>) => {
+const mk = (child: VNode<unknown>): () => VNode => {
   const node = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" class={iconFont}>
     {child}
   </svg>;

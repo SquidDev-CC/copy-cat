@@ -1,5 +1,5 @@
-import { ComputerActionable, KeyCode, LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
-import { ConfigFactory, ComputerAccess as IComputerAccess, FileSystemEntry as IFileSystemEntry, Result, start } from "../java";
+import { type ComputerActionable, type KeyCode, type LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
+import { type ConfigFactory, type ComputerAccess as IComputerAccess, type FileSystemEntry as IFileSystemEntry, type Result, start } from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
 import type { ComputerCallbacks, FileAttributes, PeripheralKind, Side } from "../classes";
 
@@ -20,18 +20,18 @@ const encoder = new TextEncoder();
 export class FileSystemEntry implements IFileSystemEntry {
   private readonly persistance: ComputerPersistance;
   private readonly path: string;
-  private children: string[] | null;
+  private children: Array<string> | null;
   private contents: Int8Array | null;
   private exists: boolean = true;
   private semaphore?: Semaphore;
   private attributes: BasicAttributes;
 
-  public constructor(persistance: ComputerPersistance, path: string, children: string[] | null, contents: Int8Array | null, attributes: BasicAttributes | null) {
+  public constructor(persistance: ComputerPersistance, path: string, children: Array<string> | null, contents: Int8Array | null, attributes: BasicAttributes | null) {
     this.persistance = persistance;
     this.path = path;
     this.children = children;
     this.contents = contents;
-    this.attributes = attributes === null ? { modification: 0, creation: 0 } : attributes;
+    this.attributes = attributes ?? { modification: 0, creation: 0 };
   }
 
   public static create(persistance: ComputerPersistance, path: string, directory: boolean): FileSystemEntry {
@@ -45,12 +45,12 @@ export class FileSystemEntry implements IFileSystemEntry {
     return this.children != null;
   }
 
-  public getChildren(): string[] {
+  public getChildren(): Array<string> {
     if (this.children === null) throw Error("Not a directory");
     return this.children;
   }
 
-  public setChildren(children: string[]): void {
+  public setChildren(children: Array<string>): void {
     if (this.children === null) throw Error("Not a directory");
     this.children = children;
     if (this.semaphore) this.semaphore.signal();
@@ -101,7 +101,7 @@ export class FileSystemEntry implements IFileSystemEntry {
   }
 
   public getSemaphore(): Semaphore {
-    return this.semaphore || (this.semaphore = new Semaphore());
+    return this.semaphore ?? (this.semaphore = new Semaphore());
   }
 
   public doesExist(): boolean {
@@ -200,7 +200,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public getEntry(path: string): FileSystemEntry | null {
-    return this.filesystem.get(path) || null;
+    return this.filesystem.get(path) ?? null;
   }
 
   public createDirectory(path: string): Result<FileSystemEntry> {
@@ -271,7 +271,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
         this.handlers = computer;
         if (this.removed) computer.dispose();
 
-        const { width, height, label } = options || {};
+        const { width, height, label } = options ?? {};
         if (typeof width === "number" && typeof height === "number") computer.resize(width, height);
 
         if (typeof this.label === "string") computer.setLabel(this.label);
@@ -282,8 +282,8 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
       .catch(e => console.error("Cannot start computer", e));
   }
 
-  public queueEvent(event: string, args: LuaValue[]): void {
-    if (this.handlers !== undefined) this.handlers.event(event, args.map(x => JSON.stringify(x)));
+  public queueEvent(event: string, args: Array<LuaValue>): void {
+    if (this.handlers !== undefined) this.handlers.event(event, args);
   }
 
   public keyDown(key: KeyCode, repeat: boolean): void {
@@ -313,7 +313,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
     if (this.handlers) this.handlers?.dispose();
   }
 
-  public setPeripheral(side: Side, kind: PeripheralKind | null) {
+  public setPeripheral(side: Side, kind: PeripheralKind | null): void {
     if (this.handlers) {
       this.handlers.setPeripheral(side, kind);
     } else {

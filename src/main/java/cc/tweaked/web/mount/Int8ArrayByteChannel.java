@@ -1,12 +1,12 @@
 package cc.tweaked.web.mount;
 
-import cc.tweaked.web.stub.ClosedChannelException;
-import cc.tweaked.web.stub.NonWritableChannelException;
-import cc.tweaked.web.stub.SeekableByteChannel;
 import org.teavm.jso.typedarrays.Int8Array;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NonWritableChannelException;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Objects;
 
 /**
@@ -66,6 +66,17 @@ public class Int8ArrayByteChannel implements SeekableByteChannel {
     @Override
     public void close() {
         closed = true;
+    }
+
+    @Override
+    public SeekableByteChannel truncate(long size) throws IOException {
+        if (closed) throw new ClosedChannelException();
+        throw new NonWritableChannelException();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return !closed;
     }
 }
 

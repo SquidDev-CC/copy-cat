@@ -9,7 +9,7 @@ public interface ConfigGroup extends JSObject {
     /**
      * Add a string property to this config group
      *
-     * @param id Unique ID for this property
+     * @param id          Unique ID for this property
      * @param name        The display name of this group
      * @param description A short description of this group
      * @param def         The default value
@@ -20,7 +20,7 @@ public interface ConfigGroup extends JSObject {
     /**
      * Add a boolean property to this config group
      *
-     * @param id Unique ID for this property
+     * @param id          Unique ID for this property
      * @param name        The display name of this group
      * @param description A short description of this group
      * @param def         The default value
@@ -31,7 +31,7 @@ public interface ConfigGroup extends JSObject {
     /**
      * Add an integer property to this config group
      *
-     * @param id Unique ID for this property
+     * @param id          Unique ID for this property
      * @param name        The display name of this group
      * @param description A short description of this group
      * @param min         The minimum value

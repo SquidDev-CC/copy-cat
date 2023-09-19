@@ -1,8 +1,5 @@
 import type { ComputerAccess, ComputerCallbacks, ConfigGroup, Callbacks as ICallbacks } from "./classes";
-export type { ComputerAccess, FileSystemEntry, QueueEventHandler, Result, ConfigGroup as IConfigGroup } from "./classes";
-import { timeFormat } from "d3-time-format";
-
-import "setimmediate";
+export type { ComputerAccess, FileSystemEntry, Result, ConfigGroup as IConfigGroup } from "./classes";
 
 export type ConfigFactory = (name: string, description: string | null) => ConfigGroup;
 
@@ -19,19 +16,6 @@ class Callbacks implements ICallbacks {
   public setup(addComputer: (computer: ComputerAccess) => ComputerCallbacks): void {
     doAddComputer = addComputer;
   }
-
-  public setInterval(callback: () => void, delay: number): void {
-    setInterval(callback, delay);
-  }
-
-  public setImmediate(callback: () => void): void {
-    // Bodge, as there's no types for 'setImmediate'
-    (window as any).setImmediate(callback); // eslint-disable-line @typescript-eslint/no-explicit-any
-  }
-
-  public strftime(format: string, time: Date): string {
-    return timeFormat(format)(time);
-  }
 }
 
 export const start = async (computer: ComputerAccess, config: ConfigFactory): Promise<ComputerCallbacks> => {
@@ -47,7 +31,7 @@ export const start = async (computer: ComputerAccess, config: ConfigFactory): Pr
   }
 
   loaded = true;
-  (window as any).copycatCallbacks = new Callbacks(config);
+  (window as any).copycatCallbacks = new Callbacks(config); // eslint-disable-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   classes.main();
   if (!doAddComputer) throw new Error("Callbacks.setup was never called");
 

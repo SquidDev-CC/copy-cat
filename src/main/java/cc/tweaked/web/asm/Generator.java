@@ -4,8 +4,6 @@
 
 package cc.tweaked.web.asm;
 
-import cc.tweaked.web.stub.Logger;
-import cc.tweaked.web.stub.LoggerFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -16,6 +14,8 @@ import dan200.computercraft.core.methods.LuaMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.teavm.metaprogramming.CompileTime;
 import org.teavm.metaprogramming.ReflectClass;
 

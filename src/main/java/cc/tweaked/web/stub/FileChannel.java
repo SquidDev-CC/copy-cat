@@ -1,6 +1,7 @@
 package cc.tweaked.web.stub;
 
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 
 /**
  * This is never constructed, only used in {@code instanceof} checks.

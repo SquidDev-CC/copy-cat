@@ -25,9 +25,9 @@ export interface ComputerPersistance {
 
   removeContents(path: string): void;
 
-  getChildren(path: string): string[] | null;
+  getChildren(path: string): Array<string> | null;
 
-  setChildren(path: string, children: string[]): void;
+  setChildren(path: string, children: Array<string>): void;
 
   removeChildren(path: string): void;
 
@@ -90,19 +90,19 @@ export class StoragePersistence implements ComputerPersistance {
     storage.remove(`${this.prefix}.files[${path}].b64`);
   }
 
-  public getChildren(path: string): string[] | null {
+  public getChildren(path: string): Array<string> | null {
     const children = storage.get(`${this.prefix}.files[${path}].children`);
     if (children === null) return null;
 
     try {
-      return JSON.parse(children);
+      return JSON.parse(children) as Array<string>;
     } catch (e) {
       console.error(`Error loading path "${path}"`);
       return null;
     }
   }
 
-  public setChildren(path: string, children: string[]): void {
+  public setChildren(path: string, children: Array<string>): void {
     storage.set(`${this.prefix}.files[${path}].children`, JSON.stringify(children));
   }
 
@@ -115,7 +115,7 @@ export class StoragePersistence implements ComputerPersistance {
     if (attributes === null) return null;
 
     try {
-      return JSON.parse(attributes);
+      return JSON.parse(attributes) as BasicAttributes;
     } catch (e) {
       console.error(`Error loading attributes for "${path}"`);
       return null;

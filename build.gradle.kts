@@ -1,7 +1,6 @@
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import java.util.*
 
 buildscript {
@@ -12,7 +11,6 @@ buildscript {
     dependencies {
         // Misc buildscript stuff
         classpath("io.github.java-diff-utils:java-diff-utils:4.0")
-        classpath("org.ajoberstar.grgit:grgit-gradle:3.0.0")
     }
 }
 
@@ -70,10 +68,6 @@ sourceSets.main { java.srcDir("src/main/javaPatched") }
 tasks {
     val teaVMDir = layout.buildDirectory.dir("teaVM")
     val classesFile = layout.buildDirectory.file("teaVM/classes.js")
-    val rollupDir = layout.buildDirectory.dir("rollup")
-    val webDir = layout.buildDirectory.dir("web")
-    val minifiedDir = layout.buildDirectory.dir("minified")
-    val webMinDir = layout.buildDirectory.dir("webMin")
 
     val compileTeaVM by registering(JavaExec::class) {
         group = "build"
@@ -118,94 +112,14 @@ tasks {
 
         dependsOn(compileTeaVM, genCssTypes)
         inputs.file(classesFile).withPropertyName("teaVM")
-        inputs.files(fileTree("src/web/ts")).withPropertyName("sources")
+        inputs.files(fileTree("src/web")).withPropertyName("sources")
         inputs.file("package-lock.json").withPropertyName("package-lock.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
 
-        outputs.files(fileTree(rollupDir)).withPropertyName("output")
+        outputs.files(fileTree(layout.buildDirectory.dir("web"))).withPropertyName("output")
+        outputs.files(fileTree(layout.buildDirectory.dir("webMin"))).withPropertyName("outputMin")
 
         commandLine(mkCommand("npm run --silent prepare:rollup"))
-    }
-
-    val website by registering(Sync::class) {
-        group = "build"
-        description = "Combines all resource files into one distribution."
-
-        dependsOn(rollup)
-        inputs.files(fileTree(rollupDir)).withPropertyName("rollup")
-
-        /** Replace various template strings within our files. */
-        fun replaceTemplate(x: String) = x
-            .replace("{{version}}", inputs.properties["hash"].toString());
-
-        inputs.property("hash", {
-            try {
-                FileRepositoryBuilder().setWorkTree(projectDir).build()
-                    .use { it.resolve("HEAD").name() }
-            } catch (e: Exception) {
-                project.logger.warn("Cannot get current commit ($e)")
-                "unknown"
-            }
-        })
-
-        from(rollupDir);
-
-        from("src/web/public") {
-            filter { replaceTemplate(it) }
-        }
-
-        into(webDir)
-    }
-
-    val minify by registering {
-        group = "build"
-        description = "Minifies the JS and CSS files"
-
-        val js = fileTree(webDir) { include("**/*.js") }
-        val css = fileTree(webDir) { include("**/*.css") }
-        val dest = file(minifiedDir)
-
-        inputs.files(js).withPropertyName("js")
-        inputs.files(css).withPropertyName("css")
-        inputs.file("package-lock.json").withPropertyName("package-lock.json")
-        outputs.files(fileTree(dest))
-        dependsOn(website)
-
-        doLast {
-            // Clean the directory a little bit.
-            fileTree(dest).forEach { it.delete() }
-
-            js.forEach { original ->
-                val relative = original.relativeTo(js.dir)
-                val renamed = dest.resolve(relative)
-                renamed.parentFile.mkdirs()
-
-                exec {
-                    commandLine(mkCommand("npm run --silent prepare:terser -- --output \"$renamed\" \"$original\""))
-                }
-            }
-
-            css.forEach { original ->
-                val relative = original.relativeTo(js.dir)
-                val renamed = dest.resolve(relative)
-                renamed.parentFile.mkdirs()
-
-                exec {
-                    commandLine(mkCommand("npm run --silent prepare:uglifycss -- --output \"$renamed\" \"$original\""))
-                }
-            }
-        }
-    }
-
-    val websiteMinified by registering(Sync::class) {
-        group = "build"
-        description = "Produces a minified website"
-
-        dependsOn(website, minify)
-
-        from(webDir) { exclude("**/*.css", "**/*.js") }
-        from(minifiedDir) { include("**/*.css", "**/*.js") }
-        into(webMinDir)
     }
 
     val cleanPatches by registering(Delete::class) {
@@ -225,23 +139,9 @@ tasks {
 
     val importMap = mapOf(
         "com.google.common.io.ByteStreams" to "ByteStreams",
-        "java.io.UncheckedIOException" to "UncheckedIOException",
-        "java.nio.channels.Channel" to "Channel",
         "java.nio.channels.Channels" to "Channels",
-        "java.nio.channels.ClosedChannelException" to "ClosedChannelException",
         "java.nio.channels.FileChannel" to "FileChannel",
-        "java.nio.channels.NonWritableChannelException" to "NonWritableChannelException",
-        "java.nio.channels.ReadableByteChannel" to "ReadableByteChannel",
-        "java.nio.channels.SeekableByteChannel" to "SeekableByteChannel",
-        "java.nio.channels.WritableByteChannel" to "WritableByteChannel",
-        "java.nio.file.AccessDeniedException" to "AccessDeniedException",
-        "java.nio.file.FileSystemException" to "FileSystemException",
-        "java.nio.file.attribute.BasicFileAttributes" to "BasicFileAttributes",
         "java.util.concurrent.locks.ReentrantLock" to "ReentrantLock",
-        "org.slf4j.Logger" to "Logger",
-        "org.slf4j.LoggerFactory" to "LoggerFactory",
-        "org.slf4j.Marker" to "Marker",
-        "org.slf4j.MarkerFactory" to "MarkerFactory",
     )
 
     val importReg = Regex("^import ([^ ;]+);")
@@ -307,9 +207,7 @@ tasks {
 
             var failed = false
             listOf(
-                fileTree("original/CC-Tweaked/projects/core-api/src/main/java") {
-                    exclude("dan200/computercraft/api/filesystem/FileAttributes.java")
-                },
+                fileTree("original/CC-Tweaked/projects/core-api/src/main/java"),
                 fileTree("original/CC-Tweaked/projects/core/src/main/java") {
                     exclude(
                         // We tear out most of the ASM system with our own implementation
@@ -320,12 +218,6 @@ tasks {
                         "dan200/computercraft/core/asm/PeripheralMethodSupplier.java",
                         // We replace ComputerThread with a Javascript-compatible version
                         "dan200/computercraft/core/computer/ComputerThread.java",
-                        // We just exclude some FS stuff, as it's a bit of a faff to deal with.
-                        "dan200/computercraft/core/filesystem/ArchiveMount.java",
-                        "dan200/computercraft/core/filesystem/FileMount.java",
-                        "dan200/computercraft/core/filesystem/WritableFileMount.java",
-                        "dan200/computercraft/core/filesystem/JarMount.java",
-                        "dan200/computercraft/core/filesystem/SubMount.java",
                         // Also exclude all the Netty-specific code
                         "dan200/computercraft/core/apis/http/CheckUrl.java",
                         "dan200/computercraft/core/apis/http/NetworkUtils.java",
@@ -399,13 +291,8 @@ tasks {
         }
     }
 
-    assemble {
-        dependsOn(website)
-    }
-
-    assembleDist {
-        dependsOn(websiteMinified)
-    }
+    assemble { dependsOn(rollup) }
+    assembleDist { dependsOn(rollup) }
 
     val avengers by registering {
         description = "An alias to 'clean'. Should be run before assemble."

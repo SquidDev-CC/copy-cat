@@ -2,12 +2,10 @@ package cc.tweaked.web;
 
 import cc.tweaked.web.js.ComputerAccess;
 import cc.tweaked.web.js.ComputerCallbacks;
-import cc.tweaked.web.js.JsonParse;
+import cc.tweaked.web.js.JavascriptConv;
 import cc.tweaked.web.mount.ComputerAccessMount;
 import cc.tweaked.web.peripheral.SpeakerPeripheral;
 import cc.tweaked.web.peripheral.TickablePeripheral;
-import cc.tweaked.web.stub.Logger;
-import cc.tweaked.web.stub.LoggerFactory;
 import dan200.computercraft.api.filesystem.WritableMount;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.ComputerContext;
@@ -18,6 +16,9 @@ import dan200.computercraft.core.metrics.Metric;
 import dan200.computercraft.core.metrics.MetricsObserver;
 import dan200.computercraft.core.terminal.Palette;
 import dan200.computercraft.core.terminal.Terminal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.teavm.jso.JSObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -131,8 +132,8 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
     }
 
     @Override
-    public void event(@Nonnull String event, String[] args) {
-        computer.queueEvent(event, JsonParse.parseValues(args));
+    public void event(@Nonnull String event, @Nullable JSObject[] args) {
+        computer.queueEvent(event, JavascriptConv.toJava(args));
     }
 
     @Override

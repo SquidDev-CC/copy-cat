@@ -1,13 +1,12 @@
 package cc.tweaked.web.mount;
 
-import cc.tweaked.web.stub.SeekableByteChannel;
-import com.google.common.io.ByteStreams;
 import dan200.computercraft.api.filesystem.Mount;
 import dan200.computercraft.core.apis.handles.ArrayByteChannel;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +112,7 @@ public class ResourceMount implements Mount {
             if (contents != null) return new ArrayByteChannel(contents);
 
             try (InputStream stream = ResourceMount.class.getClassLoader().getResourceAsStream(file.path)) {
-                contents = file.contents = ByteStreams.toByteArray(stream);
+                contents = file.contents = stream.readAllBytes();
                 return new ArrayByteChannel(contents);
             }
         }

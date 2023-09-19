@@ -3,7 +3,6 @@ package cc.tweaked.web.js;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.core.JSDate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,12 +38,6 @@ public class Callbacks {
     @JSBody(params = {"name", "description"}, script = "return copycatCallbacks.config(name, description);")
     public static native ConfigGroup config(@Nonnull String name, @Nullable String description);
 
-    @JSBody(params = {"callback", "delay"}, script = "copycatCallbacks.setInterval(callback, delay);")
-    public static native void setInterval(Callback callback, int delay);
-
-    @JSBody(params = {"callback"}, script = "copycatCallbacks.setImmediate(callback);")
-    public static native void setImmediate(Callback callback);
-
-    @JSBody(params = {"format", "time"}, script = "return copycatCallbacks.strftime(format, time);")
-    public static native String strftime(String format, JSDate time);
+    @JSBody(params = {"callback"}, script = "queueMicrotask(callback);")
+    public static native void queueMicrotask(Callback callback);
 }

@@ -21,8 +21,8 @@
 -import io.netty.handler.codec.http.HttpObjectAggregator;
 -import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 -import io.netty.handler.codec.http.websocketx.WebSocketVersion;
- import cc.tweaked.web.stub.Logger;
- import cc.tweaked.web.stub.LoggerFactory;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
  
 @@ -51,17 +38,15 @@
      static final String CLOSE_EVENT = "websocket_closed";
@@ -80,7 +80,7 @@
      }
  
 -    void success(Channel channel, Options options) {
-+    public void success(cc.tweaked.web.js.WebsocketClient channel, Options options) {
++    public void success(org.teavm.jso.websocket.WebSocket channel, Options options) {
          if (isClosed()) return;
  
          var handle = new WebsocketHandle(this, options, channel);

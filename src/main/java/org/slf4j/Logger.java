@@ -1,4 +1,4 @@
-package cc.tweaked.web.stub;
+package org.slf4j;
 
 import java.util.Arrays;
 

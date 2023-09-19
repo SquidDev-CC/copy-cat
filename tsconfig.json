@@ -19,7 +19,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true,
 
     "forceConsistentCasingInFileNames": true,
 
@@ -29,6 +29,6 @@
     }
   },
   "include": [
-    "src/web",
+    "src/web"
    ]
 }

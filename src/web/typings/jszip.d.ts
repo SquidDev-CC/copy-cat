@@ -25,7 +25,7 @@ interface InputByType {
   string: string;
   text: string;
   binarystring: string;
-  array: number[];
+  array: Array<number>;
   uint8array: Uint8Array;
   arraybuffer: ArrayBuffer;
   blob: Blob;
@@ -35,7 +35,7 @@ interface OutputByType {
   base64: string;
   text: string;
   binarystring: string;
-  array: number[];
+  array: Array<number>;
   uint8array: Uint8Array;
   arraybuffer: ArrayBuffer;
   blob: Blob;
@@ -131,7 +131,7 @@ declare namespace JSZip {
 }
 
 interface JSZip {
-  files: {[key: string]: JSZip.JSZipObject};
+  files: Record<string, JSZip.JSZipObject>;
 
   /**
    * Get a file from the archive
@@ -147,7 +147,7 @@ interface JSZip {
    * @param path RegExp to match
    * @return Return all matching files or an empty array
    */
-  file(path: RegExp): JSZip.JSZipObject[];
+  file(path: RegExp): Array<JSZip.JSZipObject>;
 
   /**
    * Add a file to the archive
@@ -158,7 +158,7 @@ interface JSZip {
    * @return JSZip object
    */
   file<T extends JSZip.InputType>(path: string, data: InputByType[T] | Promise<InputByType[T]>, options?: JSZip.JSZipFileOptions): this;
-  file<T extends JSZip.InputType>(path: string, data: null, options?: JSZip.JSZipFileOptions & { dir: true }): this;
+  file(path: string, data: null, options?: JSZip.JSZipFileOptions & { dir: true }): this;
 
   /**
    * Returns an new JSZip instance with the given folder as root
@@ -174,7 +174,7 @@ interface JSZip {
    * @param name RegExp to match
    * @return New array of JSZipFile objects which match the RegExp
    */
-  folder(name: RegExp): JSZip.JSZipObject[];
+  folder(name: RegExp): Array<JSZip.JSZipObject>;
 
   /**
    * Call a callback function for each entry at this folder level.
@@ -189,7 +189,7 @@ interface JSZip {
    * @param predicate Filter function
    * @return Array of matched elements
    */
-  filter(predicate: (relativePath: string, file: JSZip.JSZipObject) => boolean): JSZip.JSZipObject[];
+  filter(predicate: (relativePath: string, file: JSZip.JSZipObject) => boolean): Array<JSZip.JSZipObject>;
 
   /**
    * Removes the file or folder from the archive

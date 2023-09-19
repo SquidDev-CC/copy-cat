@@ -45,6 +45,7 @@ public interface FileSystemEntry extends JSObject {
 
     /**
      * Get the attrribut
+     *
      * @return
      */
     @Nonnull

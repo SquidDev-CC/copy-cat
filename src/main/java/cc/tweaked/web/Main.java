@@ -4,9 +4,7 @@ import cc.tweaked.web.js.Callbacks;
 import cc.tweaked.web.js.ConfigGroup;
 import dan200.computercraft.core.ComputerContext;
 import dan200.computercraft.core.CoreConfig;
-import dan200.computercraft.core.computer.ComputerThread;
-import dan200.computercraft.core.computer.mainthread.NoWorkMainThreadScheduler;
-import dan200.computercraft.core.lua.CobaltLuaMachine;
+import org.teavm.jso.browser.Window;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,7 +27,7 @@ public class Main {
             return wrapper;
         });
 
-        Callbacks.setInterval(() -> {
+        Window.setInterval(() -> {
             ticks++;
             Iterator<ComputerWrapper> iterator = computers.iterator();
             while (iterator.hasNext()) {

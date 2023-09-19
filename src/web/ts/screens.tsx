@@ -1,4 +1,4 @@
-import { VNode, h } from "preact";
+import { type VNode, h } from "preact";
 import { dialogueBox, errorView, infoDescription } from "./styles.css";
 
 const githubLink =

@@ -29,7 +29,7 @@ export const decode = (base64: string): ArrayBuffer => {
   let bufferLength = base64.length * 0.75;
   const len = base64.length;
 
-  if (base64[base64.length - 1] === "=") {
+  if (base64.endsWith("=")) {
     bufferLength--;
     if (base64[base64.length - 2] === "=") {
       bufferLength--;

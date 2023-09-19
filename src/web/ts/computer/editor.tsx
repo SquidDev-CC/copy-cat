@@ -1,4 +1,4 @@
-import { Component, ComponentChild, h } from "preact";
+import { Component, type ComponentChild, h } from "preact";
 import type { Settings } from "../settings";
 import type * as monaco from "../editor";
 import { editorPlaceholder, editorView } from "../styles.css";
@@ -82,7 +82,7 @@ export default class Editor extends Component<EditorProps, unknown> {
     this.setupEditor();
   }
 
-  private setupEditor() {
+  private setupEditor(): void {
     if (!monacoVal) {
       const promise = this.editorPromise = import("../editor")
         .then(x => {
@@ -116,7 +116,7 @@ export default class Editor extends Component<EditorProps, unknown> {
       contextMenuOrder: 1.5,
       run: editor => {
         if (this.props.settings.trimWhitespace) {
-          editor.getAction("editor.action.trimTrailingWhitespace").run();
+          void editor.getAction("editor.action.trimTrailingWhitespace")?.run();
         }
 
         this.props.doSave(editor.getValue());
@@ -184,5 +184,5 @@ export default class Editor extends Component<EditorProps, unknown> {
   /**
    * When the window resizes, we also need to update the editor's dimensions.
    */
-  private onResize = () => this.editor?.layout();
+  private onResize = (): void => this.editor?.layout();
 }

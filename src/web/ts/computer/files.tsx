@@ -1,4 +1,4 @@
-import { Component, ComponentChild, VNode, h } from "preact";
+import { Component, type ComponentChild, type VNode, h } from "preact";
 import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { DownOpen, Lua, RightOpen, Text } from "../font";
@@ -20,14 +20,14 @@ type FileEntryState = {
   expanded?: boolean,
 };
 
-const getIcon = (name: string, directory: boolean, expanded: boolean) => {
+const getIcon = (name: string, directory: boolean, expanded: boolean): VNode => {
   if (directory) return expanded ? <DownOpen /> : <RightOpen />;
   if (name.endsWith(".lua")) return <Lua />;
   return <Text />;
 };
 
 class FileEntry extends Component<FileEntryProperties, FileEntryState> {
-  public shouldComponentUpdate({ entry, depth, opened }: FileEntryProperties, { expanded }: FileEntryState) {
+  public shouldComponentUpdate({ entry, depth, opened }: FileEntryProperties, { expanded }: FileEntryState): boolean {
     return entry !== this.props.entry || depth !== this.props.depth || opened !== this.props.opened ||
       expanded !== this.state.expanded;
   }
@@ -35,12 +35,12 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
   public render(
     { computer, entry, name, path, depth, opened, open }: FileEntryProperties,
     { expanded }: FileEntryState,
-  ) {
+  ): VNode {
     return <li>
       <div class={`${fileEntryHead} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
         onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
         <span class={fileEntryIcon}>
-          {getIcon(name, entry.isDirectory(), expanded || false)}
+          {getIcon(name, entry.isDirectory(), expanded ?? false)}
         </span>
         <span class={fileEntryName}>{name}</span>
       </div>
@@ -62,7 +62,7 @@ export type FileListProperties = {
 };
 
 type FileListState = {
-  children?: string[],
+  children?: Array<string>,
 };
 
 type ChildNode = { name: string, dir: boolean, node: VNode<unknown> };
@@ -78,7 +78,7 @@ export class FileTree extends Component<FileListProperties, FileListState> {
     if (!entry.doesExist()) return "";
 
     // Gather all children, and then sort them.
-    const entries: ChildNode[] = (children || entry.getChildren()).map(childName => {
+    const entries: Array<ChildNode> = (children ?? entry.getChildren()).map(childName => {
       const childPath = joinName(path, childName);
       const child = computer.getEntry(childPath)!;
       return {
@@ -111,5 +111,5 @@ export class FileTree extends Component<FileListProperties, FileListState> {
     }
   }
 
-  private listener = () => this.setState({ children: this.props.entry.getChildren() });
+  private listener = (): void => this.setState({ children: this.props.entry.getChildren() });
 }

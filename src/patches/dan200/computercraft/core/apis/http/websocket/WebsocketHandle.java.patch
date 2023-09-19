@@ -19,10 +19,10 @@
 +    public boolean closed = false;
  
 -    private @Nullable Channel channel;
-+    private @Nullable cc.tweaked.web.js.WebsocketClient channel;
++    private @Nullable org.teavm.jso.websocket.WebSocket channel;
  
 -    public WebsocketHandle(Websocket websocket, Options options, Channel channel) {
-+    public WebsocketHandle(Websocket websocket, Options options, cc.tweaked.web.js.WebsocketClient channel) {
++    public WebsocketHandle(Websocket websocket, Options options, org.teavm.jso.websocket.WebSocket channel) {
          this.websocket = websocket;
          this.options = options;
          this.channel = channel;

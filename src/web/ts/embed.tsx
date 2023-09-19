@@ -1,4 +1,4 @@
-import { Component, h, render } from "preact";
+import { Component, type VNode, h, render } from "preact";
 import { Semaphore, Terminal, TerminalData } from "@squid-dev/cc-web-term";
 import type { ConfigGroup, PeripheralKind, Side } from "./classes";
 import { ComputerAccess, splitName } from "./computer/access";
@@ -10,7 +10,7 @@ import requirejs from "require";
 type MainProps = {
   hdFont?: boolean | string,
   persistId?: number,
-  files?: { [filename: string]: string | ArrayBuffer },
+  files?: Record<string, string | ArrayBuffer>,
   label?: string,
   width?: number,
   height?: number,
@@ -59,7 +59,7 @@ class Computer extends Component<MainProps, MainState> {
       requirejs.toUrl("./" + (hdFont === undefined || hdFont ? termFontHd : termFont));
 
     // Set up the file system from the list of files given.
-    const files = props.files || {};
+    const files = props.files ?? {};
     for (const fileName in files) {
       if (!Object.prototype.hasOwnProperty.call(files, fileName)) continue;
 
@@ -101,7 +101,7 @@ class Computer extends Component<MainProps, MainState> {
     this.state.computer.dispose();
   }
 
-  public render(_: MainProps, { font, computer, terminal, terminalChanged, label, on }: MainState) {
+  public render(_: MainProps, { font, computer, terminal, terminalChanged, label, on }: MainState): VNode {
     return <Terminal terminal={terminal} changed={terminalChanged} focused={true} computer={computer}
       font={font}
       id={0} label={label} on={on} />;
@@ -110,7 +110,7 @@ class Computer extends Component<MainProps, MainState> {
 
 const exported = (element: HTMLElement, options?: MainProps): Promise<ComputerAccess> => {
   return new Promise((resolve, _) =>
-    render(<Computer resolve={resolve} {...(options || {})} />, element));
+    render(<Computer resolve={resolve} {...(options ?? {})} />, element));
 };
 
 export default exported;

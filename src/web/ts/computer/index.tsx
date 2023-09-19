@@ -1,12 +1,12 @@
 import { Semaphore, Terminal, TerminalData, save as saveBlob } from "@squid-dev/cc-web-term";
 import type JSZip from "jszip";
-import { Component, VNode, h } from "preact";
+import { Component, type VNode, h } from "preact";
 import newZip from "../files/zip";
 import { Download } from "../font";
 import type { ConfigFactory } from "../java";
 import type { Settings } from "../settings";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
-import Editor, { LazyModel, createModel } from "./editor";
+import Editor, { type LazyModel, createModel } from "./editor";
 import { FileTree } from "./files";
 import { StoragePersistence, VoidPersistence } from "./persist";
 import {
@@ -41,7 +41,7 @@ type ComputerState = {
   dragging: boolean,
 };
 
-const createZip = async (computer: ComputerAccess) => {
+const createZip = async (computer: ComputerAccess): Promise<Blob> => {
   const zip = await newZip();
 
   const queue = [""];
@@ -69,7 +69,7 @@ const createZip = async (computer: ComputerAccess) => {
  * @param name The zip file's name, without the `.zip` extension.
  * @return If this is a simple archive.
  */
-const isSimpleZip = (zip: JSZip, name: string) => {
+const isSimpleZip = (zip: JSZip, name: string): boolean => {
   for (const fileName in zip.files) {
     if (!Object.prototype.hasOwnProperty.call(zip.files, fileName)) continue;
 
@@ -189,7 +189,7 @@ fn()`);
     </div>;
   }
 
-  private addOneFile(name: string, contents: ArrayBuffer) {
+  private addOneFile(name: string, contents: ArrayBuffer): void {
     const index = name.lastIndexOf(".");
     const prefix = index > 0 ? name.substring(0, index) : name;
     const suffix = index > 0 ? name.substring(index) : "";
@@ -252,14 +252,14 @@ fn()`);
     }
   }
 
-  private openFile = (path: string, file: FileSystemEntry) => {
+  private openFile = (path: string, file: FileSystemEntry): void => {
     if (file.isDirectory()) return;
 
     let entry = this.state.openFiles.get(file);
     if (typeof entry === "undefined") {
       const model = createModel(file.getStringContents(), path);
 
-      const monitor = () => {
+      const monitor = (): void => {
         if (!file.doesExist()) {
           // If the file has been deleted, dispose the model and remove from the cache.
           if (model.resolved) model.text.dispose();
@@ -285,11 +285,11 @@ fn()`);
     this.setState({ activeFile: { file, path, model: entry.model } });
   };
 
-  private openComputer = () => {
+  private openComputer = (): void => {
     this.setState({ activeFile: null });
   };
 
-  private saveZip = (e: Event) => {
+  private saveZip = (e: Event): void => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -298,16 +298,16 @@ fn()`);
       .catch(err => console.error(err));
   };
 
-  private startDrag = (e: DragEvent) => {
+  private startDrag = (e: DragEvent): void => {
     e.preventDefault();
     if (!this.state.dragging) this.setState({ dragging: true });
   };
 
-  private stopDrag = () => {
+  private stopDrag = (): void => {
     this.setState({ dragging: false });
   };
 
-  private dropFile = (e: DragEvent) => {
+  private dropFile = (e: DragEvent): void => {
     e.preventDefault();
     this.setState({ dragging: false });
 
@@ -315,14 +315,14 @@ fn()`);
 
     if (e.dataTransfer.items) {
       const items = e.dataTransfer.items;
-      // tslint:disable-next-line:prefer-for-of
+      // eslint-disable-next-line @typescript-eslint/prefer-for-of
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (item.kind === "file") this.addFile(item.getAsFile()!);
       }
     } else {
       const files = e.dataTransfer.files;
-      // tslint:disable-next-line:prefer-for-of
+      // eslint-disable-next-line @typescript-eslint/prefer-for-of
       for (let i = 0; i < files.length; i++) this.addFile(files[i]);
     }
   };

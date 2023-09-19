@@ -4,11 +4,6 @@ export type Side = "up" | "down" | "left" | "right" | "front" | "back";
 export type PeripheralKind = "speaker";
 
 /**
- * A handler for {@link ICallbacks.onEvent}
- */
-export type QueueEventHandler = (event: string, args: string[]) => void;
-
-/**
  * A naive Either type, instead of wrangling JS/Java exceptions.
  */
 export type Result<T> = { value: T } | { error: string, value: null };
@@ -35,7 +30,7 @@ export interface FileSystemEntry {
    * @return The child entries. Note, this is the relative path, rather than the absolute one.
    * @throws If this is not a directory
    */
-  getChildren(): string[];
+  getChildren(): Array<string>;
 
   /**
    * Get the contents of this filesystem entry
@@ -152,7 +147,7 @@ export interface ComputerCallbacks {
   /**
    * Queue an event on the computer.
    */
-  event(event: string, args: string[] | null): void;
+  event(event: string, args: Array<unknown> | null): void;
 
   /**
    * Shut the computer down.
@@ -244,10 +239,4 @@ export interface Callbacks {
 * @return The constructed config group
 */
   config(name: string, description: string | null): ConfigGroup;
-
-  setInterval(callback: () => void, delay: number): void;
-
-  setImmediate(callback: () => void): void;
-
-  strftime(format: string, time: Date): string;
 }

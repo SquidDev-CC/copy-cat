@@ -1,9 +1,8 @@
 package cc.tweaked.web.http;
 
 import cc.tweaked.web.Main;
-import cc.tweaked.web.js.WebsocketClient;
+import cc.tweaked.web.js.JavascriptConv;
 import cc.tweaked.web.mount.Int8ArrayByteChannel;
-import cc.tweaked.web.stub.SeekableByteChannel;
 import dan200.computercraft.core.apis.handles.ArrayByteChannel;
 import dan200.computercraft.core.apis.handles.BinaryReadableHandle;
 import dan200.computercraft.core.apis.handles.EncodedReadableHandle;
@@ -12,13 +11,15 @@ import dan200.computercraft.core.apis.http.options.Action;
 import dan200.computercraft.core.apis.http.request.HttpRequest;
 import dan200.computercraft.core.apis.http.request.HttpResponseHandle;
 import dan200.computercraft.core.apis.http.websocket.Websocket;
-import cc.tweaked.web.stub.Logger;
-import cc.tweaked.web.stub.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.Int8Array;
+import org.teavm.jso.websocket.WebSocket;
 
 import java.net.URI;
+import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,17 +76,17 @@ public class HttpHelpers {
     }
 
     public static void makeWebsocket(Websocket ws, URI uri) {
-        WebsocketClient client = WebsocketClient.create(uri.toASCIIString());
+        var client = WebSocket.create(uri.toASCIIString());
         client.setBinaryType("arraybuffer");
         client.onOpen(e -> ws.success(client, Action.ALLOW.toPartial().toOptions()));
         client.onError(e -> {
             LOG.error("Error " + e);
             ws.failure("Could not connect");
         });
-        client.setOnMessage(e -> {
+        client.onMessage(e -> {
             if (ws.isClosed()) return;
             Object converted;
-            if (e.isBinary()) {
+            if (JavascriptConv.isArrayBuffer(e.getData())) {
                 Int8Array array = Int8Array.create(e.getDataAsArray());
                 byte[] contents = new byte[array.getLength()];
                 for (int i = 0; i < contents.length; i++) contents[i] = array.get(i);

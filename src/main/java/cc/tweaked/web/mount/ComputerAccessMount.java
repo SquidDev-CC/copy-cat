@@ -4,17 +4,20 @@ import cc.tweaked.web.js.ComputerAccess;
 import cc.tweaked.web.js.ComputerAccess.Result;
 import cc.tweaked.web.js.FileSystemEntry;
 import cc.tweaked.web.js.JsFileAttributes;
-import cc.tweaked.web.stub.BasicFileAttributes;
-import cc.tweaked.web.stub.SeekableByteChannel;
 import dan200.computercraft.api.filesystem.FileOperationException;
 import dan200.computercraft.api.filesystem.WritableMount;
 import org.teavm.jso.core.JSBoolean;
 import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -107,7 +110,10 @@ public class ComputerAccessMount implements WritableMount {
         FileSystemEntry entry = computer.getEntry(path);
         if (entry == null) throw new FileOperationException(path, "No such file");
         JsFileAttributes attr = entry.getAttributes();
-        return new BasicFileAttributes((long) attr.getCreation(), (long) attr.getModification(), attr.getDirectory(), (long) attr.getSize());
+        return new Attributes(
+            attr.getDirectory(), (long) attr.getSize(),
+            FileTime.fromMillis((long) attr.getCreation()), FileTime.fromMillis((long) attr.getModification())
+        );
     }
 
     private static class Writer extends OutputStream implements SeekableByteChannel {
@@ -138,6 +144,11 @@ public class ComputerAccessMount implements WritableMount {
         @Override
         public long size() {
             return size;
+        }
+
+        @Override
+        public SeekableByteChannel truncate(long size) throws IOException {
+            throw new IOException("Cannot truncate");
         }
 
         @Override
@@ -196,6 +207,11 @@ public class ComputerAccessMount implements WritableMount {
         }
 
         @Override
+        public boolean isOpen() {
+            return !closed;
+        }
+
+        @Override
         public void close() throws IOException {
             if (closed) return;
             closed = true;
@@ -210,6 +226,38 @@ public class ComputerAccessMount implements WritableMount {
         @Override
         public int read(ByteBuffer buffer) throws IOException {
             throw new IOException("Cannot read from this buffer");
+        }
+    }
+
+    public record Attributes(
+        boolean isDirectory, long size, FileTime lastModifiedTime, FileTime creationTime
+    ) implements BasicFileAttributes {
+        private static final FileTime EPOCH = FileTime.from(Instant.EPOCH);
+
+        @Override
+        public FileTime lastAccessTime() {
+            return EPOCH;
+        }
+
+        @Override
+        public boolean isRegularFile() {
+            return !isDirectory;
+        }
+
+        @Override
+        public boolean isSymbolicLink() {
+            return false;
+        }
+
+        @Override
+        public boolean isOther() {
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public Object fileKey() {
+            return null;
         }
     }
 }

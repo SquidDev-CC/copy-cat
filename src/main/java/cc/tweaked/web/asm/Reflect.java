@@ -4,11 +4,11 @@
 
 package cc.tweaked.web.asm;
 
-import cc.tweaked.web.stub.Logger;
-import cc.tweaked.web.stub.LoggerFactory;
 import dan200.computercraft.api.lua.Coerced;
 import dan200.computercraft.api.lua.LuaTable;
 import org.objectweb.asm.MethodVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.teavm.metaprogramming.CompileTime;
 
 import javax.annotation.Nullable;

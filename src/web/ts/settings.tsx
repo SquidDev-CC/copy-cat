@@ -1,4 +1,4 @@
-import { JSX, h } from "preact";
+import { type JSX, h } from "preact";
 import type { ConfigGroup as IConfigGroup } from "./classes";
 import * as storage from "./storage";
 import { dialogueBox, formGroup, tinyText } from "./styles.css";
@@ -47,13 +47,13 @@ export type ConfigProperty
  * The persisted map for settings
  */
 export class SettingStore {
-  private data: { [key: string]: any } = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+  private data: Record<string, unknown> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   public constructor() {
     const settingJson = storage.get("settings");
     if (settingJson !== null) {
       try {
-        this.data = JSON.parse(settingJson);
+        this.data = JSON.parse(settingJson) as Record<string, unknown>;
       } catch (e) {
         console.error("Cannot read settings", e);
       }
@@ -62,7 +62,7 @@ export class SettingStore {
 
   /** Get the value of a config property under the current storage */
   public get<K extends keyof PropertyTypes>(property: IConfigProperty<K>): PropertyTypes[K] {
-    return property.id in this.data ? this.data[property.id] : property.def;
+    return property.id in this.data ? this.data[property.id] as PropertyTypes[K] : property.def;
   }
 
   /** Set a value and fire any callbacks */
@@ -79,7 +79,7 @@ export class ConfigGroup implements IConfigGroup {
 
   public readonly name: string;
   public readonly description: string | null;
-  public readonly properties: ConfigProperty[] = [];
+  public readonly properties: Array<ConfigProperty> = [];
 
   public constructor(name: string, description: string | null, store: SettingStore) {
     this.name = name;
@@ -88,7 +88,7 @@ export class ConfigGroup implements IConfigGroup {
   }
 
   private add<K extends keyof PropertyTypes>(property: IConfigProperty<K>): IConfigProperty<K> {
-    this.properties.push(property as unknown as ConfigProperty); // FIXME: Work out an appropriate cast.
+    this.properties.push(property as ConfigProperty);
     const value = this.store.get(property);
     if (value !== property.def) property.changed(value);
     return property;
@@ -134,12 +134,12 @@ function getUpdater<K extends keyof PropertyTypes>(
   };
 }
 
-const getString = (x: HTMLInputElement) => x.value;
-const getNumber = (x: HTMLInputElement) => {
+const getString = (x: HTMLInputElement): string => x.value;
+const getNumber = (x: HTMLInputElement): number | undefined => {
   const v = parseInt(x.value, 10);
   return Number.isNaN(v) ? undefined : v;
 };
-const getBool = (x: HTMLInputElement) => x.checked;
+const getBool = (x: HTMLInputElement): boolean => x.checked;
 const getOption = (def: string, choices: Array<{ key: string, value: string }>) => (x: HTMLInputElement) => {
   for (const { key } of choices) {
     if (key === x.value) return key;
@@ -150,7 +150,7 @@ const getOption = (def: string, choices: Array<{ key: string, value: string }>) 
 
 export type SettingsProperties = {
   store: SettingStore,
-  configGroups: ConfigGroup[],
+  configGroups: Array<ConfigGroup>,
 };
 
 export const Settings = ({ store, configGroups }: SettingsProperties): JSX.Element =>

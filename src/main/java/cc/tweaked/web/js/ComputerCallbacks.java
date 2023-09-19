@@ -16,7 +16,7 @@ public interface ComputerCallbacks extends JSObject {
     /**
      * Queue an event on the computer.
      */
-    void event(@Nonnull String event, String[] args);
+    void event(@Nonnull String event, @Nullable JSObject[] args);
 
     /**
      * Shut the computer down.

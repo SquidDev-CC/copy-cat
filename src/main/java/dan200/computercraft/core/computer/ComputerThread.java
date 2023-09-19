@@ -1,7 +1,7 @@
 package dan200.computercraft.core.computer;
 
-import cc.tweaked.web.js.Callbacks;
-import cc.tweaked.web.js.Callbacks.Callback;
+import org.teavm.jso.browser.TimerHandler;
+import org.teavm.jso.browser.Window;
 
 import java.util.ArrayDeque;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ComputerThread {
     private static final ArrayDeque<ComputerExecutor> executors = new ArrayDeque<>();
-    private final Callback callback = this::workOnce;
+    private final TimerHandler callback = this::workOnce;
 
     public ComputerThread(int threads) {
     }
@@ -21,7 +21,7 @@ public class ComputerThread {
         if (executor.onComputerQueue) throw new IllegalStateException("Cannot queue already queued executor");
         executor.onComputerQueue = true;
 
-        if (executors.isEmpty()) Callbacks.setImmediate(callback);
+        if (executors.isEmpty()) Window.queueMicrotask(callback);
         executors.add(executor);
     }
 
@@ -38,7 +38,7 @@ public class ComputerThread {
         }
 
         if (executor.afterWork()) executors.push(executor);
-        if (!executors.isEmpty()) Callbacks.setImmediate(callback);
+        if (!executors.isEmpty()) Window.queueMicrotask(callback);
     }
 
     public boolean hasPendingWork() {

@@ -1,16 +1,22 @@
-import path from "path";
 import { promises as fs } from "fs";
+import path from "path";
+import { createHash } from "crypto";
 
-import license from "rollup-plugin-license";
-import postcss from "rollup-plugin-postcss";
-import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
+import terser from '@rollup/plugin-terser';
+import { minify as minifyJavascript } from "terser";
 import typescript from "@rollup/plugin-typescript";
 import url from "@rollup/plugin-url";
+import license from "rollup-plugin-license";
+import postcss from "rollup-plugin-postcss";
 
-const out = "build/rollup";
-
-export default {
+/**
+ * @param {string} out
+ * @param {boolean} minify
+ * @returns {import("rollup").RollupOptions}
+ */
+const makeSite = (out, minify) => ({
   input: ["src/web/ts/main.tsx", "src/web/ts/embed.tsx"],
   output: {
     dir: out,
@@ -18,22 +24,27 @@ export default {
     paths: {
       "monaco-editor": "vs/editor/editor.main",
     },
-    preferConst: true,
+    freeze: true,
+    generatedCode: {
+      constBindings: true,
+      arrowFunctions: true,
+    }
   },
   context: "window",
-  external: ["monaco-editor", "require", "jszip"],
+  external: ["monaco-editor", "require"],
 
   plugins: [
     replace({
       preventAssignment: true,
 
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0",
     }),
 
     postcss({
       namedExports: true,
       modules: true,
+      minimize: minify,
     }),
     url({
       limit: 1024,
@@ -43,7 +54,8 @@ export default {
 
     typescript(),
     resolve({ browser: true, }),
-    // commonjs(),
+
+    minify && terser(),
 
     license({
       banner:
@@ -58,16 +70,36 @@ export default {
 
     {
       name: "copy-cat",
-      async writeBundle () {
-        await Promise.all([
-          fs.copyFile("node_modules/requirejs/require.js", `${out}/require.js`),
-          fs.copyFile("node_modules/jszip/dist/jszip.js", `${out}/jszip.js`),
-        ]);
+      async generateBundle(_, bundle) {
+        const contents = await fs.readFile("node_modules/requirejs/require.js", { encoding: "utf-8" });
+        this.emitFile({
+          type: "asset",
+          name: "require.js",
+          fileName: "require.js",
+          source: minify ? (await minifyJavascript(contents)).code : contents,
+        });
+
+        const version = createHash("sha256")
+          .update(bundle["main.js"].code)
+          .update(await fs.readFile(`src/web/public/main.css`))
+          .digest("hex").slice(0, 8);
+
+        await Promise.all(["index.html", "404.html", "main.css"].map(async x => this.emitFile({
+          type: "asset",
+          name: x,
+          fileName: x,
+          source: (await fs.readFile(`src/web/public/${x}`, { encoding: "utf-8" })).replaceAll("{{version}}", version),
+        })));
       },
-      async resolveId (source) {
+      async resolveId(source) {
         if (source === "./classes") return path.resolve("build/teaVM/classes.js");
         return null;
       },
     },
   ],
-};
+});
+
+export default [
+  makeSite("build/web", false),
+  makeSite("build/webMin", true),
+];
