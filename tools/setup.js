@@ -1,7 +1,9 @@
 /** Converts our styles into tsc files */
-const fs = require("fs");
-const postcss = require("postcss");
-const selector = require("postcss-selector-parser")();
+import fs from "fs";
+import postcss from "postcss";
+import selectorParser from "postcss-selector-parser";
+
+const selector = selectorParser();
 
 // Convert styles.css into a ts.d file
 const contents = fs.readFileSync("src/web/ts/styles.css");
