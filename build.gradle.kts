@@ -1,18 +1,5 @@
-import com.github.difflib.DiffUtils
-import com.github.difflib.UnifiedDiffUtils
 import org.apache.tools.ant.taskdefs.condition.Os
 import java.util.*
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        // Misc buildscript stuff
-        classpath("io.github.java-diff-utils:java-diff-utils:4.0")
-    }
-}
 
 plugins {
     java
@@ -38,8 +25,12 @@ repositories {
     }
 }
 
-val teavmCli by configurations.creating {
-    extendsFrom(configurations.runtimeOnly.get())
+sourceSets {
+    main {
+        java.srcDir("src/main/javaPatched")
+        resources.srcDir("src/main/resourcesPatched")
+    }
+    register("builder")
 }
 
 dependencies {
@@ -52,6 +43,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.6")
     implementation("it.unimi.dsi:fastutil:8.2.2")
     implementation("org.ow2.asm:asm:9.5")
+    implementation("io.netty:netty-codec-http:4.1.82.Final")
     implementation("org.squiddev:Cobalt:0.7.3")
 
     implementation("org.teavm:teavm-jso")
@@ -60,29 +52,34 @@ dependencies {
     implementation("org.teavm:teavm-classlib")
     implementation("org.teavm:teavm-metaprogramming-api")
 
-    teavmCli("org.teavm:teavm-cli")
+    "builderImplementation"("org.teavm:teavm-tooling")
+    "builderImplementation"("org.teavm:teavm-metaprogramming-impl")
+    "builderImplementation"("org.teavm:teavm-jso-impl")
+    "builderImplementation"("org.ow2.asm:asm:9.5")
+    "builderImplementation"("org.ow2.asm:asm-commons:9.5")
 }
 
-sourceSets.main { java.srcDir("src/main/javaPatched") }
-
 tasks {
-    val teaVMDir = layout.buildDirectory.dir("teaVM")
     val classesFile = layout.buildDirectory.file("teaVM/classes.js")
 
     val compileTeaVM by registering(JavaExec::class) {
         group = "build"
-        description = "Converts Java code to Javascript using TeaVM"
+        description = "Stitch all files together"
 
-        inputs.files(project.configurations.getByName("runtimeOnly").allArtifacts.files).withPropertyName("jars")
+        inputs.files(sourceSets.main.get().runtimeClasspath).withPropertyName("inputClasspath")
+        outputs.file(classesFile).withPropertyName("javascript")
 
-        outputs.file(classesFile).withPropertyName("output")
-
-        classpath = teavmCli + sourceSets.main.get().runtimeClasspath
-        mainClass.set("org.teavm.cli.TeaVMRunner")
-        args(listOf("-O2", "--minify", "--targetdir", teaVMDir.get().asFile.absolutePath, "cc.tweaked.web.Main"))
-        javaLauncher.set(project.javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(17))
+        classpath = sourceSets["builder"].runtimeClasspath
+        jvmArguments.addAll(provider {
+            val main = sourceSets.main.get()
+            listOf(
+                "-Dcct.input=${main.output.classesDirs.asPath}",
+                "-Dcct.classpath=${main.runtimeClasspath.asPath}",
+                "-Dcct.output=${classesFile.get().asFile.absolutePath}"
+            )
         })
+        mainClass.set("cc.tweaked.builder.Builder")
+        javaLauncher.set(project.javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
     }
 
     /**
@@ -122,149 +119,38 @@ tasks {
         commandLine(mkCommand("npm run --silent prepare:rollup"))
     }
 
-    val cleanPatches by registering(Delete::class) {
-        group = "patch"
-        description = "Cleans the patch directory"
-
-        delete("src/patches")
-    }
-
-    val cleanSources by registering(Delete::class) {
-        group = "patch"
-        description = "Cleans the modified sources"
-
-        delete("src/main/javaPatched/dan200/computercraft")
-        delete("src/main/resources/data/computercraft")
-    }
-
-    val importMap = mapOf(
-        "com.google.common.io.ByteStreams" to "ByteStreams",
-        "java.nio.channels.Channels" to "Channels",
-        "java.nio.channels.FileChannel" to "FileChannel",
-        "java.util.concurrent.locks.ReentrantLock" to "ReentrantLock",
-    )
-
-    val importReg = Regex("^import ([^ ;]+);")
-
-    fun patchLine(contents: String) = contents.replace(importReg) {
-        val import = importMap[it.groups[1]!!.value]
-        if (import == null) it.value else "import cc.tweaked.web.stub.$import;"
-    }
-
-    fun File.readPatchedLines() = readLines().map { patchLine(it) }
-
-    val makePatches by registering {
-        group = "patch"
-        description = "Diffs a canonical directory against our currently modified version"
-        dependsOn(cleanPatches)
-
-        doLast {
-            listOf(
-                Triple("CC-Tweaked", "projects/core-api/src/main", "dan200/computercraft/api"),
-                Triple("CC-Tweaked", "projects/core/src/main", "dan200/computercraft/core"),
-            ).forEach { (project, location, packageName) ->
-                val patches = File(projectDir, "src/patches/$packageName")
-                val modified = File(projectDir, "src/main/javaPatched/$packageName")
-                val original = File(projectDir, "original/$project/$location/java/$packageName")
-                if (!modified.isDirectory) throw IllegalArgumentException("$modified is not a directory or does not exist")
-                if (!original.isDirectory) throw IllegalArgumentException("$original is not a directory or does not exist")
-
-                modified.walk()
-                    .filter { it.name != ".editorconfig" && it.isFile }
-                    .forEach { modifiedFile ->
-                        val relativeFile = modifiedFile.relativeTo(modified)
-
-                        val originalFile = original.resolve(relativeFile)
-                        val originalContents = originalFile.readPatchedLines()
-
-                        val filename = relativeFile.name
-                        val diff = DiffUtils.diff(originalContents, modifiedFile.readPatchedLines())
-                        val patch = UnifiedDiffUtils.generateUnifiedDiff(filename, filename, originalContents, diff, 3)
-                        if (patch.isNotEmpty()) {
-                            val patchFile = File(patches, "$relativeFile.patch")
-                            patchFile.parentFile.mkdirs()
-                            patchFile.bufferedWriter().use { writer ->
-                                patch.forEach {
-                                    writer.write(it)
-                                    writer.write("\n")
-                                }
-                            }
-                        }
-                    }
-            }
-        }
-    }
-
     val applyPatches by registering {
         group = "patch"
         description = "Applies our patches to the source directories"
-        dependsOn(cleanSources)
 
         doLast {
             // We load CC:T's properties and use them to substitute in the mod version
             val props = Properties()
             File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
 
-            var failed = false
-            listOf(
-                fileTree("original/CC-Tweaked/projects/core-api/src/main/java"),
-                fileTree("original/CC-Tweaked/projects/core/src/main/java") {
+            sync {
+                from("original/CC-Tweaked/projects/core-api/src/main/java")
+                from("original/CC-Tweaked/projects/core/src/main/java") {
                     exclude(
-                        // We tear out most of the ASM system with our own implementation
-                        "dan200/computercraft/core/asm/Generator.java",
-                        "dan200/computercraft/core/asm/IntCache.java",
-                        "dan200/computercraft/core/asm/LuaMethodSupplier.java",
-                        "dan200/computercraft/core/asm/MethodSupplierImpl.java",
-                        "dan200/computercraft/core/asm/PeripheralMethodSupplier.java",
-                        // We replace ComputerThread with a Javascript-compatible version
-                        "dan200/computercraft/core/computer/ComputerThread.java",
-                        // Also exclude all the Netty-specific code
+                        // Exclude all the Netty-specific code
                         "dan200/computercraft/core/apis/http/CheckUrl.java",
                         "dan200/computercraft/core/apis/http/NetworkUtils.java",
+                        "dan200/computercraft/core/apis/http/request/HttpRequest.java",
                         "dan200/computercraft/core/apis/http/request/HttpRequestHandler.java",
-                        "dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java",
-                        "dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java",
                         "dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java",
+                        "dan200/computercraft/core/apis/http/websocket/Websocket.java",
+                        "dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java",
+                        "dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java",
                     )
-                },
-            ).forEach { files ->
-                val patches = File(projectDir, "src/patches/")
-                val modified = File(projectDir, "src/main/javaPatched")
-                val original = files.dir
-
-                files.forEach { originalFile ->
-                    val relativeFile = originalFile.relativeTo(original)
-                    val modifiedFile = modified.resolve(relativeFile)
-                    val patchFile = File(patches, "$relativeFile.patch")
-                    modifiedFile.parentFile.mkdirs()
-                    if (patchFile.exists()) {
-                        println("Patching $relativeFile")
-                        val patch = UnifiedDiffUtils.parseUnifiedDiff(patchFile.readLines())
-                        val modifiedContents = try {
-                            DiffUtils.patch(originalFile.readPatchedLines(), patch)
-                        } catch (e: Exception) {
-                            println("Failed to apply patch. This should be manually fixed")
-                            failed = true
-                            originalFile.readPatchedLines()
-                        }
-                        modifiedFile.bufferedWriter().use { writer ->
-                            modifiedContents.forEach {
-                                writer.write(it)
-                                writer.write("\n")
-                            }
-                        }
-                    } else {
-                        modifiedFile.bufferedWriter().use { writer ->
-                            originalFile.readPatchedLines().forEach {
-                                writer.write(it)
-                                writer.write("\n")
-                            }
-                        }
-                    }
                 }
+
+                into("src/main/javaPatched")
             }
 
-            if (failed) throw IllegalStateException("Failed to apply patches")
+            sync {
+                from("original/CC-Tweaked/projects/core/src/main/resources")
+                into("src/main/resourcesPatched")
+            }
 
             // Generate Resources.java
             println("Making Resources.java")
@@ -281,13 +167,6 @@ tasks {
                 .replace("__FILES__", builder.toString())
                 .replace("__VERSION__", props["modVersion"].toString())
             File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java").writeText(contents)
-
-            copy {
-                from("original/CC-Tweaked/projects/core/src/main/resources")
-                include("data/computercraft/lua/bios.lua")
-                include("data/computercraft/lua/rom/**")
-                into("src/main/resources")
-            }
         }
     }
 

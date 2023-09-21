@@ -9,20 +9,20 @@ import java.util.List;
 /**
  * A {@link MethodSupplier} implementation which lifts {@link LuaMethod} to {@link PeripheralMethod}.
  */
-public class PeripheralMethodSupplier implements MethodSupplier<PeripheralMethod> {
-    static final PeripheralMethodSupplier INSTANCE = new PeripheralMethodSupplier();
+public class TPeripheralMethodSupplier implements MethodSupplier<PeripheralMethod> {
+    static final TPeripheralMethodSupplier INSTANCE = new TPeripheralMethodSupplier();
 
-    private PeripheralMethodSupplier() {
+    private TPeripheralMethodSupplier() {
     }
 
     @Override
     public boolean forEachSelfMethod(Object object, UntargetedConsumer<PeripheralMethod> consumer) {
-        return LuaMethodSupplier.INSTANCE.forEachSelfMethod(object, (name, method, info) -> consumer.accept(name, cast(method), null));
+        return TLuaMethodSupplier.INSTANCE.forEachSelfMethod(object, (name, method, info) -> consumer.accept(name, cast(method), null));
     }
 
     @Override
     public boolean forEachMethod(Object object, TargetedConsumer<PeripheralMethod> consumer) {
-        return LuaMethodSupplier.INSTANCE.forEachMethod(object, (target, name, method, info) -> consumer.accept(target, name, cast(method), null));
+        return TLuaMethodSupplier.INSTANCE.forEachMethod(object, (target, name, method, info) -> consumer.accept(target, name, cast(method), null));
     }
 
     private static PeripheralMethod cast(LuaMethod method) {
@@ -30,6 +30,6 @@ public class PeripheralMethodSupplier implements MethodSupplier<PeripheralMethod
     }
 
     public static MethodSupplier<PeripheralMethod> create(List<GenericMethod> genericMethods) {
-        return PeripheralMethodSupplier.INSTANCE;
+        return INSTANCE;
     }
 }

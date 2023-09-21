@@ -1,5 +1,7 @@
 package org.slf4j;
 
+import cc.tweaked.web.js.Console;
+
 import java.util.Arrays;
 
 public class Logger {
@@ -8,12 +10,12 @@ public class Logger {
     }
 
     public void trace(String message, Object... args) {
-        System.err.println("[TRACE] " + message + " " + Arrays.toString(args));
+        Console.log(message + " " + Arrays.toString(args));
         printException(args);
     }
 
     public void debug(String message, Object... args) {
-        System.err.println("[DEBUG] " + message + " " + Arrays.toString(args));
+        Console.log(message + " " + Arrays.toString(args));
         printException(args);
     }
 
@@ -22,7 +24,7 @@ public class Logger {
     }
 
     public void warn(String message, Object... args) {
-        System.err.println("[WARNING] " + message + " " + Arrays.toString(args));
+        Console.warn(message + " " + Arrays.toString(args));
         printException(args);
     }
 
@@ -31,7 +33,7 @@ public class Logger {
     }
 
     public void error(String message, Object... args) {
-        System.err.println("[ERROR] " + message + " " + Arrays.toString(args));
+        Console.error(message + " " + Arrays.toString(args));
         printException(args);
     }
 

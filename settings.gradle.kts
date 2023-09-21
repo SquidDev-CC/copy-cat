@@ -1,12 +1,14 @@
 rootProject.name = "copy-cat"
 
 includeBuild("vendor/teavm") {
-     dependencySubstitution {
+    dependencySubstitution {
         substitute(module("org.teavm:teavm-jso")).using(project(":jso:core"))
         substitute(module("org.teavm:teavm-jso-apis")).using(project(":jso:apis"))
+        substitute(module("org.teavm:teavm-jso-impl")).using(project(":jso:impl"))
         substitute(module("org.teavm:teavm-platform")).using(project(":platform"))
         substitute(module("org.teavm:teavm-classlib")).using(project(":classlib"))
         substitute(module("org.teavm:teavm-metaprogramming-api")).using(project(":metaprogramming:api"))
-        substitute(module("org.teavm:teavm-cli")).using(project(":tools:cli"))
+        substitute(module("org.teavm:teavm-metaprogramming-impl")).using(project(":metaprogramming:impl"))
+        substitute(module("org.teavm:teavm-tooling")).using(project(":tools:core"))
     }
 }

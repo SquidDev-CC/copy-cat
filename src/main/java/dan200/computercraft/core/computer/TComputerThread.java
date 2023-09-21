@@ -10,11 +10,11 @@ import java.util.concurrent.TimeUnit;
  * We've no threads in JS land, so we create a fake version which just executes
  * all the work a computer can do.
  */
-public class ComputerThread {
+public class TComputerThread {
     private static final ArrayDeque<ComputerExecutor> executors = new ArrayDeque<>();
     private final TimerHandler callback = this::workOnce;
 
-    public ComputerThread(int threads) {
+    public TComputerThread(int threads) {
     }
 
     public void queue(ComputerExecutor executor) {

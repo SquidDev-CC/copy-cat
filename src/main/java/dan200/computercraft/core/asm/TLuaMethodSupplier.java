@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * A {@link MethodSupplier} for {@link LuaMethod}s, which uses {@link MethodReflection} to fabricate the classes.
  */
-public class LuaMethodSupplier implements MethodSupplier<LuaMethod> {
-    static final LuaMethodSupplier INSTANCE = new LuaMethodSupplier();
+public class TLuaMethodSupplier implements MethodSupplier<LuaMethod> {
+    static final TLuaMethodSupplier INSTANCE = new TLuaMethodSupplier();
 
-    private LuaMethodSupplier() {
+    private TLuaMethodSupplier() {
     }
 
     @Override
@@ -43,6 +43,6 @@ public class LuaMethodSupplier implements MethodSupplier<LuaMethod> {
     }
 
     public static MethodSupplier<LuaMethod> create(List<GenericMethod> genericMethods) {
-        return LuaMethodSupplier.INSTANCE;
+        return INSTANCE;
     }
 }

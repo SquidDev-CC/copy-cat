@@ -9,7 +9,7 @@
 /.vscode
 
 # Exclude modified/generated sources
-/src/main/resources/data/computercraft
 /src/main/java/cc/tweaked/web/mount/Resources.java
 /src/main/javaPatched
+/src/main/resourcesPatched
 /src/web/ts/styles.css.d.ts

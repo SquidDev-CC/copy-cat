@@ -14,8 +14,6 @@ import dan200.computercraft.core.methods.LuaMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.teavm.metaprogramming.CompileTime;
 import org.teavm.metaprogramming.ReflectClass;
 
@@ -43,8 +41,6 @@ import static org.teavm.metaprogramming.Metaprogramming.createClass;
  */
 @CompileTime
 final class Generator<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
-
     private static final String METHOD_NAME = "apply";
     private static final String[] EXCEPTIONS = new String[]{Type.getInternalName(LuaException.class)};
 
@@ -90,32 +86,30 @@ final class Generator<T> {
 
         // Instance methods must be final - this prevents them being overridden and potentially exposed twice.
         if (!Modifier.isStatic(modifiers) && !Modifier.isFinal(modifiers)) {
-            LOG.warn("Lua Method {} should be final.", name);
+            System.err.printf("Lua Method %s should be final.\n", name);
         }
 
         if (!Modifier.isPublic(modifiers)) {
-            LOG.error("Lua Method {} should be a public method.", name);
+            System.err.printf("Lua Method %s should be a public method.\n", name);
             return Optional.empty();
         }
 
         if (!Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
-            LOG.error("Lua Method {} should be on a public class.", name);
+            System.err.printf("Lua Method %s should be on a public class.\n", name);
             return Optional.empty();
         }
-
-        LOG.debug("Generating method wrapper for {}.", name);
 
         var exceptions = method.getExceptionTypes();
         for (var exception : exceptions) {
             if (exception != LuaException.class) {
-                LOG.error("Lua Method {} cannot throw {}.", name, exception.getName());
+                System.err.printf("Lua Method %s cannot throw %s.\n", name, exception.getName());
                 return Optional.empty();
             }
         }
 
         var annotation = method.getAnnotation(LuaFunction.class);
         if (annotation.unsafe() && annotation.mainThread()) {
-            LOG.error("Lua Method {} cannot use unsafe and mainThread", name);
+            System.err.printf("Lua Method %s cannot use unsafe and mainThread.\n", name);
             return Optional.empty();
         }
 
@@ -129,7 +123,8 @@ final class Generator<T> {
 
             return Optional.of(createClass(bytes).asSubclass(base));
         } catch (ClassFormatError | RuntimeException e) {
-            LOG.error("Error generating wrapper for {}.", name, e);
+            System.err.printf("Error generating %s\n", name);
+            e.printStackTrace();
             return Optional.empty();
         }
     }
@@ -296,7 +291,7 @@ final class Generator<T> {
             return true;
         }
 
-        LOG.error("Unknown parameter type {} for method {}.{}.",
+        System.err.printf("Unknown parameter type %s for method %s.%s.\n",
             arg.getName(), method.getDeclaringClass().getName(), method.getName());
         return null;
     }
@@ -309,7 +304,7 @@ final class Generator<T> {
             } catch (Exception | LinkageError e) {
                 // LinkageError due to possible codegen bugs and NoClassDefFoundError. The latter occurs when fetching
                 // methods on a class which references non-existent (i.e. client-only) types.
-                LOG.error("Error generating @LuaFunctions", e);
+                e.printStackTrace();
                 return def;
             }
         };
