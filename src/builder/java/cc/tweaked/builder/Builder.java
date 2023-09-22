@@ -1,5 +1,6 @@
 package cc.tweaked.builder;
 
+import org.teavm.common.JsonUtil;
 import org.teavm.tooling.ConsoleTeaVMToolLog;
 import org.teavm.tooling.TeaVMProblemRenderer;
 import org.teavm.tooling.TeaVMTargetType;
@@ -9,25 +10,32 @@ import org.teavm.vm.TeaVMOptimizationLevel;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 public class Builder {
     public static void main(String[] args) throws Exception {
         try (var scope = new CloseScope()) {
-            run(scope);
+            var input = getPath(scope, "cct.input");
+            var classpath = getPath(scope, "cct.classpath");
+            var output = getFile("cct.output");
+            var version = System.getProperty("cct.version");
+
+            buildClasses(input, classpath, output);
+            buildResources(version, input, classpath, output);
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
     }
 
-    private static void run(CloseScope scope) throws Exception {
-        var input = getPath(scope, "cct.input");
-        var classpath = getPath(scope, "cct.classpath");
-        var output = getFile("cct.output");
-
+    private static void buildClasses(List<Path> input, List<Path> classpath, Path output) throws Exception {
         var remapper = new RemappingClassLoader(classpath);
         // Really we should add all of these to TeaVM, but our current implementations are a bit of a hack.
         remapper.add("java/nio/channels/Channels", "cc/tweaked/web/stub/Channels");
@@ -48,8 +56,7 @@ public class Builder {
 
         TeaVMTool tool = new TeaVMTool();
         tool.setTargetType(TeaVMTargetType.JAVASCRIPT);
-        tool.setTargetDirectory(output.getParent().toFile());
-        tool.setTargetFileName(output.getFileName().toString());
+        tool.setTargetDirectory(output.toFile());
         tool.setClassLoader(remapper);
         tool.setMainClass("cc.tweaked.web.Main");
 
@@ -59,6 +66,38 @@ public class Builder {
         tool.generate();
         TeaVMProblemRenderer.describeProblems(tool.getDependencyInfo().getCallGraph(), tool.getProblemProvider(), new ConsoleTeaVMToolLog(false));
         if (!tool.getProblemProvider().getSevereProblems().isEmpty()) System.exit(1);
+    }
+
+    private static void buildResources(String version, List<Path> input, List<Path> classpath, Path output) throws IOException {
+        try (var out = Files.newBufferedWriter(output.resolve("resources.js"))) {
+            out.write("export const version = \"");
+            JsonUtil.writeEscapedString(out, version);
+            out.write("\";\n");
+            out.write("export const resources = {\n");
+
+            Stream.of(input, classpath).flatMap(Collection::stream).forEach(root -> {
+                var start = root.resolve("data/computercraft/lua");
+                if (!Files.exists(start)) return;
+
+                try (var walker = Files.find(start, Integer.MAX_VALUE, (p, a) -> a.isRegularFile())) {
+                    walker.forEach(x -> {
+                        try {
+                            out.write("  \"");
+                            JsonUtil.writeEscapedString(out, start.relativize(x).toString());
+                            out.write("\": \"");
+                            JsonUtil.writeEscapedString(out, Files.readString(x, StandardCharsets.UTF_8));
+                            out.write("\",\n");
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+
+            out.write("};\n");
+        }
     }
 
     private static void traverseClasses(Path root, BiConsumer<String, Path> child) throws IOException {

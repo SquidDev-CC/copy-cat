@@ -1,10 +1,9 @@
 package cc.tweaked.web;
 
+import cc.tweaked.web.js.Callbacks;
 import cc.tweaked.web.mount.ResourceMount;
-import cc.tweaked.web.mount.Resources;
 import dan200.computercraft.api.filesystem.Mount;
 import dan200.computercraft.core.computer.GlobalEnvironment;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.io.InputStream;
@@ -12,29 +11,37 @@ import java.io.InputStream;
 public final class GlobalEnvironmentImpl implements GlobalEnvironment {
     public static final GlobalEnvironmentImpl INSTANCE = new GlobalEnvironmentImpl();
 
+    private static final String VERSION = Callbacks.getModVersion();
+
     private GlobalEnvironmentImpl() {
     }
 
     @Nonnull
     @Override
     public String getHostString() {
-        return "ComputerCraft " + Resources.VERSION + " (copy-cat)";
+        return "ComputerCraft " + VERSION + " (copy-cat)";
     }
 
     @Override
     public String getUserAgent() {
-        return "computercraft/" + Resources.VERSION;
+        return "computercraft/" + VERSION;
     }
 
-    @Nullable
     @Override
     public Mount createResourceMount(String domain, String subPath) {
-        return new ResourceMount("data/" + domain + "/" + subPath);
+        if (domain.equals("computercraft") && subPath.equals("lua/rom")) {
+            return ResourceMount.rom();
+        } else {
+            throw new IllegalArgumentException("Unknown domain or subpath");
+        }
     }
 
-    @Nullable
     @Override
     public InputStream createResourceFile(String domain, String subPath) {
-        return ResourceMount.class.getClassLoader().getResourceAsStream("data/" + domain + "/" + subPath);
+        if (domain.equals("computercraft") && subPath.equals("lua/bios.lua")) {
+            return ResourceMount.bios();
+        } else {
+            throw new IllegalArgumentException("Unknown domain or subpath");
+        }
     }
 }

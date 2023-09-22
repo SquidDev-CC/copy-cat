@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import java.util.*
 
 plugins {
@@ -25,10 +24,29 @@ repositories {
     }
 }
 
+val filteredCCSources by tasks.registering(Sync::class) {
+    from("original/CC-Tweaked/projects/core/src/main/java") {
+        exclude(
+            // Exclude all the Netty-specific code
+            "dan200/computercraft/core/apis/http/CheckUrl.java",
+            "dan200/computercraft/core/apis/http/NetworkUtils.java",
+            "dan200/computercraft/core/apis/http/request/HttpRequest.java",
+            "dan200/computercraft/core/apis/http/request/HttpRequestHandler.java",
+            "dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java",
+            "dan200/computercraft/core/apis/http/websocket/Websocket.java",
+            "dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java",
+            "dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java",
+        )
+    }
+
+    into(layout.buildDirectory.dir("filtedCCSources"))
+}
+
 sourceSets {
     main {
-        java.srcDir("src/main/javaPatched")
-        resources.srcDir("src/main/resourcesPatched")
+        java.srcDir("original/CC-Tweaked/projects/core-api/src/main/java")
+        java.srcDir(filteredCCSources)
+        resources.srcDir("original/CC-Tweaked/projects/core/src/main/resources")
     }
     register("builder")
 }
@@ -60,38 +78,33 @@ dependencies {
 }
 
 tasks {
-    val classesFile = layout.buildDirectory.file("teaVM/classes.js")
+    val teaVMOutput = layout.buildDirectory.dir("teaVM")
 
     val compileTeaVM by registering(JavaExec::class) {
         group = "build"
         description = "Stitch all files together"
 
+        val propertiesFile = projectDir.resolve("original/CC-Tweaked/gradle.properties")
+
         inputs.files(sourceSets.main.get().runtimeClasspath).withPropertyName("inputClasspath")
-        outputs.file(classesFile).withPropertyName("javascript")
+        inputs.file(propertiesFile).withPropertyName("inputProperties")
+        outputs.dir(teaVMOutput).withPropertyName("output")
 
         classpath = sourceSets["builder"].runtimeClasspath
         jvmArguments.addAll(provider {
+            val properties = Properties().also { propertiesFile.inputStream().use(it::load) }
+
             val main = sourceSets.main.get()
             listOf(
                 "-Dcct.input=${main.output.classesDirs.asPath}",
+                "-Dcct.version=${properties["modVersion"]}",
                 "-Dcct.classpath=${main.runtimeClasspath.asPath}",
-                "-Dcct.output=${classesFile.get().asFile.absolutePath}"
+                "-Dcct.output=${teaVMOutput.get().asFile.absolutePath}"
             )
         })
         mainClass.set("cc.tweaked.builder.Builder")
         javaLauncher.set(project.javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
     }
-
-    /**
-     * Build a command which runs a specific program. Gradle daemons may not be started with the correct PATH, and so
-     * will not find the required programs.
-     */
-    fun mkCommand(cmd: String) =
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-            listOf("cmd", "/c", cmd)
-        } else {
-            listOf("sh", "-c", cmd)
-        }
 
     val genCssTypes by registering(Exec::class) {
         group = "build"
@@ -100,15 +113,15 @@ tasks {
         inputs.file("src/web/ts/styles.css").withPropertyName("styles.css")
         outputs.file("src/web/ts/styles.css.d.ts").withPropertyName("styles.css.d.ts")
 
-        commandLine(mkCommand("npm run --silent prepare:setup"))
+        commandLine("node", "tools/setup.js")
     }
 
     val rollup by registering(Exec::class) {
         group = "build"
         description = "Combines multiple Javascript files into one"
 
-        dependsOn(compileTeaVM, genCssTypes)
-        inputs.file(classesFile).withPropertyName("teaVM")
+        dependsOn(genCssTypes)
+        inputs.files(compileTeaVM).withPropertyName("teaVM")
         inputs.files(fileTree("src/web")).withPropertyName("sources")
         inputs.file("package-lock.json").withPropertyName("package-lock.json")
         inputs.file("rollup.config.js").withPropertyName("Rollup config")
@@ -116,67 +129,11 @@ tasks {
         outputs.files(fileTree(layout.buildDirectory.dir("web"))).withPropertyName("output")
         outputs.files(fileTree(layout.buildDirectory.dir("webMin"))).withPropertyName("outputMin")
 
-        commandLine(mkCommand("npm run --silent prepare:rollup"))
-    }
-
-    val applyPatches by registering {
-        group = "patch"
-        description = "Applies our patches to the source directories"
-
-        doLast {
-            // We load CC:T's properties and use them to substitute in the mod version
-            val props = Properties()
-            File(projectDir, "original/CC-Tweaked/gradle.properties").inputStream().use { props.load(it) }
-
-            sync {
-                from("original/CC-Tweaked/projects/core-api/src/main/java")
-                from("original/CC-Tweaked/projects/core/src/main/java") {
-                    exclude(
-                        // Exclude all the Netty-specific code
-                        "dan200/computercraft/core/apis/http/CheckUrl.java",
-                        "dan200/computercraft/core/apis/http/NetworkUtils.java",
-                        "dan200/computercraft/core/apis/http/request/HttpRequest.java",
-                        "dan200/computercraft/core/apis/http/request/HttpRequestHandler.java",
-                        "dan200/computercraft/core/apis/http/websocket/NoOriginWebSocketHandshaker.java",
-                        "dan200/computercraft/core/apis/http/websocket/Websocket.java",
-                        "dan200/computercraft/core/apis/http/websocket/WebsocketCompressionHandler.java",
-                        "dan200/computercraft/core/apis/http/websocket/WebsocketHandler.java",
-                    )
-                }
-
-                into("src/main/javaPatched")
-            }
-
-            sync {
-                from("original/CC-Tweaked/projects/core/src/main/resources")
-                into("src/main/resourcesPatched")
-            }
-
-            // Generate Resources.java
-            println("Making Resources.java")
-            val builder = StringBuilder()
-            val resources = fileTree("original/CC-Tweaked/projects/core/src/main/resources/data/computercraft/lua/rom/")
-            resources.forEach {
-                builder
-                    .append("        \"")
-                    .append(it.relativeTo(resources.dir).toString().replace('\\', '/'))
-                    .append("\",\n")
-            }
-
-            val contents = File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java.txt").readText()
-                .replace("__FILES__", builder.toString())
-                .replace("__VERSION__", props["modVersion"].toString())
-            File(projectDir, "src/main/java/cc/tweaked/web/mount/Resources.java").writeText(contents)
-        }
+        commandLine("npx", "rollup", "-c")
     }
 
     assemble { dependsOn(rollup) }
     assembleDist { dependsOn(rollup) }
-
-    val avengers by registering {
-        description = "An alias to 'clean'. Should be run before assemble."
-        dependsOn(clean)
-    }
 }
 
 gradle.projectsEvaluated {

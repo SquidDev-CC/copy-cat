@@ -232,11 +232,28 @@ export interface Callbacks {
   setup(addComputer: (computer: ComputerAccess) => ComputerCallbacks): void;
 
   /**
-* Get or create a config group
-*
-* @param name        The display name of this group
-* @param description A short description of this group
-* @return The constructed config group
-*/
+   * Get or create a config group
+   *
+   * @param name        The display name of this group
+   * @param description A short description of this group
+   * @return The constructed config group
+   */
   config(name: string, description: string | null): ConfigGroup;
+
+  /**
+   * The version of CC: Tweaked currently loaded.
+   */
+  modVersion: string;
+
+  /**
+   * List all resources available in the ROM.
+   */
+  listResources(): Array<string>;
+
+  /**
+   * Load a resource from the ROM.
+   *
+   * @param path The path to the resource to load.
+   */
+  getResource(path: string): Int8Array;
 }

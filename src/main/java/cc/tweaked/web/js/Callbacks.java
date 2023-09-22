@@ -3,17 +3,12 @@ package cc.tweaked.web.js;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
+import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class Callbacks {
-    @JSFunctor
-    @FunctionalInterface
-    public interface Callback extends JSObject {
-        void run();
-    }
-
     @JSFunctor
     @FunctionalInterface
     public interface Setup extends JSObject {
@@ -38,6 +33,28 @@ public class Callbacks {
     @JSBody(params = {"name", "description"}, script = "return copycatCallbacks.config(name, description);")
     public static native ConfigGroup config(@Nonnull String name, @Nullable String description);
 
-    @JSBody(params = {"callback"}, script = "queueMicrotask(callback);")
-    public static native void queueMicrotask(Callback callback);
+    /**
+     * Get the version of CC: Tweaked
+     *
+     * @return The mod's version.
+     */
+    @JSBody(script = "return copycatCallbacks.modVersion;")
+    public static native String getModVersion();
+
+    /**
+     * List all resources available in the ROM.
+     *
+     * @return All available resources.
+     */
+    @JSBody(script = "return copycatCallbacks.listResources();")
+    public static native String[] listResources();
+
+    /**
+     * Load a resource from the ROM.
+     *
+     * @param resource The path to the resource to load.
+     * @return The loaded resource.
+     */
+    @JSBody(params = "name", script = "return copycatCallbacks.getResource(name);")
+    public static native Int8Array getResource(String resource);
 }
