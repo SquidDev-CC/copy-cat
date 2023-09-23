@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-package cc.tweaked.web.asm;
+package dan200.computercraft.core.asm;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -14,7 +14,6 @@ import dan200.computercraft.core.methods.LuaMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.teavm.metaprogramming.CompileTime;
 import org.teavm.metaprogramming.ReflectClass;
 
 import javax.annotation.Nullable;
@@ -25,12 +24,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static org.objectweb.asm.Opcodes.*;
-import static org.teavm.metaprogramming.Metaprogramming.createClass;
 
 /**
  * The underlying generator for {@link LuaFunction}-annotated methods.
  * <p>
- * The constructor {@link Generator#Generator(Class, List)} takes in the type of interface to generate (i.e.
+ * The constructor {@link StaticGenerator#StaticGenerator(Class, List, Function)} takes in the type of interface to generate (i.e.
  * {@link LuaMethod}) and the context arguments for this function (in the case of {@link LuaMethod}, this will just be
  * {@link ILuaContext}).
  * <p>
@@ -39,8 +37,7 @@ import static org.teavm.metaprogramming.Metaprogramming.createClass;
  *
  * @param <T> The type of the interface the generated classes implement.
  */
-@CompileTime
-final class Generator<T> {
+public final class StaticGenerator<T> {
     private static final String METHOD_NAME = "apply";
     private static final String[] EXCEPTIONS = new String[]{Type.getInternalName(LuaException.class)};
 
@@ -59,13 +56,17 @@ final class Generator<T> {
     private final String methodDesc;
     private final String classPrefix;
 
+    private final Function<byte[], ReflectClass<?>> createClass;
+
     private final LoadingCache<Method, Optional<ReflectClass<T>>> methodCache = CacheBuilder
         .newBuilder()
         .build(CacheLoader.from(catching(this::build, Optional.empty())));
 
-    Generator(Class<T> base, List<Class<?>> context) {
+    public StaticGenerator(Class<T> base, List<Class<?>> context, Function<byte[], ReflectClass<?>> createClass) {
         this.base = base;
         this.context = context;
+        this.createClass = createClass;
+
         interfaces = new String[]{Type.getInternalName(base)};
 
         var methodDesc = new StringBuilder().append("(Ljava/lang/Object;");
@@ -73,10 +74,10 @@ final class Generator<T> {
         methodDesc.append(DESC_ARGUMENTS).append(")").append(DESC_METHOD_RESULT);
         this.methodDesc = methodDesc.toString();
 
-        classPrefix = Generator.class.getPackageName() + "." + base.getSimpleName() + "$";
+        classPrefix = StaticGenerator.class.getPackageName() + "." + base.getSimpleName() + "$";
     }
 
-    Optional<ReflectClass<T>> getMethod(Method method) {
+    public Optional<ReflectClass<T>> getMethod(Method method) {
         return methodCache.getUnchecked(method);
     }
 
@@ -121,7 +122,7 @@ final class Generator<T> {
             var bytes = generate(classPrefix + method.getDeclaringClass().getSimpleName() + "$" + method.getName(), target, method, annotation.unsafe());
             if (bytes == null) return Optional.empty();
 
-            return Optional.of(createClass(bytes).asSubclass(base));
+            return Optional.of(createClass.apply(bytes).asSubclass(base));
         } catch (ClassFormatError | RuntimeException e) {
             System.err.printf("Error generating %s\n", name);
             e.printStackTrace();

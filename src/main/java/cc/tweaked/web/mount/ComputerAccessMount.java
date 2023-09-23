@@ -3,20 +3,22 @@ package cc.tweaked.web.mount;
 import cc.tweaked.web.js.ComputerAccess;
 import cc.tweaked.web.js.ComputerAccess.Result;
 import cc.tweaked.web.js.FileSystemEntry;
+import cc.tweaked.web.js.JavascriptConv;
 import cc.tweaked.web.js.JsFileAttributes;
 import dan200.computercraft.api.filesystem.FileAttributes;
 import dan200.computercraft.api.filesystem.FileOperationException;
 import dan200.computercraft.api.filesystem.WritableMount;
+import dan200.computercraft.core.apis.handles.ArrayByteChannel;
 import org.teavm.jso.core.JSBoolean;
 import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -92,7 +94,7 @@ public class ComputerAccessMount implements WritableMount {
     public long getSize(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
         if (entry == null) throw new FileOperationException(path, "No such file");
-        return entry.isDirectory() ? 0 : entry.getContents().getLength();
+        return entry.isDirectory() ? 0 : entry.getContents().length;
     }
 
     @Nonnull
@@ -100,7 +102,7 @@ public class ComputerAccessMount implements WritableMount {
     public SeekableByteChannel openForRead(@Nonnull String path) throws IOException {
         FileSystemEntry entry = computer.getEntry(path);
         if (entry == null || entry.isDirectory()) throw new FileOperationException(path, "No such file");
-        return new Int8ArrayByteChannel(entry.getContents());
+        return new ArrayByteChannel(entry.getContents());
     }
 
     @Nonnull
@@ -115,13 +117,13 @@ public class ComputerAccessMount implements WritableMount {
         );
     }
 
-    private static class Writer extends OutputStream implements SeekableByteChannel {
+    private static class Writer implements SeekableByteChannel {
         private static final Int8Array EMPTY = Int8Array.create(0);
 
         private final FileSystemEntry entry;
 
         private boolean closed = false;
-        private Int8Array contents;
+        private byte[] contents;
         private int position;
         private int size;
 
@@ -129,10 +131,10 @@ public class ComputerAccessMount implements WritableMount {
             this.entry = entry;
         }
 
-        private Writer(@Nonnull FileSystemEntry entry, Int8Array existing) {
+        private Writer(@Nonnull FileSystemEntry entry, byte[] existing) {
             this.entry = entry;
             this.contents = existing;
-            this.position = this.size = existing.getLength();
+            this.position = this.size = existing.length;
         }
 
         @Override
@@ -163,14 +165,12 @@ public class ComputerAccessMount implements WritableMount {
 
             if (contents == null) {
                 // Allocate an initial buffer
-                contents = Int8Array.create(Math.max(16, end));
-            } else if (end > contents.getLength()) {
+                contents = new byte[Math.max(16, end)];
+            } else if (end > contents.length) {
                 // Grow our existing buffer
-                int newCapacity = contents.getLength() << 1;
+                int newCapacity = contents.length << 1;
                 if (newCapacity - end < 0) newCapacity = end;
-                Int8Array copy = Int8Array.create(newCapacity);
-                copy.set(contents);
-                contents = copy;
+                contents = Arrays.copyOf(contents, newCapacity);
             }
         }
 
@@ -181,28 +181,9 @@ public class ComputerAccessMount implements WritableMount {
             int length = buffer.remaining();
             preWrite(length);
             int position = this.position;
-            for (int i = 0; i < length; i++) contents.set(position + i, buffer.get());
+            for (int i = 0; i < length; i++) contents[position + i] = buffer.get();
             size = Math.max(size, this.position += length);
             return length;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            if (closed) throw new IOException("Stream is closed");
-
-            preWrite(1);
-            contents.set(position, (byte) b);
-            size = Math.max(size, position += 1);
-        }
-
-        @Override
-        public void write(@Nonnull byte[] b, int offset, int length) throws IOException {
-            if (closed) throw new IOException("Stream is closed");
-
-            preWrite(length);
-            int position = this.position;
-            for (int i = 0; i < length; i++) contents.set(position + i, b[offset + i]);
-            size = Math.max(size, this.position += length);
         }
 
         @Override
@@ -215,9 +196,14 @@ public class ComputerAccessMount implements WritableMount {
             if (closed) return;
             closed = true;
 
-            Result<JSBoolean> result = entry.setContents(
-                contents == null ? EMPTY : Int8Array.create(contents.getBuffer(), contents.getByteOffset(), size)
-            );
+            Int8Array contentsArray;
+            if (contents == null) {
+                contentsArray = EMPTY;
+            } else {
+                var wrapped = JavascriptConv.ofByteArray(contents);
+                contentsArray = Int8Array.create(wrapped.getBuffer(), wrapped.getByteOffset(), size);
+            }
+            Result<JSBoolean> result = entry.setContents(contentsArray);
             contents = null;
             result.getOrThrow();
         }

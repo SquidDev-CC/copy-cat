@@ -1,5 +1,6 @@
 package cc.tweaked.web.js;
 
+import org.teavm.jso.JSByRef;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.core.JSBoolean;
 import org.teavm.jso.typedarrays.Int8Array;
@@ -30,8 +31,9 @@ public interface FileSystemEntry extends JSObject {
      * @return This file's contents
      * @throws RuntimeException If this is not a file
      */
+    @JSByRef
     @Nonnull
-    Int8Array getContents();
+    byte[] getContents();
 
     /**
      * Set the contents of this filesystem entry

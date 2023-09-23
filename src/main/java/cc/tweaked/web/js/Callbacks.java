@@ -1,9 +1,9 @@
 package cc.tweaked.web.js;
 
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSByRef;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,6 +55,7 @@ public class Callbacks {
      * @param resource The path to the resource to load.
      * @return The loaded resource.
      */
+    @JSByRef
     @JSBody(params = "name", script = "return copycatCallbacks.getResource(name);")
-    public static native Int8Array getResource(String resource);
+    public static native byte[] getResource(String resource);
 }

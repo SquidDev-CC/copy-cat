@@ -1,6 +1,5 @@
 package dan200.computercraft.core.asm;
 
-import cc.tweaked.web.asm.MethodReflection;
 import dan200.computercraft.core.methods.LuaMethod;
 import dan200.computercraft.core.methods.MethodSupplier;
 import dan200.computercraft.core.methods.ObjectSource;

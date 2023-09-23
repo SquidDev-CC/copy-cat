@@ -1,8 +1,7 @@
 package dan200.computercraft.core.apis.http.request;
 
 import cc.tweaked.web.Main;
-import cc.tweaked.web.http.HttpHelpers;
-import cc.tweaked.web.mount.Int8ArrayByteChannel;
+import cc.tweaked.web.js.JavascriptConv;
 import dan200.computercraft.core.Logging;
 import dan200.computercraft.core.apis.IAPIEnvironment;
 import dan200.computercraft.core.apis.handles.ArrayByteChannel;
@@ -19,9 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.typedarrays.ArrayBuffer;
-import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
@@ -114,11 +114,10 @@ public class HttpRequest extends Resource<HttpRequest> {
         HandleGeneric reader;
         if (binary) {
             ArrayBuffer buffer = request.getResponse().cast();
-            SeekableByteChannel contents = new Int8ArrayByteChannel(Int8Array.create(buffer));
+            SeekableByteChannel contents = new ArrayByteChannel(JavascriptConv.asByteArray(buffer));
             reader = BinaryReadableHandle.of(contents);
         } else {
-            SeekableByteChannel contents = new ArrayByteChannel(HttpHelpers.encode(request.getResponseText()));
-            reader = new EncodedReadableHandle(EncodedReadableHandle.openUtf8(contents));
+            reader = new EncodedReadableHandle(new BufferedReader(new StringReader(request.getResponseText())));
         }
 
         Map<String, String> responseHeaders = new HashMap<>();

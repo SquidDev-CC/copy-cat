@@ -9,8 +9,6 @@ import dan200.computercraft.core.apis.http.ResourceGroup;
 import dan200.computercraft.core.apis.http.options.Action;
 import dan200.computercraft.core.apis.http.options.Options;
 import io.netty.handler.codec.http.HttpHeaders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.teavm.jso.typedarrays.Int8Array;
 import org.teavm.jso.websocket.WebSocket;
 
@@ -19,8 +17,6 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 
 public class Websocket extends Resource<Websocket> implements WebsocketClient {
-    private static final Logger LOG = LoggerFactory.getLogger(Websocket.class);
-
     private final IAPIEnvironment environment;
     private final URI uri;
     private final String address;
@@ -76,7 +72,6 @@ public class Websocket extends Resource<Websocket> implements WebsocketClient {
     @Override
     protected void dispose() {
         super.dispose();
-        LOG.error("Dispose");
         if (websocket != null) {
             websocket.close();
             websocket = null;
@@ -100,7 +95,6 @@ public class Websocket extends Resource<Websocket> implements WebsocketClient {
     void close(int status, String reason) {
         if (!tryClose()) return;
 
-        LOG.error("Close");
         environment.queueEvent(CLOSE_EVENT, address, Strings.isNullOrEmpty(reason) ? null : reason, status < 0 ? null : status);
     }
 }

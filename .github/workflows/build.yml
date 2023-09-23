@@ -22,7 +22,7 @@ jobs:
       run: npm ci
 
     - name: Build with Gradle
-      run: ./gradlew applyPatches assemble
+      run: ./gradlew assemble
 
     - name: Lint JS/TS
       run: npm run --silent lint

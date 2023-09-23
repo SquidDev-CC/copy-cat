@@ -1,4 +1,4 @@
-package cc.tweaked.web.asm;
+package dan200.computercraft.core.asm;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -61,7 +61,9 @@ public class MethodReflection {
             .newBuilder()
             .build(CacheLoader.from(Internal::getMethodsImpl));
 
-        private static final Generator<LuaMethod> GENERATOR = new Generator<>(LuaMethod.class, Collections.singletonList(ILuaContext.class));
+        private static final StaticGenerator<LuaMethod> GENERATOR = new StaticGenerator<>(
+            LuaMethod.class, Collections.singletonList(ILuaContext.class), Internal::createClass
+        );
 
         static List<NamedMethod<ReflectClass<LuaMethod>>> getMethods(Class<?> klass) {
             try {
@@ -69,6 +71,18 @@ public class MethodReflection {
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        private static ReflectClass<?> createClass(byte[] bytes) {
+            /*
+             StaticGenerator is not declared to be @CompileTime, to ensure it loads in the same module/classloader as
+             other files in this package. This means it can't call Metaprogramming.createClass directly, as that's
+             only available to @CompileTime classes.
+
+             We need to use an explicit call (rather than a MethodReference), as TeaVM doesn't correctly rewrite the
+             latter.
+            */
+            return Metaprogramming.createClass(bytes);
         }
 
         private static List<NamedMethod<ReflectClass<LuaMethod>>> getMethodsImpl(Class<?> klass) {
