@@ -29,6 +29,7 @@
     }
   },
   "include": [
-    "src/web"
+    "src/web",
+    "vendor/CC-Tweaked/projects/web/src/frontend/typings.ts",
    ]
 }

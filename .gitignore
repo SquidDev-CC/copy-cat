@@ -9,5 +9,4 @@
 /.vscode
 
 # Exclude generated sources
-/src/main/java/cc/tweaked/web/mount/Resources.java
 /src/web/ts/styles.css.d.ts

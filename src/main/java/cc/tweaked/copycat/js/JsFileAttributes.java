@@ -1,4 +1,4 @@
-package cc.tweaked.web.js;
+package cc.tweaked.copycat.js;
 
 import org.teavm.jso.JSObject;
 import org.teavm.jso.JSProperty;

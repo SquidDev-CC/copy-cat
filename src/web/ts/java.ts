@@ -1,18 +1,22 @@
-import type { ComputerAccess, ComputerCallbacks, ConfigGroup } from "./classes";
-export type { ComputerAccess, FileSystemEntry, Result, ConfigGroup as IConfigGroup } from "./classes";
+import "setimmediate";
+
+import type { ComputerDisplay, ComputerHandle, ConfigGroup } from "cct/classes";
+export type {
+  ComputerDisplay, ComputerHandle, ConfigGroup, FileAttributes, FileSystemEntry, PeripheralKind, Result, Side
+} from "cct/classes";
 
 export type ConfigFactory = (name: string, description: string | null) => ConfigGroup;
 
 let loaded = false;
-let doAddComputer: ((computer: ComputerAccess) => ComputerCallbacks) | null = null;
+let doAddComputer: ((computer: ComputerDisplay) => ComputerHandle) | null = null;
 
-export const start = async (computer: ComputerAccess, config: ConfigFactory): Promise<ComputerCallbacks> => {
+export const start = async (computer: ComputerDisplay, config: ConfigFactory): Promise<ComputerHandle> => {
   if (loaded) {
     if (!doAddComputer) throw new Error("Failed to load computer (see previous errors for a possible reason");
     return doAddComputer(computer);
   }
 
-  const [classes, { version, resources }] = await Promise.all([import("./classes"), import("./resources")]);
+  const [classes, { version, resources }] = await Promise.all([import("cct/classes"), import("cct/resources")]);
   if (loaded) {
     if (!doAddComputer) throw new Error("Failed to load computer (see previous errors for a possible reason");
     return doAddComputer(computer);
@@ -21,7 +25,7 @@ export const start = async (computer: ComputerAccess, config: ConfigFactory): Pr
   loaded = true;
 
   const encoder = new TextEncoder();
-  window.copycatCallbacks = {
+  window.$javaCallbacks = {
     config,
     setup: add => doAddComputer = add,
     modVersion: version,

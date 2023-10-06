@@ -1,6 +1,3 @@
-[submodule "original/CC-Tweaked"]
-	path = original/CC-Tweaked
+[submodule "vendor/CC-Tweaked"]
+	path = vendor/CC-Tweaked
 	url = https://github.com/cc-tweaked/CC-Tweaked.git
-[submodule "vendor/teavm"]
-	path = vendor/teavm
-	url = https://github.com/SquidDev/teavm.git

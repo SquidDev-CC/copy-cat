@@ -92,8 +92,8 @@ const makeSite = (out, minify) => ({
         })));
       },
       async resolveId(source) {
-        if (source === "./classes") return path.resolve("build/teaVM/classes.js");
-        if (source === "./resources") return path.resolve("build/teaVM/resources.js");
+        if (source === "cct/classes") return path.resolve("build/teaVM/classes.js");
+        if (source === "cct/resources") return path.resolve("build/teaVM/resources.js");
         return null;
       },
     },

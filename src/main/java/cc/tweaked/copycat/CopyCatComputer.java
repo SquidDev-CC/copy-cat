@@ -1,14 +1,17 @@
-package cc.tweaked.web;
+package cc.tweaked.copycat;
 
-import cc.tweaked.web.js.ComputerAccess;
-import cc.tweaked.web.js.ComputerCallbacks;
+import cc.tweaked.copycat.js.ExtendedComputerDisplay;
+import cc.tweaked.copycat.js.ExtendedComputerHandle;
+import cc.tweaked.web.Main;
 import cc.tweaked.web.js.JavascriptConv;
-import cc.tweaked.web.mount.ComputerAccessMount;
 import cc.tweaked.web.peripheral.SpeakerPeripheral;
 import cc.tweaked.web.peripheral.TickablePeripheral;
 import dan200.computercraft.api.filesystem.WritableMount;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.ComputerContext;
+import dan200.computercraft.core.apis.handles.ArrayByteChannel;
+import dan200.computercraft.core.apis.transfer.TransferredFile;
+import dan200.computercraft.core.apis.transfer.TransferredFiles;
 import dan200.computercraft.core.computer.Computer;
 import dan200.computercraft.core.computer.ComputerEnvironment;
 import dan200.computercraft.core.computer.ComputerSide;
@@ -19,22 +22,23 @@ import dan200.computercraft.core.terminal.Terminal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teavm.jso.JSObject;
+import org.teavm.jso.typedarrays.ArrayBuffer;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
-public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, MetricsObserver {
-    private static final Logger LOG = LoggerFactory.getLogger(ComputerWrapper.class);
+public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHandle, MetricsObserver {
+    private static final Logger LOG = LoggerFactory.getLogger(CopyCatComputer.class);
 
     private static final ComputerSide[] SIDES = ComputerSide.values();
     private boolean terminalChanged = false;
     private final Terminal terminal = new Terminal(Main.computerTermWidth, Main.computerTermHeight, true, () -> terminalChanged = true);
     private final Computer computer;
-    private final ComputerAccess computerAccess;
+    private final ExtendedComputerDisplay computerAccess;
     private boolean disposed = false;
     private boolean customSize;
 
-    public ComputerWrapper(ComputerContext context, ComputerAccess computerAccess) {
+    public CopyCatComputer(ComputerContext context, ExtendedComputerDisplay computerAccess) {
         this.computerAccess = computerAccess;
         this.computer = new Computer(context, this, terminal, 0);
 
@@ -107,7 +111,7 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
         return ((Main.getTicks() + 6000) % 24000) / 1000.0;
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     @Override
     public WritableMount createRootMount() {
         return new ComputerAccessMount(computerAccess);
@@ -132,7 +136,7 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
     }
 
     @Override
-    public void event(@Nonnull String event, @Nullable JSObject[] args) {
+    public void event(String event, @Nullable JSObject[] args) {
         computer.queueEvent(event, JavascriptConv.toJava(args));
     }
 
@@ -166,8 +170,10 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
     }
 
     @Override
-    public void setPeripheral(@Nonnull String sideName, @Nullable String kind) {
-        ComputerSide side = ComputerSide.valueOfInsensitive(sideName);
+    public void setPeripheral(String sideName, @Nullable String kind) {
+        var side = ComputerSide.valueOfInsensitive(sideName);
+        if (side == null) throw new IllegalArgumentException("Unknown side");
+
         IPeripheral peripheral;
         if (kind == null) {
             peripheral = null;
@@ -178,5 +184,27 @@ public class ComputerWrapper implements ComputerEnvironment, ComputerCallbacks, 
         }
 
         computer.getEnvironment().setPeripheral(side, peripheral);
+    }
+
+    @Override
+    public void transferFiles(FileContents[] files) {
+        computer.queueEvent(TransferredFiles.EVENT, new Object[]{
+            new TransferredFiles(
+                Arrays.stream(files)
+                    .map(x -> new TransferredFile(x.getName(), new ArrayByteChannel(bytesOfBuffer(x.getContents()))))
+                    .toList(),
+                () -> {
+                }),
+        });
+    }
+
+    @Override
+    public void addFile(String path, JSObject contents) {
+        throw new UnsupportedOperationException("Use mount methods instead");
+    }
+
+    private byte[] bytesOfBuffer(ArrayBuffer buffer) {
+        var oldBytes = JavascriptConv.asByteArray(buffer);
+        return Arrays.copyOf(oldBytes, oldBytes.length);
     }
 }

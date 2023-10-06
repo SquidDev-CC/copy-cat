@@ -59,11 +59,11 @@ html {
 }
 
 .actionButton {
-  composes: actionButton from "@squid-dev/cc-web-term/dist/styles.css";
+  composes: actionButton from "@squid-dev/cc-web-term/dist/styles.module.css";
 }
 
 .iconFont {
-  composes: iconFont from "@squid-dev/cc-web-term/dist/styles.css";
+  composes: iconFont from "@squid-dev/cc-web-term/dist/styles.module.css";
   fill: var(--bg-button);
 }
 
@@ -320,13 +320,6 @@ html {
     flex-basis: 100%;
   }
 }
-
-.codeBlock {
-  background-color: var(--bg-code-block);
-  color: var(--text-color);
-  border-radius: 5px;
-}
-
 
 h1, h2, h3, p {
   color: var(--text-color);

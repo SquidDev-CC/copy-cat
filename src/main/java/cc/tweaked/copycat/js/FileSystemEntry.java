@@ -1,4 +1,4 @@
-package cc.tweaked.web.js;
+package cc.tweaked.copycat.js;
 
 import org.teavm.jso.JSByRef;
 import org.teavm.jso.JSObject;
@@ -43,7 +43,7 @@ public interface FileSystemEntry extends JSObject {
      * @throws RuntimeException If this is not a file
      */
     @Nonnull
-    ComputerAccess.Result<JSBoolean> setContents(@Nonnull Int8Array contents);
+    ExtendedComputerDisplay.Result<JSBoolean> setContents(@Nonnull Int8Array contents);
 
     /**
      * Get the attrribut

@@ -1,10 +1,10 @@
-package cc.tweaked.web.mount;
+package cc.tweaked.copycat;
 
-import cc.tweaked.web.js.ComputerAccess;
-import cc.tweaked.web.js.ComputerAccess.Result;
-import cc.tweaked.web.js.FileSystemEntry;
-import cc.tweaked.web.js.JavascriptConv;
-import cc.tweaked.web.js.JsFileAttributes;
+import cc.tweaked.copycat.js.ExtendedComputerDisplay;
+import cc.tweaked.copycat.js.ExtendedComputerDisplay.Result;
+import cc.tweaked.copycat.js.FileSystemEntry;
+import cc.tweaked.copycat.js.JsFileAttributes;
+import cc.tweaked.copycat.js.MoreJavascriptConv;
 import dan200.computercraft.api.filesystem.FileAttributes;
 import dan200.computercraft.api.filesystem.FileOperationException;
 import dan200.computercraft.api.filesystem.WritableMount;
@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class ComputerAccessMount implements WritableMount {
-    private final ComputerAccess computer;
+    private final ExtendedComputerDisplay computer;
 
-    public ComputerAccessMount(ComputerAccess computer) {
+    public ComputerAccessMount(ExtendedComputerDisplay computer) {
         this.computer = computer;
     }
 
@@ -200,7 +200,7 @@ public class ComputerAccessMount implements WritableMount {
             if (contents == null) {
                 contentsArray = EMPTY;
             } else {
-                var wrapped = JavascriptConv.ofByteArray(contents);
+                var wrapped = MoreJavascriptConv.ofByteArray(contents);
                 contentsArray = Int8Array.create(wrapped.getBuffer(), wrapped.getByteOffset(), size);
             }
             Result<JSBoolean> result = entry.setContents(contentsArray);

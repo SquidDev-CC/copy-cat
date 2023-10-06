@@ -1,37 +1,39 @@
 package cc.tweaked.web;
 
-import cc.tweaked.web.js.Callbacks;
-import cc.tweaked.web.js.ConfigGroup;
+import cc.tweaked.copycat.CopyCatComputer;
+import cc.tweaked.copycat.js.Callbacks;
+import cc.tweaked.copycat.js.ConfigGroup;
 import dan200.computercraft.core.ComputerContext;
 import dan200.computercraft.core.CoreConfig;
 import org.teavm.jso.browser.Window;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Main {
-    public static String corsProxy = "https://copy-cat-cors.vercel.app/?{}";
-    private static final List<ComputerWrapper> computers = new ArrayList<>();
-    private static long ticks;
+    public static String CORS_PROXY = "https://copy-cat-cors.vercel.app/?{}";
+    public static int computerTermWidth = 51;
+    public static int computerTermHeight = 19;
 
-    private static final ComputerContext context = ComputerContext.builder(GlobalEnvironmentImpl.INSTANCE).build();
-    static int computerTermWidth = 51;
-    static int computerTermHeight = 19;
+    private static long ticks;
 
     public static void main(String[] args) {
         setupConfig();
+
+        var context = ComputerContext.builder(EmulatorEnvironment.INSTANCE).build();
+        List<CopyCatComputer> computers = new ArrayList<>();
+
         Callbacks.setup(access -> {
-            ComputerWrapper wrapper = new ComputerWrapper(context, access);
+            var wrapper = new CopyCatComputer(context, access);
             computers.add(wrapper);
             return wrapper;
         });
 
         Window.setInterval(() -> {
             ticks++;
-            Iterator<ComputerWrapper> iterator = computers.iterator();
+            var iterator = computers.iterator();
             while (iterator.hasNext()) {
-                ComputerWrapper wrapper = iterator.next();
+                var wrapper = iterator.next();
                 if (wrapper.tick()) iterator.remove();
             }
         }, 50);
@@ -97,10 +99,10 @@ public class Main {
             x -> CoreConfig.httpMaxWebsockets = x
         );
 
-        http.addString("http.proxy", "Proxy", corsProxy,
+        http.addString("http.proxy", "Proxy", CORS_PROXY,
             "The proxy to use in order to bypass Cross-Origin protection (aka CORS). This allows you to make requests to " +
                 "any site, but does involve sending all headers to another site first. Set to empty or \"{}\" to disable.",
-            x -> corsProxy = x
+            x -> CORS_PROXY = x
         );
     }
 }

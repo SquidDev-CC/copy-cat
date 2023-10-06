@@ -20,11 +20,12 @@
     "host:min": "python -m http.server -d build/webMin --bind 127.0.0.1 8080"
   },
   "dependencies": {
-    "@squid-dev/cc-web-term": "^1.2.3",
+    "@squid-dev/cc-web-term": "^2.0.0",
     "jszip": "^3.5.0",
     "monaco-editor": "^0.43.0",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
+    "setimmediate": "^1.0.5",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

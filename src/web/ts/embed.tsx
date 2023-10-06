@@ -1,6 +1,6 @@
 import { Component, type VNode, h, render } from "preact";
 import { Semaphore, Terminal, TerminalData } from "@squid-dev/cc-web-term";
-import type { ConfigGroup, PeripheralKind, Side } from "./classes";
+import type { ConfigGroup, PeripheralKind, Side } from "./java";
 import { ComputerAccess, splitName } from "./computer/access";
 import { StoragePersistence, VoidPersistence } from "./computer/persist";
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";

@@ -1,7 +1,16 @@
 import { type ComputerActionable, type KeyCode, type LuaValue, Semaphore, TerminalData, lwjgl3Code } from "@squid-dev/cc-web-term";
-import { type ConfigFactory, type ComputerAccess as IComputerAccess, type FileSystemEntry as IFileSystemEntry, type Result, start } from "../java";
+import {
+  type ComputerDisplay,
+  type ComputerHandle,
+  type ConfigFactory,
+  type FileAttributes,
+  type FileSystemEntry as IFileSystemEntry,
+  type PeripheralKind,
+  type Result,
+  type Side,
+  start
+} from "../java";
 import type { BasicAttributes, ComputerPersistance } from "./persist";
-import type { ComputerCallbacks, FileAttributes, PeripheralKind, Side } from "../classes";
 
 const colours = "0123456789abcdef";
 
@@ -114,7 +123,7 @@ export class FileSystemEntry implements IFileSystemEntry {
   }
 }
 
-export class ComputerAccess implements IComputerAccess, ComputerActionable {
+export class ComputerAccess implements ComputerDisplay, ComputerActionable {
   private readonly persistance: ComputerPersistance;
 
   private readonly terminal: TerminalData;
@@ -124,8 +133,8 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   private label: string | null;
   private readonly filesystem: Map<string, FileSystemEntry> = new Map<string, FileSystemEntry>();
 
-  private handlers?: ComputerCallbacks;
-  private callbacks: Array<(cb: ComputerCallbacks) => void> = [];
+  private computer?: ComputerHandle;
+  private callbacks: Array<(cb: ComputerHandle) => void> = [];
   private removed: boolean = false;
 
   public constructor(
@@ -268,7 +277,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   public start(config: ConfigFactory, options?: { width?: number, height?: number, label?: string }): void {
     start(this, config)
       .then(computer => {
-        this.handlers = computer;
+        this.computer = computer;
         if (this.removed) computer.dispose();
 
         const { width, height, label } = options ?? {};
@@ -283,7 +292,7 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public queueEvent(event: string, args: Array<LuaValue>): void {
-    if (this.handlers !== undefined) this.handlers.event(event, args);
+    this.computer?.event(event, args);
   }
 
   public keyDown(key: KeyCode, repeat: boolean): void {
@@ -297,25 +306,29 @@ export class ComputerAccess implements IComputerAccess, ComputerActionable {
   }
 
   public turnOn(): void {
-    if (this.handlers) this.handlers?.turnOn();
+    this.computer?.turnOn();
   }
 
   public shutdown(): void {
-    if (this.handlers) this.handlers?.shutdown();
+    this.computer?.shutdown();
   }
 
   public reboot(): void {
-    if (this.handlers) this.handlers?.reboot();
+    this.computer?.reboot();
   }
 
   public dispose(): void {
     this.removed = true;
-    if (this.handlers) this.handlers?.dispose();
+    this.computer?.dispose();
+  }
+
+  public transferFiles(files: Array<{ name: string, contents: ArrayBuffer }>): void {
+    this.computer?.transferFiles(files);
   }
 
   public setPeripheral(side: Side, kind: PeripheralKind | null): void {
-    if (this.handlers) {
-      this.handlers.setPeripheral(side, kind);
+    if (this.computer) {
+      this.computer.setPeripheral(side, kind);
     } else {
       this.callbacks.push(handler => handler.setPeripheral(side, kind));
     }
