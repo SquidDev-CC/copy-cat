@@ -1,15 +1,15 @@
+import { createHash } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import { createHash } from "crypto";
 
 import resolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
-import terser from '@rollup/plugin-terser';
-import { minify as minifyJavascript } from "terser";
 import typescript from "@rollup/plugin-typescript";
 import url from "@rollup/plugin-url";
+import { minify as minifyJavascript } from "@swc/core";
 import license from "rollup-plugin-license";
-import postcss from "rollup-plugin-postcss";
+
+import { cssToModule } from "./tools/css-tools.js";
 
 /**
  * @param {string} out
@@ -38,14 +38,9 @@ const makeSite = (out, minify) => ({
       preventAssignment: true,
 
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0",
     }),
 
-    postcss({
-      namedExports: true,
-      modules: true,
-      minimize: minify,
-    }),
     url({
       limit: 1024,
       fileName: "[name]-[hash][extname]",
@@ -53,13 +48,11 @@ const makeSite = (out, minify) => ({
     }),
 
     typescript(),
-    resolve({ browser: true, }),
-
-    minify && terser(),
+    resolve({ browser: true }),
 
     license({
       banner:
-        `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format('YYYY') %>
+        `<%= pkg.name %>: Copyright <%= pkg.author %> <%= moment().format("YYYY") %>
 <% _.forEach(_.sortBy(dependencies, ["name"]), ({ name, author, license }) => { %>
   - <%= name %>: Copyright <%= author ? author.name : "" %> (<%= license %>)<% }) %>
 
@@ -70,6 +63,17 @@ const makeSite = (out, minify) => ({
 
     {
       name: "copy-cat",
+
+      async transform(input, id) {
+        if (id.endsWith(".css")) {
+          return { code: cssToModule(id, input, minify), map: { mappings: "" } };
+        }
+      },
+
+      async renderChunk(code) {
+        return minify ? (await minifyJavascript(code)).code : code;
+      },
+
       async generateBundle(_, bundle) {
         const contents = await fs.readFile("node_modules/requirejs/require.js", { encoding: "utf-8" });
         this.emitFile({
@@ -91,6 +95,7 @@ const makeSite = (out, minify) => ({
           source: (await fs.readFile(`src/web/public/${x}`, { encoding: "utf-8" })).replaceAll("{{version}}", version),
         })));
       },
+
       async resolveId(source) {
         if (source === "cct/classes") return path.resolve("build/teaVM/classes.js");
         if (source === "cct/resources") return path.resolve("build/teaVM/resources.js");
