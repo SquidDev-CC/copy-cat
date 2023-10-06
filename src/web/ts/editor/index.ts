@@ -1,2 +1,3 @@
 export * from "monaco-editor";
-import "../editor/lua";
+import "./lua";
+import "./lua-features";
