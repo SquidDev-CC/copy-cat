@@ -51,12 +51,6 @@ public class Main {
             x -> CoreConfig.maximumFilesOpen = x
         );
 
-        general.addBoolean("disable_lua51_features", "Disable Lua 5.1 features", CoreConfig.disableLua51Features,
-            "Set this to true to disable Lua 5.1 functions that will be removed in a future " +
-                "update. Useful for ensuring forward compatibility of your programs now.",
-            x -> CoreConfig.disableLua51Features = x
-        );
-
         general.addString("default_computer_settings", "Default computer settings", CoreConfig.defaultComputerSettings,
             "A comma separated list of default system settings to set on new computers. Example: " +
                 "\"shell.autocomplete=false,lua.autocomplete=false,edit.autocomplete=false\" will disable all autocompletion",
