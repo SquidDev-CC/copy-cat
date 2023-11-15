@@ -19,7 +19,7 @@ repositories {
             maven("https://squiddev.cc/maven")
         }
         filter {
-            includeGroup("org.squiddev")
+            includeGroup("cc.tweaked")
             includeGroup("org.teavm")
         }
     }
