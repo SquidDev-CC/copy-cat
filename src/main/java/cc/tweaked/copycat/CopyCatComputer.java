@@ -26,6 +26,7 @@ import org.teavm.jso.typedarrays.ArrayBuffer;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHandle, MetricsObserver {
     private static final Logger LOG = LoggerFactory.getLogger(CopyCatComputer.class);
@@ -37,6 +38,9 @@ public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHan
     private final ExtendedComputerDisplay computerAccess;
     private boolean disposed = false;
     private boolean customSize;
+
+    private @Nullable String oldLabel;
+    private boolean oldOn;
 
     public CopyCatComputer(ComputerContext context, ExtendedComputerDisplay computerAccess) {
         this.computerAccess = computerAccess;
@@ -59,8 +63,10 @@ public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHan
             LOG.error("Error when ticking computer", e);
         }
 
-        if (computer.pollAndResetChanged()) {
-            computerAccess.setState(computer.getLabel(), computer.isOn());
+        var newLabel = computer.getLabel();
+        var newOn = computer.isOn();
+        if (!Objects.equals(oldLabel, newLabel) || oldOn != newOn) {
+            computerAccess.setState(oldLabel = newLabel, oldOn = newOn);
         }
 
         if (!customSize && (terminal.getWidth() != Main.computerTermWidth || terminal.getHeight() != Main.computerTermHeight)) {
