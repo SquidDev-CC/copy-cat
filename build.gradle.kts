@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.netty.proxy)
     implementation(libs.netty.socks)
     implementation(libs.slf4j)
+    runtimeOnly(libs.teavm.core) // Contains the TeaVM runtime
 
     implementation(libs.bundles.teavm.api)
 
