@@ -8,21 +8,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: 📥 Clone repository
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
-    - name: Set up Java
-      uses: actions/setup-java@v1
+    - name: 📥 Set up Java
+      uses: actions/setup-java@v4
       with:
         java-version: 17
         distribution: 'temurin'
 
-    - name: Setup node.js
+    - name: 📥 Setup node.js
       run: npm ci
 
-    - name: Build with Gradle
+    - name: ⚒️ Build
       run: ./gradlew assemble
 
-    - name: Lint JS/TS
+    - name: 💡 Lint
       run: npm run --silent lint
+
+    - name: 📤 Upload site
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/webMin
+        retention-days: 1
+
+  deploy:
+    name: Publish
+    needs: build
+    if: ${{ github.ref_name == 'master' }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚀 Deploy
+      id: deployment
+      uses: actions/deploy-pages@v4
