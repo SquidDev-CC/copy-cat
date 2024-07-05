@@ -1,6 +1,6 @@
 import { Semaphore, Terminal, TerminalData, save as saveBlob } from "@squid-dev/cc-web-term";
 import type JSZip from "jszip";
-import { Component, type VNode, h } from "preact";
+import { Component, type VNode } from "preact";
 import newZip from "../files/zip";
 import { Download } from "../font";
 import type { ConfigFactory } from "../java";

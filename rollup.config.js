@@ -11,6 +11,12 @@ import license from "rollup-plugin-license";
 
 import { cssToModule } from "./tools/css-tools.js";
 
+const description = `
+Copy Cat is a web emulator for the popular Minecraft mod CC: Tweaked. Here you
+can play with a ComputerCraft computer, write and test programs and experiment
+to your heart's desire, without having to leave your browser!
+`.replaceAll("\n", " ").trim();
+
 /**
  * @param {string} out
  * @param {boolean} minify
@@ -38,7 +44,7 @@ const makeSite = (out, minify) => ({
       preventAssignment: true,
 
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0",
     }),
 
     url({
@@ -92,7 +98,7 @@ const makeSite = (out, minify) => ({
           type: "asset",
           name: x,
           fileName: x,
-          source: (await fs.readFile(`src/web/public/${x}`, { encoding: "utf-8" })).replaceAll("{{version}}", version),
+          source: (await fs.readFile(`src/web/public/${x}`, { encoding: "utf-8" })).replaceAll("{{version}}", version).replaceAll("{{description}}", description),
         })));
       },
 

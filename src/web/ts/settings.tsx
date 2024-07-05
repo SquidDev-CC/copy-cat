@@ -1,4 +1,4 @@
-import { type JSX, h } from "preact";
+import type { JSX } from "preact";
 import type { ConfigGroup as IConfigGroup } from "./java";
 import * as storage from "./storage";
 import { dialogueBox, formGroup, tinyText } from "./styles.css";

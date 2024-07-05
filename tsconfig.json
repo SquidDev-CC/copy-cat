@@ -11,8 +11,8 @@
     // Additional compile options
     "noEmitOnError": true,
     "preserveWatchOutput": true,
-    "jsx": "react",
-    "jsxFactory": "h",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     // Strict Type-Checking Options
     "strict": true,
     "noUnusedLocals": true,

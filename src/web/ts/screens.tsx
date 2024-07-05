@@ -1,4 +1,4 @@
-import { type VNode, h } from "preact";
+import type { VNode } from "preact";
 import { dialogueBox, errorView, infoDescription } from "./styles.css";
 
 const githubLink =
@@ -29,7 +29,7 @@ export const About = (): VNode<unknown> => <div class={dialogueBox}>
 
   <p>
     However, due to the limitations of Javascript, some functionality may not be 100% accurate (most notably, that to do
-     with HTTP and filesystems). For even closer emulation, I'd recommend <a href="https://emux.cc/" target="_blank"
+    with HTTP and filesystems). For even closer emulation, I'd recommend <a href="https://emux.cc/" target="_blank"
       title="The CCEmuX emulator">CCEmuX</a>.
   </p>
 
@@ -59,7 +59,7 @@ export const About = (): VNode<unknown> => <div class={dialogueBox}>
       : Apache 2.0, Copyright 2001-2018 The Apache Software Foundation
     </li>
     <li>
-      <a href="https://github.com/SquidDev/Cobalt" target="_blank">Cobalt/LuaJ</a>
+      <a href="https://github.com/cc-tweaked/Cobalt" target="_blank">Cobalt/LuaJ</a>
       : MIT, Copyright (c) 2009-2011 Luaj.org. All rights reserved., modifications Copyright (c) 2015-2016 SquidDev
     </li>
     <li>

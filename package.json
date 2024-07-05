@@ -22,7 +22,7 @@
   "dependencies": {
     "@squid-dev/cc-web-term": "^2.0.1",
     "jszip": "^3.5.0",
-    "monaco-editor": "^0.44.0",
+    "monaco-editor": "^0.50.0",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
     "setimmediate": "^1.0.5",
@@ -40,7 +40,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.3.0",
     "lightningcss": "^1.22.0",
-    "rollup": "^3.0.0",
+    "rollup": "^4.0.0",
     "rollup-plugin-license": "^3.0.0",
     "typescript": "^5.0.2"
   }

@@ -1,4 +1,4 @@
-import { Component, type ComponentChild, type VNode, h } from "preact";
+import { Component, type ComponentChild, type VNode } from "preact";
 import { active, fileEntryHead, fileEntryIcon, fileEntryName, fileTree } from "../styles.css";
 import { ComputerAccess, FileSystemEntry, joinName } from "./access";
 import { DownOpen, Lua, RightOpen, Text } from "../font";
@@ -38,7 +38,7 @@ class FileEntry extends Component<FileEntryProperties, FileEntryState> {
   ): VNode {
     return <li>
       <div class={`${fileEntryHead} ${opened === path ? active : ""}`} style={`padding-left: ${depth}em`}
-        onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded}) : () => open(path, entry)}>
+        onClick={entry.isDirectory() ? () => this.setState({ expanded: !expanded }) : () => open(path, entry)}>
         <span class={fileEntryIcon}>
           {getIcon(name, entry.isDirectory(), expanded ?? false)}
         </span>

@@ -1,4 +1,4 @@
-import { Component, type ComponentChild, h } from "preact";
+import { Component, type ComponentChild } from "preact";
 import type { Settings } from "../settings";
 import type * as monaco from "../editor";
 import { editorPlaceholder, editorView } from "../styles.css";

@@ -16,7 +16,7 @@ repositories {
 
     exclusiveContent {
         forRepository {
-            maven("https://squiddev.cc/maven")
+            maven("https://maven.squiddev.cc")
         }
         filter {
             includeGroup("cc.tweaked")

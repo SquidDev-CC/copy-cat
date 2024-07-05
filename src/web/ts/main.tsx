@@ -1,7 +1,7 @@
 import termFont from "@squid-dev/cc-web-term/assets/term_font.png";
 import termFontHd from "@squid-dev/cc-web-term/assets/term_font_hd.png";
 import type * as monaco from "monaco-editor";
-import { Component, type JSX, type VNode, h, render } from "preact";
+import { Component, type JSX, type VNode, render } from "preact";
 import { Computer } from "./computer";
 import { Cog, Info } from "./font";
 import { About } from "./screens";
