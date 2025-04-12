@@ -125,6 +125,10 @@
 
           // Provide a custom label
           label: "My computer",
+
+          // Specify peripherals, as a map of side (front, back, left, right, top, bottom) to peripheral
+          // type. Currently only "speaker" is supported.
+          peripherals: {back: "speaker"},
         });
 
         // See /src/web/ts/computer/access.ts for available methods.
