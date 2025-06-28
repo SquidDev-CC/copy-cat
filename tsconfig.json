@@ -30,6 +30,6 @@
   },
   "include": [
     "src/web",
-    "vendor/CC-Tweaked/projects/web/src/frontend/typings.ts",
+    "vendor/CC-Tweaked/projects/web/src/frontend/typings.d.ts",
    ]
 }
