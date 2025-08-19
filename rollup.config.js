@@ -37,7 +37,7 @@ const makeSite = (out, minify) => ({
     }
   },
   context: "window",
-  external: ["monaco-editor", "require"],
+  external: ["monaco-editor", "require", "jszip"],
 
   plugins: [
     replace({
@@ -81,13 +81,20 @@ const makeSite = (out, minify) => ({
       },
 
       async generateBundle(_, bundle) {
-        const contents = await fs.readFile("node_modules/requirejs/require.js", { encoding: "utf-8" });
-        this.emitFile({
-          type: "asset",
-          name: "require.js",
-          fileName: "require.js",
-          source: minify ? (await minifyJavascript(contents)).code : contents,
-        });
+        for (const [input, output] of [
+          // This is the main entrypoint to our package
+          ["node_modules/requirejs/require.js", "require.js"],
+          // This is already bundled using UMD, so we can't pass it through rollup.
+          ["node_modules/jszip/dist/jszip.js", "jszip.js"],
+        ]) {
+          const contents = await fs.readFile(input, { encoding: "utf-8" });
+          this.emitFile({
+            type: "asset",
+            name: output,
+            fileName: output,
+            source: minify ? (await minifyJavascript(contents)).code : contents,
+          });
+        };
 
         const version = createHash("sha256")
           .update(bundle["main.js"].code)

@@ -76,7 +76,7 @@ export class FileSystemEntry implements IFileSystemEntry {
     return decoder.decode(this.getContents());
   }
 
-  public setContents(contents: ArrayBuffer | string): Result<true> {
+  public setContents(contents: Int8Array | ArrayBuffer | string): Result<true> {
     if (this.children !== null) throw Error("Not a file");
     if (!this.exists) return { error: "File has been deleted", value: null };
     this.attributes.modification = Date.now();
