@@ -44,7 +44,7 @@ const makeSite = (out, minify) => ({
       preventAssignment: true,
 
       __storageBackend__: JSON.stringify(process.env.COPY_CAT_STORAGE || "storage"),
-      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2",
+      __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1",
     }),
 
     url({

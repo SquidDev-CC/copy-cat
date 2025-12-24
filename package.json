@@ -22,7 +22,7 @@
   "dependencies": {
     "@squid-dev/cc-web-term": "^2.0.1",
     "jszip": "^3.5.0",
-    "monaco-editor": "^0.52.0",
+    "monaco-editor": "^0.55.0",
     "preact": "^10.5.7",
     "requirejs": "^2.3.6",
     "setimmediate": "^1.0.5",
