@@ -4,7 +4,6 @@ import cc.tweaked.copycat.js.ExtendedComputerDisplay;
 import cc.tweaked.copycat.js.ExtendedComputerDisplay.Result;
 import cc.tweaked.copycat.js.FileSystemEntry;
 import cc.tweaked.copycat.js.JsFileAttributes;
-import cc.tweaked.copycat.js.MoreJavascriptConv;
 import dan200.computercraft.api.filesystem.FileAttributes;
 import dan200.computercraft.api.filesystem.FileOperationException;
 import dan200.computercraft.api.filesystem.WritableMount;
@@ -200,8 +199,7 @@ public class ComputerAccessMount implements WritableMount {
             if (contents == null) {
                 contentsArray = EMPTY;
             } else {
-                var wrapped = MoreJavascriptConv.ofByteArray(contents);
-                contentsArray = Int8Array.create(wrapped.getBuffer(), wrapped.getByteOffset(), size);
+                contentsArray = Int8Array.copyFromJavaArray(contents);
             }
             Result<JSBoolean> result = entry.setContents(contentsArray);
             contents = null;

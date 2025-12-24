@@ -50,7 +50,7 @@ const makeSite = (out, minify) => ({
     url({
       limit: 1024,
       fileName: "[name]-[hash][extname]",
-      include: ["**/*.worker.js", "**/*.png"],
+      include: ["**/*.worker.js", "**/*.png", "**/*.wasm"],
     }),
 
     typescript(),
@@ -110,8 +110,7 @@ const makeSite = (out, minify) => ({
       },
 
       async resolveId(source) {
-        if (source === "cct/classes") return path.resolve("build/teaVM/classes.js");
-        if (source === "cct/resources") return path.resolve("build/teaVM/resources.js");
+        if (source.startsWith("cct/")) return path.resolve("build/teaVM/" + source.substring(4));
         return null;
       },
     },

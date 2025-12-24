@@ -4,7 +4,7 @@
  */
 declare const __storageBackend__: string;
 
-declare module "cct/classes" {
+declare module "cct/classes.js" {
 
   /**
    * A naive Either type, instead of wrangling JS/Java exceptions.

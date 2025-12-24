@@ -27,7 +27,8 @@
     "requirejs": "^2.3.6",
     "setimmediate": "^1.0.5",
     "style-inject": "^0.3.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "wasm-feature-detect": "^1.8.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",

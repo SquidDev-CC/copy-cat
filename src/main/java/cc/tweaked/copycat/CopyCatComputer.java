@@ -22,7 +22,7 @@ import dan200.computercraft.core.terminal.Terminal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.typedarrays.ArrayBuffer;
+import org.teavm.jso.typedarrays.Int8Array;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -197,7 +197,7 @@ public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHan
         computer.queueEvent(TransferredFiles.EVENT, new Object[]{
             new TransferredFiles(
                 Arrays.stream(files)
-                    .map(x -> new TransferredFile(x.getName(), new ArrayByteChannel(bytesOfBuffer(x.getContents()))))
+                    .map(x -> new TransferredFile(x.getName(), new ArrayByteChannel(new Int8Array(x.getContents()).copyToJavaArray())))
                     .toList(),
                 () -> {
                 }),
@@ -209,8 +209,4 @@ public class CopyCatComputer implements ComputerEnvironment, ExtendedComputerHan
         throw new UnsupportedOperationException("Use mount methods instead");
     }
 
-    private byte[] bytesOfBuffer(ArrayBuffer buffer) {
-        var oldBytes = JavascriptConv.asByteArray(buffer);
-        return Arrays.copyOf(oldBytes, oldBytes.length);
-    }
 }
