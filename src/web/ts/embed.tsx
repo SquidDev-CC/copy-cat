@@ -15,9 +15,7 @@ type MainProps = {
   width?: number,
   height?: number,
   resolve?: (computer: ComputerAccess) => void,
-  peripherals?: {
-    [side in Side]?: PeripheralKind | null
-  },
+  peripherals?: Partial<Record<Side, PeripheralKind | null>>,
 }
 
 type MainState = {

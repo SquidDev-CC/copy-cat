@@ -20,7 +20,6 @@ repositories {
         }
         filter {
             includeGroup("cc.tweaked")
-            includeGroup("org.teavm")
         }
     }
 }

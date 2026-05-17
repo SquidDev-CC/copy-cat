@@ -96,7 +96,7 @@ export class StoragePersistence implements ComputerPersistance {
 
     try {
       return JSON.parse(children) as Array<string>;
-    } catch (e) {
+    } catch (_) {
       console.error(`Error loading path "${path}"`);
       return null;
     }
@@ -116,7 +116,7 @@ export class StoragePersistence implements ComputerPersistance {
 
     try {
       return JSON.parse(attributes) as BasicAttributes;
-    } catch (e) {
+    } catch (_) {
       console.error(`Error loading attributes for "${path}"`);
       return null;
     }

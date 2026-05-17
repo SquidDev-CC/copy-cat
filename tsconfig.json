@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "module": "esNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "target": "es6",
-    "lib": ["es2015", "dom" ],
+    "lib": ["es2015", "dom"],
     "newLine": "LF",
-    "baseUrl": ".",
-    "types": [ "requirejs" ],
+    "types": ["requirejs"],
 
     // Additional compile options
     "noEmitOnError": true,
@@ -24,8 +23,8 @@
     "forceConsistentCasingInFileNames": true,
 
     "paths": {
-      "jszip": [ "src/web/typings/jszip.d.ts" ],
-      "require": [ "src/web/typings/require.d.ts" ],
+      "jszip": [ "./src/web/typings/jszip.d.ts" ],
+      "require": [ "./src/web/typings/require.d.ts" ],
     }
   },
   "include": [

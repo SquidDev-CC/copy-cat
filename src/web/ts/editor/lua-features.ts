@@ -54,7 +54,7 @@ languages.registerHoverProvider("luax", {
     if (!definitionName) return;
 
     const item = await findDocumentedTerm(definitionName);
-    if (!item || item["module-kind"] != "module") return null;
+    if (item?.["module-kind"] != "module") return null;
 
     const contents: Array<IMarkdownString> = [
       { value: `\`${item.name}\`` }

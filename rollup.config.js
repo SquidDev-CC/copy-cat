@@ -98,7 +98,7 @@ const makeSite = (out, minify) => ({
 
         const version = createHash("sha256")
           .update(bundle["main.js"].code)
-          .update(await fs.readFile(`src/web/public/main.css`))
+          .update(await fs.readFile("src/web/public/main.css"))
           .digest("hex").slice(0, 8);
 
         await Promise.all(["index.html", "404.html", "main.css"].map(async x => this.emitFile({

@@ -47,7 +47,7 @@ export type ConfigProperty
  * The persisted map for settings
  */
 export class SettingStore {
-  private data: Record<string, unknown> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+  private data: Record<string, unknown> = {};  
 
   public constructor() {
     const settingJson = storage.get("settings");

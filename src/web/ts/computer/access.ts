@@ -235,7 +235,7 @@ export class ComputerAccess implements ComputerDisplay, ComputerActionable {
     if (!entry) {
       const [parentName, fileName] = splitName(path);
       const parent = this.filesystem.get(parentName);
-      if (parent == null || !parent.isDirectory()) return { error: `/${path}: Access denied`, value: null };
+      if (!parent?.isDirectory()) return { error: `/${path}: Access denied`, value: null };
 
       const file = FileSystemEntry.create(this.persistance, path, false);
       parent.setChildren([...parent.getChildren(), fileName]);

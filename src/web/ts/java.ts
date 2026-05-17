@@ -6,26 +6,27 @@ export type {
 } from "cct/classes.js";
 import { load as teaVMLoad } from "cct/wasm-gc-runtime.js";
 import { exceptions, gc } from "wasm-feature-detect";
+import debug from "./log";
 import wasmClasses from "cct/classes.wasm";
 
 export type ConfigFactory = (name: string, description: string | null) => ConfigGroup;
 
-const loadClasses = async (): Promise<{ main: (args: string[]) => void }> => {
-    if (
-        typeof WebAssembly === "object" && typeof WebAssembly.compileStreaming === "function" &&
+const loadClasses = async (): Promise<{ main: (args: Array<string>) => void }> => {
+  if (
+    typeof WebAssembly === "object" && typeof WebAssembly.compileStreaming === "function" &&
         await exceptions() && await gc()
-    ) {
-        try {
-            console.log("Loading WASM runtime");
-            return (await teaVMLoad(wasmClasses)).exports;
-        } catch (e) {
-            console.error("Failed to load WebAssembly runtime", e);
-        }
+  ) {
+    try {
+      debug("Loading WASM runtime");
+      return (await teaVMLoad(wasmClasses)).exports;
+    } catch (e) {
+      console.error("Failed to load WebAssembly runtime", e);
     }
+  }
 
-    console.log("Using JS runtime");
-    return await import("cct/classes.js");
-}
+  debug("Using JS runtime");
+  return await import("cct/classes.js");
+};
 
 let loaded = false;
 let doAddComputer: ((computer: ComputerDisplay) => ComputerHandle) | null = null;

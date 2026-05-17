@@ -1,5 +1,5 @@
 import { transform } from "lightningcss";
-import { createRequire } from 'node:module';
+import { createRequire } from "node:module";
 
 const styleInject = JSON.stringify(createRequire(import.meta.url).resolve("style-inject/dist/style-inject.es.js"));
 
@@ -40,7 +40,7 @@ export const cssToModule = (filename, input, minify) => {
   output += `import styleInject from ${styleInject};\nstyleInject(${JSON.stringify(new TextDecoder().decode(code))})`;
 
   return output;
-}
+};
 
 /**
  * Get a list of CSS classes in a file.
