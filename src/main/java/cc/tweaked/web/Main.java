@@ -3,8 +3,13 @@ package cc.tweaked.web;
 import cc.tweaked.copycat.CopyCatComputer;
 import cc.tweaked.copycat.js.Callbacks;
 import cc.tweaked.copycat.js.ConfigGroup;
+import cc.tweaked.web.http.JsHttpHandler;
+import cc.tweaked.web.methods.StaticLuaMethodSupplier;
+import cc.tweaked.web.methods.StaticPeripheralMethodSupplier;
 import dan200.computercraft.core.ComputerContext;
 import dan200.computercraft.core.CoreConfig;
+import dan200.computercraft.core.computer.mainthread.NoWorkMainThreadScheduler;
+import dan200.computercraft.core.lua.CobaltLuaMachine;
 import org.teavm.jso.browser.Window;
 
 import java.util.ArrayList;
@@ -14,13 +19,23 @@ public class Main {
     public static String CORS_PROXY = "https://copy-cat-cors.vercel.app/?{}";
     public static int computerTermWidth = 51;
     public static int computerTermHeight = 19;
+    private static boolean httpEnabled = true;
 
     private static long ticks;
 
     public static void main(String[] args) {
         setupConfig();
 
-        var context = ComputerContext.builder(EmulatorEnvironment.INSTANCE).build();
+        @SuppressWarnings("deprecation") // Intentional.
+        var context = new ComputerContext(
+            EmulatorEnvironment.INSTANCE,
+            JsComputerScheduler.INSTANCE,
+            new NoWorkMainThreadScheduler(),
+            CobaltLuaMachine::new,
+            StaticLuaMethodSupplier.INSTANCE,
+            StaticPeripheralMethodSupplier.INSTANCE,
+            c -> httpEnabled ? new JsHttpHandler(c) : null
+        );
         List<CopyCatComputer> computers = new ArrayList<>();
 
         Callbacks.setup(access -> {
@@ -71,26 +86,14 @@ public class Main {
 
         ConfigGroup http = Callbacks.config("HTTP API", "Controls the HTTP API");
 
-        http.addBoolean("http.enabled", "Enabled", CoreConfig.httpEnabled,
-            "Enable the \"http\" API on Computers (see \"http_whitelist\" and \"http_blacklist\" for " +
-                "more fine grained control than this)",
-            x -> CoreConfig.httpEnabled = x
+        http.addBoolean("http.enabled", "Enabled", httpEnabled,
+            "Enable the \"http\" API on Computers",
+            x -> httpEnabled = x
         );
 
         http.addBoolean("http.websocket_enabled", "Websocket enabled", CoreConfig.httpWebsocketEnabled,
             "Enable use of http websockets. This requires the \"http_enable\" option to also be true.",
             x -> CoreConfig.httpWebsocketEnabled = x
-        );
-
-        http.addInt("http.max_requests", "Maximum concurrent requests", CoreConfig.httpMaxRequests, 0, Integer.MAX_VALUE,
-            "The number of http requests a computer can make at one time. Additional requests " +
-                "will be queued, and sent when the running requests have finished. Set to 0 for unlimited.",
-            x -> CoreConfig.httpMaxRequests = x
-        );
-
-        http.addInt("http.max_websockets", "Maximum concurrent websockets", CoreConfig.httpMaxWebsockets, 1, Integer.MAX_VALUE,
-            "The number of websockets a computer can have open at one time. Set to 0 for unlimited.",
-            x -> CoreConfig.httpMaxWebsockets = x
         );
 
         http.addString("http.proxy", "Proxy", CORS_PROXY,
